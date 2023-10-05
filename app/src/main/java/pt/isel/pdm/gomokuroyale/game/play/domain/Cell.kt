@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.model
+package pt.isel.pdm.gomokuroyale.game.play.domain
 
 /**
   * Class Cell represents a cell in the board.
@@ -16,8 +16,8 @@ value class Cell private constructor(private val index: Int) {
     val row get() = Row.values[rowIndex]
     val col get() = Column.values[colIndex]
 
-    val backSlash get() = row.index == col.index            // Is in principal diagonal?
-    val slash get() = row.index + col.index == BOARD_DIM - 1   // Is in secondary diagonal?
+    val backSlash get() = rowIndex == colIndex           // Is in principal diagonal?
+    val slash get() = rowIndex + colIndex == BOARD_DIM - 1   // Is in secondary diagonal?
 
     override fun toString(): String =
         if (this == INVALID) "INVALID Cell" else "${row.number}${col.symbol}"

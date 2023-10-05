@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.ui
+package pt.isel.pdm.gomokuroyale.ui.about
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

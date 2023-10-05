@@ -1,6 +1,6 @@
-package pt.isel.pdm.gomokuroyale.model
+package pt.isel.pdm.gomokuroyale.game.play.domain
 
-import pt.isel.pdm.gomokuroyale.ui.BOARD_DIM
+import pt.isel.pdm.gomokuroyale.game.play.ui.BOARD_DIM
 
 /**
     * Class Row represents a row in the board.

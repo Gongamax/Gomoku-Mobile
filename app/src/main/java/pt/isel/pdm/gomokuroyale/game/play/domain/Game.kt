@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.model
+package pt.isel.pdm.gomokuroyale.game.play.domain
 
 import android.util.Log
 

@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.model
+package pt.isel.pdm.gomokuroyale.game.play.domain
 
 /**
  * Represents a player in the game.
@@ -7,7 +7,7 @@ package pt.isel.pdm.gomokuroyale.model
 enum class Player(val symbol : Char)  {
     BLACK('#'),
     WHITE('@');
-    fun other() = if (this==BLACK) WHITE else BLACK
+    fun other() = if (this== BLACK) WHITE else BLACK
 }
 
 /**
