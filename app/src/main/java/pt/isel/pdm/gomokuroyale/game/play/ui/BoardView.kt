@@ -3,6 +3,7 @@ package pt.isel.pdm.gomokuroyale.game.play.ui
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,9 +36,9 @@ import pt.isel.pdm.gomokuroyale.game.play.domain.BoardRun
 import pt.isel.pdm.gomokuroyale.game.play.domain.Cell
 import pt.isel.pdm.gomokuroyale.game.play.domain.Player
 
-const val BOARD_DIM = 15
+const val BOARD_DIM = 17
 
-val cellSize = 24.dp
+val cellSize = 20.dp
 
 //val lineSize = 0.5.dp //Atualmente não está a ser usado LineSize
 val boardSize = cellSize * BOARD_DIM //+ (cellSize/2) * (BOARD_DIM)
@@ -51,30 +52,51 @@ const val BROWN_COLOR_CODE = 0xFF8B4513
 fun BoardView(
     board: Board?,
     onClick: (Cell) -> Unit
-) {
+){
     if (board == null) Log.v("View", "The Board is null")
     else
-        Column(
-            modifier = Modifier
-                .width(boardSize)
-                .padding(cellSize / 2)
-                .testTag("Board"),
-            verticalArrangement = Arrangement.SpaceBetween,
-        ) {
-            repeat(BOARD_DIM) { row ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    repeat(BOARD_DIM) { col ->
-                        val pos = Cell(row, col)
-                        CellView(board.moves[pos]) { onClick(pos);
-                            Log.v("Piece", "(${pos.row.index}, ${pos.col.index})") }
+        Box(Modifier.border(width = 5.dp, color = Color.Cyan,)) {
+            Column(
+                modifier = Modifier
+                    .width(boardSize)
+                    .testTag("Board"),
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
+                repeat(BOARD_DIM) { row ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        repeat(BOARD_DIM) { col ->
+                            if (row == 0) {
+                                when (col) {
+                                    0 -> Border(resourceId = R.drawable.top_left_corner_border)
+                                    BOARD_DIM - 1 -> Border(resourceId = R.drawable.top_right_corner_border)
+                                    else -> Border(resourceId = R.drawable.top_border)
+                                }
+                            } else if (row == BOARD_DIM - 1) {
+                                when (col) {
+                                    0 -> Border(resourceId = R.drawable.bottom_left_corner_border)
+                                    BOARD_DIM - 1 -> Border(resourceId = R.drawable.bottom_right_corner_border)
+                                    else -> Border(resourceId = R.drawable.bottom_border)
+                                }
+                            } else if (col == BOARD_DIM - 1)
+                                Border(resourceId = R.drawable.right_border)
+                            else if (col == 0) {
+                                Border(resourceId = R.drawable.left_border)
+                            } else {
+                                val pos = Cell(row - 1, col - 1)
+                                CellView(board.moves[pos]) {
+                                    onClick(pos);
+                                    Log.v("Piece", "(${pos.row.index}, ${pos.col.index})")
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
-}
+    }
 
 @Composable
 fun CellView(player: Player?, onClick: () -> Unit) {
@@ -113,6 +135,20 @@ fun CellView(player: Player?, onClick: () -> Unit) {
                 fill = 1f
             }
         }
+}
+
+@Composable
+fun Border(resourceId : Int){
+    Box(
+        modifier = Modifier
+            .size(cellSize)
+            .background(Color(BROWN_COLOR_CODE))
+    ) {
+        Image(
+            painter = painterResource(id = resourceId),
+            contentDescription = "top"
+        )
+    }
 }
 
 @Composable

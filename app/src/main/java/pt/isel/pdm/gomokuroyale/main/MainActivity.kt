@@ -17,6 +17,7 @@ class MainActivity : ComponentActivity() {
             GomokuRoyaleTheme {
                 val vm = viewModel<GomokuViewModel>(
                     factory = object : ViewModelProvider.Factory {
+                        
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             return GomokuViewModel() as T
                         }
