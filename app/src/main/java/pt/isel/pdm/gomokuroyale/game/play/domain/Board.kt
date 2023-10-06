@@ -12,7 +12,7 @@ typealias Moves = Map<Cell, Player>
  * Represents a board of the game.
  * @property moves the map of the moves of the game.
  * @constructor Creates a board with the given [moves] that is map from [Cell] to [Player] ([Moves]).
- * There are four possible states of board: [BoardRun], [BoardWin], [BoardDraw] and [BoardPass].
+ * There are four possible states of board: [BoardRun], [BoardWin] and [BoardDraw]
  * These hierarchies are to be used by pattern matching.
  */
 sealed class Board(val moves: Moves) {
@@ -34,7 +34,6 @@ sealed class Board(val moves: Moves) {
 open class BoardRun(moves: Moves, val turn: Player) : Board(moves)
 class BoardWin(moves: Moves, val winner: Player) : Board(moves)
 class BoardDraw(moves: Moves) : Board(moves)
-class BoardPass(moves: Moves, turn: Player) : BoardRun(moves, turn)
 
 fun createBoard(first: Player) = BoardRun(emptyMap(), first)
 
@@ -64,14 +63,42 @@ fun Board.play(cell: Cell): Board {
  * Checks if the move in [cell] position is a winning move.
  */
 private fun BoardRun.isWin(cell: Cell) =
-    moves.size >= WIN_LENGTH  * 2 - 2 &&
+    moves.size >= WIN_LENGTH * 2 - 2 &&
             (moves.filter { it.value == turn }.keys + cell).run {
-                count { it.row == cell.row } == WIN_LENGTH  ||
-                        count { it.col == cell.col } == WIN_LENGTH  ||
-                        count { it.slash } == WIN_LENGTH  || count { it.backSlash } == WIN_LENGTH
+                count { it.row == cell.row } == WIN_LENGTH ||
+                        isDiagonalWin(cell)
             }
 
 /**
  * Checks if the state of the board will end the game as a Draw.
  */
-private fun BoardRun.isDraw() =  moves.size == MAX_MOVES
+private fun BoardRun.isDraw() = moves.size == MAX_MOVES
+
+//Auxiliary functions for isWin
+
+private val diagonals = listOf<Direction>(
+    Direction.DOWN_LEFT,
+    Direction.DOWN_RIGHT,
+    Direction.UP_LEFT,
+    Direction.UP_RIGHT
+)
+
+private fun BoardRun.isDiagonalWin(cell: Cell): Boolean {
+    val backSlash = mutableListOf(cell)
+    val slash = mutableListOf(cell)
+    val addToDiagonals = { dir: Direction, cells: List<Cell> ->
+        when (dir) {
+            Direction.DOWN_LEFT, Direction.UP_LEFT -> backSlash += cells
+            Direction.DOWN_RIGHT, Direction.UP_RIGHT -> slash += cells
+            else -> {}
+        }
+    }
+    diagonals.forEach { dir ->
+        val cells = cellsInDirection(cell, dir).takeWhile { it in moves && moves[it] == turn }
+        addToDiagonals(dir, cells)
+        if (backSlash.size >= WIN_LENGTH || slash.size >= WIN_LENGTH)
+            return true
+    }
+    return false
+}
+

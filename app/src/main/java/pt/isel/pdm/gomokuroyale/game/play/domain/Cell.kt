@@ -16,9 +16,6 @@ value class Cell private constructor(private val index: Int) {
     val row get() = Row.values[rowIndex]
     val col get() = Column.values[colIndex]
 
-    val backSlash get() = rowIndex == colIndex           // Is in principal diagonal?
-    val slash get() = rowIndex + colIndex == BOARD_DIM - 1   // Is in secondary diagonal?
-
     override fun toString(): String =
         if (this == INVALID) "INVALID Cell" else "${row.number}${col.symbol}"
 
