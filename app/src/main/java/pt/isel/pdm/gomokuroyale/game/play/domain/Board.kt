@@ -65,41 +65,29 @@ fun Board.play(cell: Cell): Board {
 private fun BoardRun.isWin(cell: Cell) =
     moves.size >= WIN_LENGTH * 2 - 2 &&
             (moves.filter { it.value == turn }.keys + cell).run {
-                count { it.row == cell.row } == WIN_LENGTH ||
-                        count { it.col == cell.col } == WIN_LENGTH ||
-                        isDiagonalWin(cell)
+                any { winningCell ->
+                    directions.any { (forwardDir, backwardDir) ->
+                        val forwardCells = cellsInDirection(winningCell, forwardDir)
+                            .takeWhile { it in this }
+                        val backwardCells = cellsInDirection(winningCell, backwardDir)
+                            .takeWhile { it in this }
+
+                        val consecutiveCells = (backwardCells + listOf(winningCell) + forwardCells)
+
+                        consecutiveCells.size >= WIN_LENGTH
+                    }
+                }
             }
+
+
+private val directions = listOf(
+    Pair(Direction.DOWN_LEFT, Direction.UP_RIGHT),
+    Pair(Direction.DOWN_RIGHT, Direction.UP_LEFT),
+    Pair(Direction.UP, Direction.DOWN),
+    Pair(Direction.LEFT, Direction.RIGHT)
+)
 
 /**
  * Checks if the state of the board will end the game as a Draw.
  */
 private fun BoardRun.isDraw() = moves.size == MAX_MOVES
-
-//Auxiliary functions for isWin
-
-private val diagonals = listOf<Direction>(
-    Direction.DOWN_LEFT,
-    Direction.DOWN_RIGHT,
-    Direction.UP_LEFT,
-    Direction.UP_RIGHT
-)
-
-private fun BoardRun.isDiagonalWin(cell: Cell): Boolean {
-    val backSlash = mutableListOf(cell)
-    val slash = mutableListOf(cell)
-    val addToDiagonals = { dir: Direction, cells: List<Cell> ->
-        when (dir) {
-            Direction.DOWN_LEFT, Direction.UP_LEFT -> backSlash += cells
-            Direction.DOWN_RIGHT, Direction.UP_RIGHT -> slash += cells
-            else -> {}
-        }
-    }
-    diagonals.forEach { dir ->
-        val cells = cellsInDirection(cell, dir).takeWhile { it in moves && moves[it] == turn }
-        addToDiagonals(dir, cells)
-        if (backSlash.size >= WIN_LENGTH || slash.size >= WIN_LENGTH)
-            return true
-    }
-    return false
-}
-
