@@ -66,6 +66,7 @@ private fun BoardRun.isWin(cell: Cell) =
     moves.size >= WIN_LENGTH * 2 - 2 &&
             (moves.filter { it.value == turn }.keys + cell).run {
                 count { it.row == cell.row } == WIN_LENGTH ||
+                        count { it.col == cell.col } == WIN_LENGTH ||
                         isDiagonalWin(cell)
             }
 

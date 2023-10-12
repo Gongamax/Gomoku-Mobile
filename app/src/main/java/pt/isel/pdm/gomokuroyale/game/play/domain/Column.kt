@@ -14,7 +14,7 @@ import pt.isel.pdm.gomokuroyale.game.play.ui.BOARD_DIM
 value class Column private constructor (val symbol: Char) {
     val index: Int get() = symbol - 'A'
     override fun toString() = "Column $symbol"
-    operator fun plus(offset: Int): Column = Column((this.index + offset + 'a'.toInt()).toChar())
+    operator fun plus(offset: Int): Column = Column((this.index + offset + 'a'.code).toChar())
 
     companion object {
         val values = List(BOARD_DIM) { Column('A' + it) }
