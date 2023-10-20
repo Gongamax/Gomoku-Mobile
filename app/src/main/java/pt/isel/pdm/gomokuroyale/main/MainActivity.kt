@@ -2,33 +2,27 @@ package pt.isel.pdm.gomokuroyale.main
 
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
-import pt.isel.pdm.gomokuroyale.game.play.ui.GomokuViewModel
+import androidx.activity.ComponentActivity
+import pt.isel.pdm.gomokuroyale.game.play.ui.GameActivity
 import pt.isel.pdm.gomokuroyale.ui.about.AboutActivity
-import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
+import pt.isel.pdm.gomokuroyale.ui.rankings.RankingActivity
 
 const val TAG = "GOMOKU_ROYALE_TAG"
 
 class MainActivity : ComponentActivity() {
+
+//    private val service = GomokuService()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.v(TAG, "onCreate() called")
         setContent {
-            GomokuRoyaleTheme {
-                val vm = viewModel<GomokuViewModel>(
-                    factory = object : ViewModelProvider.Factory {
-                        
-                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                            return GomokuViewModel() as T
-                        }
-                    }
-                )
-                MainScreen(vm, onInfoRequested = { AboutActivity.navigateTo(this) })
-            }
+            MainScreen(
+                onCreateGameRequested = { GameActivity.navigateTo(this) },
+                onInfoRequested = { AboutActivity.navigateTo(this) },
+                onRankingRequested = { RankingActivity.navigateTo(this) }
+            )
         }
     }
 

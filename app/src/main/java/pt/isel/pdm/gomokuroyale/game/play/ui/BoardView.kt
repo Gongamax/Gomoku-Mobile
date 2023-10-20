@@ -45,6 +45,8 @@ val boardSize = cellSize * BOARD_DIM //+ (cellSize/2) * (BOARD_DIM)
 
 const val BROWN_COLOR_CODE = 0xFF8B4513
 
+const val PIECE_TEST_TAG = "PIECE"
+
 /**
  * Board still needs some adjustments in design, but almost there!
  */
@@ -52,10 +54,10 @@ const val BROWN_COLOR_CODE = 0xFF8B4513
 fun BoardView(
     board: Board?,
     onClick: (Cell) -> Unit
-){
+) {
     if (board == null) Log.v("View", "The Board is null")
     else
-        Box(Modifier.border(width = 5.dp, color = Color.Cyan,)) {
+        Box(Modifier.border(width = 5.dp, color = Color.Cyan)) {
             Column(
                 modifier = Modifier
                     .width(boardSize)
@@ -86,29 +88,36 @@ fun BoardView(
                                 Border(resourceId = R.drawable.left_border)
                             } else {
                                 val pos = Cell(row - 1, col - 1)
-                                CellView(board.moves[pos]) {
-                                    onClick(pos);
-                                    Log.v("Piece", "(${pos.row.index}, ${pos.col.index})")
-                                }
+                                CellView(
+                                    player = board.moves[pos],
+                                    onClick = {
+                                        onClick(pos); Log.v(
+                                        "Piece",
+                                        "(${pos.row.index}, ${pos.col.index})"
+                                    )
+                                    }
+                                )
                             }
                         }
                     }
                 }
             }
         }
-    }
+}
 
 @Composable
 fun CellView(player: Player?, onClick: () -> Unit) {
     val mod = Modifier
         .size(cellSize)
         .background(Color(BROWN_COLOR_CODE))
+        .testTag(PIECE_TEST_TAG)
     if (player == null)
         Box(
             modifier = mod
                 .clip(CircleShape)
-                .clickable(onClick = onClick)
+                .clickable { onClick() }
         ) {
+            Log.v("Piece", "Inside if on CellView")
             val resourceId = R.drawable.cross
             Image(painter = painterResource(id = resourceId), contentDescription = "Cross")
         }
@@ -135,10 +144,11 @@ fun CellView(player: Player?, onClick: () -> Unit) {
                 fill = 1f
             }
         }
+
 }
 
 @Composable
-fun Border(resourceId : Int){
+fun Border(resourceId: Int) {
     Box(
         modifier = Modifier
             .size(cellSize)

@@ -75,15 +75,17 @@ fun ButtonComponent(iconResourceId: Int, text: String, onClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(
-    onBackRequested: () -> Unit = { }, board: Board?,
-    onClick: (Cell) -> Unit = {}
+    board : Board,
+    onPlayRequested: (Cell) -> Unit = {},
+    onForfeitRequested: () -> Unit = {},
+    onHelpRequested: () -> Unit = {}
 ) {
     GomokuRoyaleTheme {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
                 .testTag(GameScreenTestTag),
-            topBar = { TopBar(NavigationHandlers(onBackRequested = onBackRequested)) },
+            topBar = { TopBar() },
         ) { innerPadding ->
             Box(
                 modifier = Modifier
@@ -118,8 +120,9 @@ fun GameScreen(
                         Text("Player WHITE : 0", fontSize = 16.sp)
                         Text("Player BLACK : 0", fontSize = 16.sp)
                     }
-                    BoardView(BoardRun(emptyMap(), Player.BLACK), onClick = {})
-
+                    BoardView(
+                        board = board
+                    ) { at -> onPlayRequested(at) }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -128,11 +131,13 @@ fun GameScreen(
                         ButtonComponent(
                             iconResourceId = R.drawable.ic_exit,
                             text = "Exit",
-                            onClick = {})
+                            onClick = onForfeitRequested
+                        )
                         ButtonComponent(
                             iconResourceId = R.drawable.ic_robot,
                             text = "Help",
-                            onClick = {})
+                            onClick = onHelpRequested
+                        )
                     }
                 }
             }
@@ -143,5 +148,5 @@ fun GameScreen(
 @Preview(showBackground = true)
 @Composable
 fun GameScreenPreview() {
-    GameScreen({},BoardRun(emptyMap(), Player.BLACK), onClick = {})
+    GameScreen(BoardRun(emptyMap(), Player.BLACK))
 }
