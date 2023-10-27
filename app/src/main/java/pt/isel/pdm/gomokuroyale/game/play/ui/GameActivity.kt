@@ -9,7 +9,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
-import pt.isel.pdm.gomokuroyale.ui.about.AboutActivity
 
 class GameActivity : ComponentActivity() {
 

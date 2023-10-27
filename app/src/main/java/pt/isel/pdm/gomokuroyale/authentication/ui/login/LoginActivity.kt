@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.ui.accreditations
+package pt.isel.pdm.gomokuroyale.authentication.ui.login
 
 import android.app.Activity
 import android.content.Intent
@@ -19,8 +19,9 @@ class LoginActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent{
-
+            LoginScreen(onBackRequested = { finish() })
         }
     }
+
 
 }

@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.ui.rankings
+package pt.isel.pdm.gomokuroyale.rankings.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,9 +39,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
-import pt.isel.pdm.gomokuroyale.ui.about.AboutScreenTestTag
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 import pt.isel.pdm.gomokuroyale.R
+import pt.isel.pdm.gomokuroyale.about.ui.AboutScreenTestTag
 
 const val MAX_RANKING_NUMBER = 10
 data class PlayerInfo(val userName: String, val points: Int)

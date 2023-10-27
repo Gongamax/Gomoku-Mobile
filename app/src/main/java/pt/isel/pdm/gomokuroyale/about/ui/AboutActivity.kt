@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.ui.about
+package pt.isel.pdm.gomokuroyale.about.ui
 
 import android.app.Activity
 import android.content.ActivityNotFoundException

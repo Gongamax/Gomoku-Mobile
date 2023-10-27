@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.ComponentActivity
 import pt.isel.pdm.gomokuroyale.game.play.ui.GameActivity
-import pt.isel.pdm.gomokuroyale.ui.about.AboutActivity
-import pt.isel.pdm.gomokuroyale.ui.rankings.RankingActivity
+import pt.isel.pdm.gomokuroyale.about.ui.AboutActivity
+import pt.isel.pdm.gomokuroyale.rankings.ui.RankingActivity
 
 const val TAG = "GOMOKU_ROYALE_TAG"
 

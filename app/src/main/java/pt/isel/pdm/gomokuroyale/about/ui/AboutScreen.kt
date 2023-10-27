@@ -1,4 +1,5 @@
-package pt.isel.pdm.gomokuroyale.ui.about
+package pt.isel.pdm.gomokuroyale.about.ui
+
 
 import android.net.Uri
 import androidx.annotation.DrawableRes
@@ -28,7 +29,6 @@ import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
-import kotlin.math.min
 
 
 data class SocialInfo(val link: Uri, @DrawableRes val imageId: Int)
@@ -128,10 +128,10 @@ private val authorsList: List<AuthorInfo> = listOf(
         email = "a49495@alunos.isel.pt",
         image = R.drawable.ic_frutuoso,
         socials = listOf(
-                    SocialInfo(
-            link = Uri.parse("https://www.linkedin.com/in/gonçalo-frutuoso/"),
-            imageId = R.drawable.ic_linkedin
-        ),
+            SocialInfo(
+                link = Uri.parse("https://www.linkedin.com/in/gonçalo-frutuoso/"),
+                imageId = R.drawable.ic_linkedin
+            ),
             SocialInfo(
                 link = Uri.parse("https://github.com/Gongamax"),
                 imageId = R.drawable.ic_github
@@ -144,10 +144,10 @@ private val authorsList: List<AuthorInfo> = listOf(
         email = "49462@alunos.isel.pt",
         image = R.drawable.ic_saraiva,
         socials = listOf(
-                    SocialInfo(
-            link = Uri.parse("https://www.linkedin.com/in/francisco-saraiva-507119236/"),
-            imageId = R.drawable.ic_linkedin
-        ),
+            SocialInfo(
+                link = Uri.parse("https://www.linkedin.com/in/francisco-saraiva-507119236/"),
+                imageId = R.drawable.ic_linkedin
+            ),
             SocialInfo(
                 link = Uri.parse("https://github.com/saraiva22"),
                 imageId = R.drawable.ic_github
@@ -160,10 +160,10 @@ private val authorsList: List<AuthorInfo> = listOf(
         email = "49419@alunos.isel.pt",
         image = R.drawable.ic_carvalho,
         socials = listOf(
-                    SocialInfo(
-            link = Uri.parse("https://www.linkedin.com/in/daniel-martinho-de-carvalho-3b0619207/"),
-            imageId = R.drawable.ic_linkedin
-        ),
+            SocialInfo(
+                link = Uri.parse("https://www.linkedin.com/in/daniel-martinho-de-carvalho-3b0619207/"),
+                imageId = R.drawable.ic_linkedin
+            ),
             SocialInfo(
                 link = Uri.parse("https://github.com/DanielMartinhoCarvalho"),
                 imageId = R.drawable.ic_github

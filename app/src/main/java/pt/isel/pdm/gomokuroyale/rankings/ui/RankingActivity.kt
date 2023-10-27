@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.ui.rankings
+package pt.isel.pdm.gomokuroyale.rankings.ui
 
 import android.app.Activity
 import android.content.Intent
