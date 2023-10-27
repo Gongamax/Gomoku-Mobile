@@ -24,13 +24,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.about.AboutActivity"
+            android:name=".about.ui.AboutActivity"
             android:exported="false" />
         <activity
             android:name=".game.play.ui.GameActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.rankings.RankingActivity"
+            android:name=".rankings.ui.RankingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".authentication.ui.login.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".authentication.ui.register.RegisterActivity"
             android:exported="false" />
     </application>
 
