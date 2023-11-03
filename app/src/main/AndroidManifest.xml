@@ -25,6 +25,7 @@
         </activity>
         <activity
             android:name=".about.ui.AboutActivity"
+            android:noHistory="true"
             android:exported="false" />
         <activity
             android:name=".game.play.ui.GameActivity"
@@ -34,9 +35,11 @@
             android:exported="false" />
         <activity
             android:name=".authentication.ui.login.LoginActivity"
+            android:noHistory="true"
             android:exported="false" />
         <activity
             android:name=".authentication.ui.register.RegisterActivity"
+            android:noHistory="true"
             android:exported="false" />
     </application>
 
