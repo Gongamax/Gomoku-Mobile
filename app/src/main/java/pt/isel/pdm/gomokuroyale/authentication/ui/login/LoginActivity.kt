@@ -15,13 +15,10 @@ class LoginActivity : ComponentActivity(){
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent{
             LoginScreen(onBackRequested = { finish() })
         }
     }
-
-
 }

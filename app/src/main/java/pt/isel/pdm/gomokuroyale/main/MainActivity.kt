@@ -8,13 +8,14 @@ import pt.isel.pdm.gomokuroyale.game.play.ui.GameActivity
 import pt.isel.pdm.gomokuroyale.about.ui.AboutActivity
 import pt.isel.pdm.gomokuroyale.authentication.ui.login.LoginActivity
 import pt.isel.pdm.gomokuroyale.authentication.ui.register.RegisterActivity
+import pt.isel.pdm.gomokuroyale.GomokuRoyaleApplication
 import pt.isel.pdm.gomokuroyale.rankings.ui.RankingActivity
 
 const val TAG = "GOMOKU_ROYALE_TAG"
 
 class MainActivity : ComponentActivity() {
 
-//    private val service = GomokuService()
+    private val app by lazy { application as GomokuRoyaleApplication }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
