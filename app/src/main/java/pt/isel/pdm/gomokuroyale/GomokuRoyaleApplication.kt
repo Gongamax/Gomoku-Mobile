@@ -3,6 +3,7 @@ package pt.isel.pdm.gomokuroyale
 import android.app.Application
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
+import pt.isel.pdm.gomokuroyale.authentication.UserInfoSharedPrefs
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 
 class GomokuRoyaleApplication : Application(), GomokuRoyaleDependencyProvider {
@@ -12,6 +13,10 @@ class GomokuRoyaleApplication : Application(), GomokuRoyaleDependencyProvider {
     override val client =
         OkHttpClient.Builder()
             .build()
+
+    override val userInfoSharedPrefs: UserInfoSharedPrefs by lazy {
+        UserInfoSharedPrefs(this)
+    }
 
     override val gomokuService = GomokuService(client, gson, API_ENDPOINT)
 

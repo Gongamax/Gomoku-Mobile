@@ -5,8 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import pt.isel.pdm.gomokuroyale.GomokuRoyaleDependencyProvider
 
 class LoginActivity : ComponentActivity(){
+
+    // Missing logic to put in practice the saving of the user's credentials
+    private val repo by lazy {
+        (application as GomokuRoyaleDependencyProvider).userInfoSharedPrefs
+    }
 
     companion object {
         fun navigateTo(origin : Activity){
