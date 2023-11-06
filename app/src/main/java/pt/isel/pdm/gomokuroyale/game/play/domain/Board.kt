@@ -6,6 +6,14 @@ const val BOARD_DIM = 15
 const val WIN_LENGTH = 5
 const val MAX_MOVES = BOARD_DIM * BOARD_DIM
 
+enum class BoardDim {
+    STANDARD,
+    MODIFIED;
+    fun toInt(): Int = when (this) {
+        STANDARD -> 15
+        MODIFIED -> 19
+    }
+}
 typealias Moves = Map<Cell, Player>
 
 /**
