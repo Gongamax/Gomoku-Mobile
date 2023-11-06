@@ -43,7 +43,7 @@ import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.about.ui.AboutScreenTestTag
 import pt.isel.pdm.gomokuroyale.ui.components.TextComponent
-import pt.isel.pdm.gomokuroyale.ui.theme.defaultColor
+import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 
 const val MAX_RANKING_NUMBER = 50
 data class PlayerInfo(val userName: String, val points: Int)
@@ -118,7 +118,7 @@ fun RankingLazyColumn(
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
                     .padding(1.dp),
-                colors = ButtonDefaults.buttonColors(defaultColor)
+                colors = ButtonDefaults.buttonColors(DarkViolet)
             ) {
                 PlayerView(ranks.table[it], it)
             }
