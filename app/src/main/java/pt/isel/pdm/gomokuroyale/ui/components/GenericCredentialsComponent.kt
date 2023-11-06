@@ -42,7 +42,7 @@ import pt.isel.pdm.gomokuroyale.authentication.ui.login.TEXT_BOX
 const val BUTTON_COLOR = 0xFF7E91DB
 
 @Composable
-fun TextComponent(value: Int, fontSize: TextUnit = 35.sp, height : Dp = 80.dp) {
+fun TextComponent(value: Int, fontSize: TextUnit = 35.sp, height: Dp = 80.dp) {
     Text(
         text = stringResource(id = value),
         modifier = Modifier
@@ -58,13 +58,14 @@ fun TextComponent(value: Int, fontSize: TextUnit = 35.sp, height : Dp = 80.dp) {
         )
     )
 }
+
 //preciso uma variavel que guarde o valor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InformationBox(
     text: String,
     value: String,
-    onValueChange : (String) -> Unit,
+    onValueChange: (String) -> Unit,
     resourceId: Int
 ) {
 
@@ -89,7 +90,12 @@ fun InformationBox(
 
 
 @Composable
-fun TextComponent(text: String, underline: Boolean, enableClick: Boolean,onClick: () -> Unit) {
+fun TextComponent(
+    text: String,
+    underline: Boolean = false,
+    enableClick: Boolean = false,
+    onClick: () -> Unit = {}
+) {
     if (underline && enableClick) {
         Text(
             text,
@@ -114,9 +120,12 @@ fun TextComponent(text: String, underline: Boolean, enableClick: Boolean,onClick
 }
 
 @Composable
-fun VerificationComponent(text: String?  = null, textUnderline: String, onClick: () -> Unit) {
+fun VerificationComponent(text: String? = null, textUnderline: String, onClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement =  Arrangement.Center) {
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
         if (text != null) {
             TextComponent(text = text, underline = false, enableClick = false, onClick = {})
             Spacer(modifier = Modifier.width(5.dp))
@@ -145,7 +154,7 @@ fun ButtonComponent(iconResourceId: Int, text: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(1f),
-        colors = ButtonDefaults.buttonColors( Color(BUTTON_COLOR))
+        colors = ButtonDefaults.buttonColors(Color(BUTTON_COLOR))
     ) {
         Icon(
             painter = painterResource(id = iconResourceId),
@@ -181,7 +190,13 @@ fun DivideComponent() {
                 .fillMaxWidth()
                 .weight(1f), color = Color.Gray, thickness = 1.dp
         )
-        Text(text = "or", modifier = Modifier.padding(horizontal = 10.dp), color = Color.Gray, fontStyle = FontStyle.Italic, fontSize = 20.sp)
+        Text(
+            text = "or",
+            modifier = Modifier.padding(horizontal = 10.dp),
+            color = Color.Gray,
+            fontStyle = FontStyle.Italic,
+            fontSize = 20.sp
+        )
         Divider(
             modifier = Modifier
                 .fillMaxWidth()

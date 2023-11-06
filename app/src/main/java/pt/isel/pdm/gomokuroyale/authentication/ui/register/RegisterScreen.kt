@@ -20,12 +20,12 @@ import androidx.compose.ui.unit.dp
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
-import pt.isel.pdm.gomokuroyale.authentication.ui.components.ButtonComponent
-import pt.isel.pdm.gomokuroyale.authentication.ui.components.DivideComponent
-import pt.isel.pdm.gomokuroyale.authentication.ui.components.IconButtonWithBorder
-import pt.isel.pdm.gomokuroyale.authentication.ui.components.InformationBox
-import pt.isel.pdm.gomokuroyale.authentication.ui.components.TextComponent
-import pt.isel.pdm.gomokuroyale.authentication.ui.components.VerificationComponent
+import pt.isel.pdm.gomokuroyale.ui.components.ButtonComponent
+import pt.isel.pdm.gomokuroyale.ui.components.DivideComponent
+import pt.isel.pdm.gomokuroyale.ui.components.IconButtonWithBorder
+import pt.isel.pdm.gomokuroyale.ui.components.InformationBox
+import pt.isel.pdm.gomokuroyale.ui.components.TextComponent
+import pt.isel.pdm.gomokuroyale.ui.components.VerificationComponent
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
 

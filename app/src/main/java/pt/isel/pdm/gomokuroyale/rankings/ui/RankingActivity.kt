@@ -4,10 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import pt.isel.pdm.gomokuroyale.userStats.UserStatsActivity
+//import pt.isel.pdm.gomokuroyale.userStats.UserStatsActivity
 
 class RankingActivity: ComponentActivity() {
     companion object {
@@ -23,7 +22,7 @@ class RankingActivity: ComponentActivity() {
         setContent {
             RankingScreen(
                 onBackRequested = { finish() },
-                onPlayerClicked = { username -> UserStatsActivity.navigateTo(this, username) },
+                onPlayerClicked = { /*username -> UserStatsActivity.navigateTo(this, username) */},
                 rankingTable = getTop10(),
                 prefs
             )
