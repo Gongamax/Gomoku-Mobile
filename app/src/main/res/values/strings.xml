@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">GomokuRoyale</string>
+    <string name="app_name">Gomoku</string>
     <string name="top_bar_go_back">Back</string>
     <string name="top_bar_navigate_to_about">About</string>
     <string name="activity_info_no_suitable_app">Could not find a suitable application</string>
+    <string name="ranking_title">Global LeaderBoard</string>
 </resources>

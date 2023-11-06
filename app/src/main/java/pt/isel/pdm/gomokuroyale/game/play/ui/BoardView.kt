@@ -22,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -36,6 +35,8 @@ import pt.isel.pdm.gomokuroyale.game.play.domain.BoardDim
 import pt.isel.pdm.gomokuroyale.game.play.domain.BoardRun
 import pt.isel.pdm.gomokuroyale.game.play.domain.Cell
 import pt.isel.pdm.gomokuroyale.game.play.domain.Player
+import pt.isel.pdm.gomokuroyale.ui.theme.AlabasterWhite
+import pt.isel.pdm.gomokuroyale.ui.theme.Brown
 
 /*const val BOARD_DIM = 15*/
 
@@ -73,7 +74,7 @@ fun BoardView(
         val maxWidth = LocalConfiguration.current.screenWidthDp.dp
         Box(
             Modifier
-                .border(width = boarderSize, color = Color(WHITE_COLOR))
+                .border(width = boarderSize, color = AlabasterWhite)
                 .fillMaxWidth()
         ) {
 
@@ -133,7 +134,7 @@ private fun BorderConstructor(
 fun CellView(player: Player?, cellSize: Dp, onClick: () -> Unit) {
     val mod = Modifier
         .size(cellSize)
-        .background(Color(BROWN_COLOR_CODE))
+        .background(Brown)
         .testTag(PIECE_TEST_TAG)
     if (player == null)
         Box(
@@ -176,7 +177,7 @@ fun Border(resourceId: Int, cellSize: Dp) {
     Box(
         modifier = Modifier
             .size(cellSize)
-            .background(Color(BROWN_COLOR_CODE))
+            .background(Brown)
     ) {
         Image(
             painter = painterResource(id = resourceId),

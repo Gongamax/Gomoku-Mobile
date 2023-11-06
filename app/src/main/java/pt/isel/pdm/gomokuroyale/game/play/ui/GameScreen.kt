@@ -36,14 +36,13 @@ import pt.isel.pdm.gomokuroyale.game.play.domain.BoardDim
 import pt.isel.pdm.gomokuroyale.game.play.domain.BoardRun
 import pt.isel.pdm.gomokuroyale.game.play.domain.Cell
 import pt.isel.pdm.gomokuroyale.game.play.domain.Player
+import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
+import pt.isel.pdm.gomokuroyale.ui.theme.Violet
 
 
 const val GameScreenTestTag = "GameScreenTestTag"
 
-
-const val DARK_VIOLET = 0xFF7E91DB
-const val VIOLET = 0xFFC5CEF1
 
 @Composable
 fun IconComposable(
@@ -66,7 +65,7 @@ fun IconComposable(
 fun ButtonComponent(iconResourceId: Int, text: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(Color(DARK_VIOLET))
+        colors = ButtonDefaults.buttonColors(DarkViolet)
     ) {
         IconComposable(iconResourceId = iconResourceId, height = 24.dp, padding = 4.dp)
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
@@ -94,7 +93,7 @@ fun RectangleComponent() {
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .fillMaxHeight()
-                .background(Color(DARK_VIOLET)),
+                .background(DarkViolet),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -121,7 +120,7 @@ fun RectangleComponent() {
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .background(Color(DARK_VIOLET)),
+                .background(DarkViolet),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End
         ) {
@@ -160,7 +159,7 @@ fun GameScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    color = Color(VIOLET)
+                    color = Violet
                 )
                 .testTag(GameScreenTestTag)
         ) {

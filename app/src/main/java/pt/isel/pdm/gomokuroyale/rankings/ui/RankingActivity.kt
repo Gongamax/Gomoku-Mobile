@@ -1,11 +1,13 @@
 package pt.isel.pdm.gomokuroyale.rankings.ui
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import pt.isel.pdm.gomokuroyale.userStats.UserStatsActivity
 
 class RankingActivity: ComponentActivity() {
     companion object {
@@ -16,12 +18,14 @@ class RankingActivity: ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val prefs by lazy { applicationContext.getSharedPreferences("prefs", Context.MODE_PRIVATE) }
         super.onCreate(savedInstanceState)
         setContent {
             RankingScreen(
                 onBackRequested = { finish() },
-                onPlayerClicked = { getPlayer(it) },
-                rankingTable = getTop10()
+                onPlayerClicked = { username -> UserStatsActivity.navigateTo(this, username) },
+                rankingTable = getTop10(),
+                prefs
             )
         }
     }
@@ -30,7 +34,4 @@ class RankingActivity: ComponentActivity() {
             return RankingTable(leaderboard)
     }
 
-    private fun getPlayer(it: String) {
-        TODO("Not yet implemented")
-    }
 }

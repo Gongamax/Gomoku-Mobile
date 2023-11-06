@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.authentication.ui.components
+package pt.isel.pdm.gomokuroyale.ui.components
 
 
 import androidx.compose.foundation.clickable
@@ -26,12 +26,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.isel.pdm.gomokuroyale.authentication.ui.login.TEXT_BOX
@@ -39,14 +42,14 @@ import pt.isel.pdm.gomokuroyale.authentication.ui.login.TEXT_BOX
 const val BUTTON_COLOR = 0xFF7E91DB
 
 @Composable
-fun TextComponent(value: String) {
+fun TextComponent(value: Int, fontSize: TextUnit = 35.sp, height : Dp = 80.dp) {
     Text(
-        text = value,
+        text = stringResource(id = value),
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 80.dp),
+            .heightIn(min = height),
         style = TextStyle(
-            fontSize = 35.sp,
+            fontSize = fontSize,
             fontWeight = FontWeight.Medium,
             fontFamily = FontFamily.Monospace,
             fontStyle = FontStyle.Italic,
