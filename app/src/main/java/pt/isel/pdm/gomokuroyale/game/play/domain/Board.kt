@@ -2,7 +2,7 @@ package pt.isel.pdm.gomokuroyale.game.play.domain
 
 import android.util.Log
 
-const val BOARD_DIM = 15
+const val BOARD_DIM = 19
 const val WIN_LENGTH = 5
 const val MAX_MOVES = BOARD_DIM * BOARD_DIM
 

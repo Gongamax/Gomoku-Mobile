@@ -178,7 +178,7 @@ fun GameScreen(
                 RectangleComponent()
                 BoardView(
                     board = board,
-                    boardDim = BoardDim.STANDARD.toInt(),
+                    boardDim = BoardDim.MODIFIED.toInt(),
                 ) { at -> onPlayRequested(at) }
                 Row(
                     modifier = Modifier.fillMaxWidth(),

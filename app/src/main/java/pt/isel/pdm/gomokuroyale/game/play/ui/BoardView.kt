@@ -31,14 +31,13 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.game.play.domain.Board
-import pt.isel.pdm.gomokuroyale.game.play.domain.BoardDim
 import pt.isel.pdm.gomokuroyale.game.play.domain.BoardRun
 import pt.isel.pdm.gomokuroyale.game.play.domain.Cell
 import pt.isel.pdm.gomokuroyale.game.play.domain.Player
 import pt.isel.pdm.gomokuroyale.ui.theme.AlabasterWhite
 import pt.isel.pdm.gomokuroyale.ui.theme.Brown
 
-/*const val BOARD_DIM = 15*/
+const val BOARD_DIM = 15
 
 /*val cellSize = 24.5.dp*/
 
@@ -208,7 +207,7 @@ private fun getResourceId(cell: Cell, boardDim: Int): Int {
 @Composable
 @Preview
 fun BoardViewPreview() {
-    BoardView(BoardRun(emptyMap(), Player.BLACK), BoardDim.STANDARD.toInt(), onClick = {})
+    BoardView(BoardRun(emptyMap(), Player.BLACK), BOARD_DIM, onClick = {})
 }
 
 
