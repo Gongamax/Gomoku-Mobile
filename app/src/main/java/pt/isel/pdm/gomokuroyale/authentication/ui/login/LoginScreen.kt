@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +25,7 @@ import pt.isel.pdm.gomokuroyale.ui.components.DivideComponent
 import pt.isel.pdm.gomokuroyale.ui.components.IconButtonWithBorder
 import pt.isel.pdm.gomokuroyale.ui.components.InformationBox
 import pt.isel.pdm.gomokuroyale.ui.components.TextComponent
+import pt.isel.pdm.gomokuroyale.ui.components.TextComponent1
 import pt.isel.pdm.gomokuroyale.ui.components.VerificationComponent
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
@@ -33,6 +33,7 @@ const val BACKGROUND = 0xFFFF4FC3F7
 const val TEXT_BOX = 0xFFBDBDBD
 
 const val LoginScreenTestTag = "LoginScreenTestTag"
+private val paddingHead = 30.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,38 +48,33 @@ fun LoginScreen(onBackRequested: () -> Unit = { }) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(35.dp)
+                    .padding(paddingHead)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
+                        .padding(innerPadding),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    TextComponent(text = "Login")
-                    Spacer(modifier = Modifier.height(100.dp))
+                    TextComponent( "Login")
                     InformationBox(
                         text = "Enter Email...",
                         value = "",
                         onValueChange = {},
                         resourceId = R.drawable.email
                     )
-                    Spacer(modifier = Modifier.height(10.dp))
                     InformationBox(
                         text = "Password",
                         value = "",
                         onValueChange = {},
                         resourceId = R.drawable.password
                     )
-                    Spacer(modifier = Modifier.height(20.dp))
                     VerificationComponent(textUnderline = "Forgot Password?", onClick = {})
-                    Spacer(modifier = Modifier.height(40.dp))
                     ButtonComponent(
                         iconResourceId = R.drawable.ic_enter,
                         text = "Login",
                         onClick = {})
-                    Spacer(modifier = Modifier.height(20.dp))
                     DivideComponent()
-                    Spacer(modifier = Modifier.height(50.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -91,8 +87,6 @@ fun LoginScreen(onBackRequested: () -> Unit = { }) {
                             iconResourceId = R.drawable.facebook,
                             onClick = {})
                     }
-
-                    Spacer(modifier = Modifier.height(40.dp))
 
                     VerificationComponent(
                         text = "Don't have an account yet?",

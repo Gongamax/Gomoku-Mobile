@@ -4,10 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -30,6 +28,7 @@ import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
 
 const val RegisterScreenTestTag = "RegisterScreenTestTag"
+private val paddingHead = 30.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,34 +42,29 @@ fun RegisterScreen(onBackRequested: () -> Unit = { }) {
         ) { innerPadding ->
             Box(modifier = Modifier
                 .fillMaxSize()
-                .padding(35.dp)) {
+                .padding(paddingHead)) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
+                        .padding(innerPadding),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     TextComponent("Register")
-                    Spacer(modifier = Modifier.height(50.dp))
                     InformationBox(
                         text = "ID Name",
                         value = "",
                         onValueChange = {},
                         resourceId = R.drawable.ic_user
                     )
-                    Spacer(modifier = Modifier.height(10.dp))
                     InformationBox(text = "Email", value = "",onValueChange = {}, resourceId = R.drawable.email)
-                    Spacer(modifier = Modifier.height(10.dp))
                     InformationBox(text = "Password", value = "",onValueChange = {}, resourceId = R.drawable.password)
-                    Spacer(modifier = Modifier.height(10.dp))
                     InformationBox(text = "Confirm Password ", value = "", onValueChange = {},resourceId = R.drawable.password)
-                    Spacer(modifier = Modifier.height(20.dp))
+
                     ButtonComponent(
                         iconResourceId = R.drawable.ic_enter,
                         text = "Register",
                         onClick = {})
-                    Spacer(modifier = Modifier.height(20.dp))
                     DivideComponent()
-                    Spacer(modifier = Modifier.height(20.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -83,8 +77,6 @@ fun RegisterScreen(onBackRequested: () -> Unit = { }) {
                             iconResourceId = R.drawable.facebook,
                             onClick = {})
                     }
-
-                    Spacer(modifier = Modifier.height(40.dp))
 
                     VerificationComponent(
                         text = "Already have an account?",

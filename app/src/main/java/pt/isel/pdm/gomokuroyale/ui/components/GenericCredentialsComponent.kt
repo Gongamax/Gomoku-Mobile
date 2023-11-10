@@ -42,9 +42,9 @@ import pt.isel.pdm.gomokuroyale.authentication.ui.login.TEXT_BOX
 const val BUTTON_COLOR = 0xFF7E91DB
 
 @Composable
-fun TextComponent(value: Int, fontSize: TextUnit = 35.sp, height: Dp = 80.dp) {
+fun TextComponent(value: String, fontSize: TextUnit = 35.sp, height: Dp = 80.dp) {
     Text(
-        text = stringResource(id = value),
+        text = value,
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = height),
@@ -90,7 +90,7 @@ fun InformationBox(
 
 
 @Composable
-fun TextComponent(
+fun TextComponent1(
     text: String,
     underline: Boolean = false,
     enableClick: Boolean = false,
@@ -127,9 +127,9 @@ fun VerificationComponent(text: String? = null, textUnderline: String, onClick: 
         horizontalArrangement = Arrangement.Center
     ) {
         if (text != null) {
-            TextComponent(text = text, underline = false, enableClick = false, onClick = {})
+            TextComponent1(text = text, underline = false, enableClick = false, onClick = {})
             Spacer(modifier = Modifier.width(5.dp))
-            TextComponent(
+            TextComponent1(
                 text = textUnderline,
                 underline = true,
                 enableClick = true,
@@ -137,7 +137,7 @@ fun VerificationComponent(text: String? = null, textUnderline: String, onClick: 
             )
 
         } else {
-            TextComponent(
+            TextComponent1(
                 text = textUnderline,
                 underline = true,
                 enableClick = true,
