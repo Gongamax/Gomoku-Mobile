@@ -29,6 +29,12 @@ import pt.isel.pdm.gomokuroyale.ui.components.TextComponent1
 import pt.isel.pdm.gomokuroyale.ui.components.VerificationComponent
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
+/*
+TODO:
+- CHANGE ALL HARDCODED STRINGS AND COLORS TO CONSTANTS AND VALUES
+ */
+
+
 const val BACKGROUND = 0xFFFF4FC3F7
 const val TEXT_BOX = 0xFFBDBDBD
 
@@ -56,7 +62,7 @@ fun LoginScreen(onBackRequested: () -> Unit = { }) {
                         .padding(innerPadding),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    TextComponent( "Login")
+                    TextComponent( R.string.login_title)
                     InformationBox(
                         text = "Enter Email...",
                         value = "",

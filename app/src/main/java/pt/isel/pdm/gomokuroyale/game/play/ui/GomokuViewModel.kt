@@ -17,12 +17,12 @@ class GomokuViewModel() : ViewModel() {
     var game : Game? by mutableStateOf(null)
         private set
 
-    fun newGame(name: String) {
+    fun newGame() {
         try {
             Log.v("Viewmodel", "Creating New Game")
             val g = game
             if (g == null || g.board.moves.isNotEmpty())
-                game = createGame(name)
+                game = createGame()
         } catch (e: Exception) {
             println(e.message)
         }

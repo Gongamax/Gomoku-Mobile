@@ -28,7 +28,7 @@ class GameActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             if (viewModel.game == null)
-                viewModel.newGame("TEST") //hardcoded while we dont have a screen for creating a game
+                viewModel.newGame() //hardcoded while we dont have a screen for creating a game
             GameScreen(
                 board = viewModel.game!!.board, //temporary double bang while we dont have the middle screen
                 onPlayRequested = viewModel::makeMove,

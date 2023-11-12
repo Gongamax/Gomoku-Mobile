@@ -2,7 +2,6 @@ package pt.isel.pdm.gomokuroyale.game.play.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,7 +34,8 @@ import pt.isel.pdm.gomokuroyale.game.play.domain.Board
 import pt.isel.pdm.gomokuroyale.game.play.domain.BoardDim
 import pt.isel.pdm.gomokuroyale.game.play.domain.BoardRun
 import pt.isel.pdm.gomokuroyale.game.play.domain.Cell
-import pt.isel.pdm.gomokuroyale.game.play.domain.Player
+import pt.isel.pdm.gomokuroyale.game.play.domain.Piece
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 import pt.isel.pdm.gomokuroyale.ui.theme.Violet
@@ -118,8 +118,7 @@ fun RectangleComponent() {
         }
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
+                .fillMaxSize()
                 .background(DarkViolet),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End
@@ -155,50 +154,40 @@ fun GameScreen(
     onHelpRequested: () -> Unit = {}
 ) {
     GomokuRoyaleTheme {
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    color = Violet
-                )
-                .testTag(GameScreenTestTag)
+                //TODO: FIX BOARD SIZE BUG
+                .fillMaxSize() // This is affecting the size of the board, but it shouldn't
+                .background(color = Violet)
+                .testTag(GameScreenTestTag),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly
+            IconComposable(
+                iconResourceId = R.drawable.gomokulog,
+                height = 50.dp,
+            )
+            RectangleComponent()
+            BoardView(
+                board = board,
+                boardDim = BoardDim.MODIFIED.toInt(),
+            ) { at -> onPlayRequested(at) }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-
-                IconComposable(
-                    iconResourceId = R.drawable.gomokulog,
-                    height = 50.dp,
+                ButtonComponent(
+                    iconResourceId = R.drawable.ic_exit,
+                    text = "Exit",
+                    onClick = onForfeitRequested
                 )
-                RectangleComponent()
-                BoardView(
-                    board = board,
-                    boardDim = BoardDim.MODIFIED.toInt(),
-                ) { at -> onPlayRequested(at) }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    ButtonComponent(
-                        iconResourceId = R.drawable.ic_exit,
-                        text = "Exit",
-                        onClick = onForfeitRequested
-                    )
-                    ButtonComponent(
-                        iconResourceId = R.drawable.ic_robot,
-                        text = "Help",
-                        onClick = onHelpRequested
-                    )
-                }
+                ButtonComponent(
+                    iconResourceId = R.drawable.ic_robot,
+                    text = "Help",
+                    onClick = onHelpRequested
+                )
             }
-
-
         }
     }
 }
@@ -207,5 +196,5 @@ fun GameScreen(
 @Preview(showBackground = true)
 @Composable
 fun GameScreenPreview() {
-    GameScreen(BoardRun(emptyMap(), Player.BLACK))
+    GameScreen(BoardRun(emptyMap(), Piece.BLACK, Variants.STANDARD))
 }

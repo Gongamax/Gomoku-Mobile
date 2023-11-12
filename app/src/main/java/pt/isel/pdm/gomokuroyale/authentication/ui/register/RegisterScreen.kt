@@ -49,7 +49,7 @@ fun RegisterScreen(onBackRequested: () -> Unit = { }) {
                         .padding(innerPadding),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    TextComponent("Register")
+                    TextComponent(R.string.register_title)
                     InformationBox(
                         text = "ID Name",
                         value = "",

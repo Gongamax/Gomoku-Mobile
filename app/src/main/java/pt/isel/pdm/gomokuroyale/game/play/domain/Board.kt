@@ -1,29 +1,21 @@
 package pt.isel.pdm.gomokuroyale.game.play.domain
 
-import android.util.Log
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
 
-const val BOARD_DIM = 19
-const val WIN_LENGTH = 5
-const val MAX_MOVES = BOARD_DIM * BOARD_DIM
 
-enum class BoardDim {
-    STANDARD,
-    MODIFIED;
-    fun toInt(): Int = when (this) {
-        STANDARD -> 15
-        MODIFIED -> 19
-    }
-}
-typealias Moves = Map<Cell, Player>
+typealias Moves = Map<Cell, Piece>
 
 /**
  * Represents a board of the game.
  * @property moves the map of the moves of the game.
- * @constructor Creates a board with the given [moves] that is map from [Cell] to [Player] ([Moves]).
+ * @constructor Creates a board with the given [moves] that is map from [Cell] to [Piece] ([Moves]).
  * There are four possible states of board: [BoardRun], [BoardWin] and [BoardDraw]
  * These hierarchies are to be used by pattern matching.
  */
-sealed class Board(val moves: Moves) {
+sealed class Board(val moves: Moves, val variant: Variants = Variants.STANDARD) {
+    private val boardSize = variant.boardDim.toInt()
+    val maxMoves = boardSize * boardSize
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null) return false
@@ -36,66 +28,47 @@ sealed class Board(val moves: Moves) {
         }
     }
 
+    override fun toString(): String {
+        return when (this) {
+            is BoardOpen -> "Open:$turn"
+            is BoardRun -> "Run:$turn"
+            is BoardWin -> "Win:$winner"
+            is BoardDraw -> "Draw:-"
+        } + moves.entries.joinToString(" ") {
+            "${it.key}:${it.value.name}"
+        }
+    }
+
     override fun hashCode(): Int = moves.hashCode()
+
+    companion object {
+        fun createBoard(piece: Piece, variant: Variants) = BoardOpen(emptyMap(), piece, variant)
+    }
 }
 
-open class BoardRun(moves: Moves, val turn: Player) : Board(moves)
-class BoardWin(moves: Moves, val winner: Player) : Board(moves)
+class BoardOpen(moves: Moves, val turn: Piece, variant: Variants) : Board(moves, variant)
+class BoardRun(moves: Moves, val turn: Piece, variant: Variants) : Board(moves, variant )
+class BoardWin(moves: Moves, val winner: Piece) : Board(moves)
 class BoardDraw(moves: Moves) : Board(moves)
-
-fun createBoard(first: Player) = BoardRun(emptyMap(), first)
 
 /**
  * Makes a move in [cell] cell by the current turn.
  * @throws IllegalArgumentException if the [cell] is already used.
  * @throws IllegalStateException if the game is over (Draw or Win).
  */
-fun Board.play(cell: Cell): Board {
-    return when (this) {
-        is BoardRun -> {
-            require(moves[cell] == null) { "Position $cell used" }
-            val moves = moves + (cell to turn)
-            Log.v("Model", "Its the turn of ${turn.name}")
-            when {
-                isWin(cell) -> BoardWin(moves, winner = turn)
-                isDraw() -> BoardDraw(moves)
-                else -> BoardRun(moves, turn.other())
-            }
-        }
-
-        is BoardWin, is BoardDraw -> error("Game over")
-    }
-}
+fun Board.playRound(cell: Cell, nextPiece: Piece): Board = variant.play(this, cell, nextPiece)
 
 /**
  * Checks if the move in [cell] position is a winning move.
  */
-private fun BoardRun.isWin(cell: Cell) =
-    moves.size >= WIN_LENGTH * 2 - 2 &&
-            (moves.filter { it.value == turn }.keys + cell).run {
-                any { winningCell ->
-                    directions.any { (forwardDir, backwardDir) ->
-                        val forwardCells = cellsInDirection(winningCell, forwardDir)
-                            .takeWhile { it in this }
-                        val backwardCells = cellsInDirection(winningCell, backwardDir)
-                            .takeWhile { it in this }
+fun BoardRun.isWin(cell: Cell) = variant.isWin(this, cell)
 
-                        val consecutiveCells = (backwardCells + listOf(winningCell) + forwardCells)
-
-                        consecutiveCells.size >= WIN_LENGTH
-                    }
-                }
-            }
-
-
-private val directions = listOf(
-    Pair(Direction.DOWN_LEFT, Direction.UP_RIGHT),
-    Pair(Direction.DOWN_RIGHT, Direction.UP_LEFT),
-    Pair(Direction.UP, Direction.DOWN),
-    Pair(Direction.LEFT, Direction.RIGHT)
-)
+/**
+ * Checks if the move in [cell] position is a valid move according to the play rule.
+ */
+fun Board.canPlayOn(cell: Cell) = variant.validPlay(this, cell)
 
 /**
  * Checks if the state of the board will end the game as a Draw.
  */
-private fun BoardRun.isDraw() = moves.size == MAX_MOVES
+fun BoardRun.isDraw() = moves.size == maxMoves

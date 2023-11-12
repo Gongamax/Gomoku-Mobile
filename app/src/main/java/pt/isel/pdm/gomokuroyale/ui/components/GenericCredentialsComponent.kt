@@ -1,6 +1,8 @@
 package pt.isel.pdm.gomokuroyale.ui.components
 
 
+//TODO: REMOVE ALL HARDCODED VALUES
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,9 +44,9 @@ import pt.isel.pdm.gomokuroyale.authentication.ui.login.TEXT_BOX
 const val BUTTON_COLOR = 0xFF7E91DB
 
 @Composable
-fun TextComponent(value: String, fontSize: TextUnit = 35.sp, height: Dp = 80.dp) {
+fun TextComponent(value: Int, fontSize: TextUnit = 35.sp, height: Dp = 80.dp) {
     Text(
-        text = value,
+        text = stringResource(id = value),
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = height),

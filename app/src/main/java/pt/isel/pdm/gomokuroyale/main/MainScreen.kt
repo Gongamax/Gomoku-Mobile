@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -73,7 +73,7 @@ fun MainScreen(
                         .weight(1f)
                         .padding(vertical = 16.dp),
                     painter = painterResource(id = R.drawable.gomoku),
-                    contentDescription = "Gomoku Royale"
+                    contentDescription = stringResource(id = R.string.app_menu_name)
                 )
                 Column(
                     modifier = Modifier
@@ -82,22 +82,20 @@ fun MainScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Gomoku Royale",
-                        style = MaterialTheme.typography.displayMedium,
-                        fontStyle = FontStyle.Italic
+                        text = stringResource(id = R.string.app_menu_name),
+                        style = MaterialTheme.typography.titleLarge,
                     )
                     Spacer(modifier = Modifier.size(30.dp))
-                    ButtonMenu(icon = Icons.Default.PlayArrow, text = "Play") {
+                    ButtonMenu(icon = Icons.Default.PlayArrow, stringId = R.string.play_title) {
                         onCreateGameRequested()
                     }
-                    ButtonMenu(icon = Icons.Default.List, text = "Ranking") {
+                    ButtonMenu(icon = Icons.Default.List, stringId = R.string.ranking_menu_title) {
                         onRankingRequested()
                     }
-
-                    ButtonMenu(icon = Icons.Default.AccountBox, text = "Register") {
+                    ButtonMenu(icon = Icons.Default.AccountBox, stringId = R.string.register_title) {
                         onRegisterRequested()
                     }
-                    ButtonMenu(icon = Icons.Default.Person, text = "Login") {
+                    ButtonMenu(icon = Icons.Default.Person, stringId = R.string.login_title) {
                         onLoginRequested()
                     }
 //                ButtonMenu(icon = Icons.Default.ExitToApp, text = "Logout") {
@@ -110,22 +108,22 @@ fun MainScreen(
 }
 
 @Composable
-private fun ButtonMenu(icon: ImageVector, text: String, onClick: () -> Unit) {
+private fun ButtonMenu(icon: ImageVector, stringId: Int, onClick: () -> Unit) {
     Button(
         modifier = Modifier.fillMaxWidth(0.8f),
         onClick = onClick
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = text
+            contentDescription = stringResource(id = stringId)
         )
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        Text(text, textAlign = TextAlign.Start)
+        Text(stringResource(id = stringId), textAlign = TextAlign.Start)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun MainScreenV2Preview() {
+fun MainScreenPreview() {
     MainScreen()
 }

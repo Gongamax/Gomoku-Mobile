@@ -46,6 +46,7 @@ import pt.isel.pdm.gomokuroyale.ui.components.TextComponent
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 
 const val MAX_RANKING_NUMBER = 50
+
 data class PlayerInfo(val userName: String, val points: Int)
 
 data class RankingTable(
@@ -59,7 +60,7 @@ fun RankingScreen(
     onPlayerClicked: (String) -> Unit = { },
     rankingTable: RankingTable,
     prefs: SharedPreferences
-){
+) {
     GomokuRoyaleTheme {
         Scaffold(
             modifier = Modifier
@@ -85,13 +86,13 @@ fun RankingLazyColumn(
     modifier: Modifier = Modifier,
     onPlayerClicked: (String) -> Unit = { },
     prefs: SharedPreferences
-){
+) {
     val scrollPosition = prefs.getInt("scroll_position", 0)
     val lazyListState = rememberLazyListState(
         initialFirstVisibleItemIndex = scrollPosition
     )
 
-    LaunchedEffect(key1 = lazyListState){
+    LaunchedEffect(key1 = lazyListState) {
         snapshotFlow { lazyListState.firstVisibleItemIndex }
             .debounce(500L)
             .collectLatest { index ->
@@ -111,9 +112,9 @@ fun RankingLazyColumn(
         stickyHeader {
             RankingHeader()
         }
-        items(ranks.table.size){
-        Button(
-            shape = CircleShape,
+        items(ranks.table.size) {
+            Button(
+                shape = CircleShape,
                 onClick = { onPlayerClicked(ranks.table[it].userName) },
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
@@ -127,8 +128,10 @@ fun RankingLazyColumn(
 }
 
 @Composable
-fun RankingHeader(){
-    Column(modifier = Modifier.fillMaxWidth().background(Color.White)){
+fun RankingHeader() {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(Color.White)) {
         Row() {
             TextComponent(R.string.ranking_title, 20.sp, 40.dp)
         }
@@ -167,26 +170,38 @@ fun RankingHeader(){
 fun PlayerView(
     playerInfo: PlayerInfo,
     ranking: Int
-){
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        when(val res = ranking + 1 ){
+        when (val res = ranking + 1) {
             1 -> IconButton(onClick = { }, enabled = false) {
-                Image(painter = painterResource(id = R.drawable.first_place), contentDescription = "1st")
+                Image(
+                    painter = painterResource(id = R.drawable.first_place),
+                    contentDescription = "1st"
+                )
             }
 
             2 -> IconButton(onClick = { }, enabled = false) {
-                Image(painter = painterResource(id = R.drawable.second_place), contentDescription = "2nd")
+                Image(
+                    painter = painterResource(id = R.drawable.second_place),
+                    contentDescription = "2nd"
+                )
             }
+
             3 -> IconButton(onClick = { }, enabled = false) {
-                Image(painter = painterResource(id = R.drawable.third_place), contentDescription = "3rd")
+                Image(
+                    painter = painterResource(id = R.drawable.third_place),
+                    contentDescription = "3rd"
+                )
             }
+
             else -> IconButton(onClick = { }, enabled = false) {
-                Text(text = "${res}th",
+                Text(
+                    text = "${res}th",
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center,
                     color = Color.Black
@@ -222,8 +237,8 @@ fun PlayerView(
 //    }
 
 
-    val leaderboard =buildList {
-        repeat(MAX_RANKING_NUMBER) {
-            add(PlayerInfo( "Player$it", it*3))
-        }
-    }.asReversed()
+val leaderboard = buildList {
+    repeat(MAX_RANKING_NUMBER) {
+        add(PlayerInfo("Player$it", it * 3))
+    }
+}.asReversed()

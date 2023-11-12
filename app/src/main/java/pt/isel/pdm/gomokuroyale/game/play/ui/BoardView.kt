@@ -11,8 +11,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,103 +24,81 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
+import androidx.compose.ui.unit.min
 import kotlinx.coroutines.delay
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.game.play.domain.Board
+import pt.isel.pdm.gomokuroyale.game.play.domain.BoardDim
 import pt.isel.pdm.gomokuroyale.game.play.domain.BoardRun
 import pt.isel.pdm.gomokuroyale.game.play.domain.Cell
-import pt.isel.pdm.gomokuroyale.game.play.domain.Player
+import pt.isel.pdm.gomokuroyale.game.play.domain.Piece
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
 import pt.isel.pdm.gomokuroyale.ui.theme.AlabasterWhite
 import pt.isel.pdm.gomokuroyale.ui.theme.Brown
 
-const val BOARD_DIM = 15
-
-/*val cellSize = 24.5.dp*/
-
-/*
-val displayMetrics = LocalContext.current.resources.displayMetrics
-val screenWidth = displayMetrics.widthPixels
-val screenHeight = displayMetrics.heightPixels
-*/
-
-//val lineSize = 0.5.dp //Atualmente não está a ser usado LineSize
-//val boardSize = cellSize * BOARD_DIM //+ (cellSize/2) * (BOARD_DIM)
-
 val boarderSize = 5.dp
 
-const val BROWN_COLOR_CODE = 0xFFC39F60
-const val WHITE_COLOR = 0xFFEDEADE
-
 const val PIECE_TEST_TAG = "PIECE"
+const val BOARD_TEST_TAG = "BOARD"
 
-/**
- * Board still needs some adjustments in design, but almost there!
- */
 @Composable
 fun BoardView(
     board: Board?,
     boardDim: Int,
     onClick: (Cell) -> Unit,
 ) {
-
-    if (board == null) Log.v("View", "The Board is null")
-    else {
-        /*  var currentWidth by remember(board) { mutableStateOf(0) }*/
-        val maxWidth = LocalConfiguration.current.screenWidthDp.dp
-        Box(
-            Modifier
-                .border(width = boarderSize, color = AlabasterWhite)
-                .fillMaxWidth()
+    val maxWidth = LocalConfiguration.current.screenWidthDp.dp - boarderSize * 2
+    Box(
+        Modifier.border(width = boarderSize, color = AlabasterWhite)
+    ) {
+        Column(
+            modifier = Modifier.testTag(BOARD_TEST_TAG),
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    /*.onGloballyPositioned { coordinates ->
-                        currentWidth = coordinates.size.width
-                    }*/
-                    .testTag("Board"),
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
-                BorderConstructor(
-                    board,
-                    boardDim,
-                    onClick,
-                    maxWidth = maxWidth
-                )
-                /* maxWidth = LocalDensity.current.run {  currentWidth.toDp() })*/
-            }
+            BorderConstructor(
+                board = board,
+                boardDim = boarDimWithBorder(size = boardDim),
+                onClick = onClick,
+                maxWidth = maxWidth
+            )
         }
     }
 }
 
 @Composable
 private fun BorderConstructor(
-    board: Board,
+    board: Board?,
     boardDim: Int,
     onClick: (Cell) -> Unit,
     maxWidth: Dp
 ) {
-    val cellSize = maxWidth / (boardDim)
+    val roundedWidth = roundToNearestMultipleOf4(maxWidth.value.toInt())
+    val cellSize: Dp = (roundedWidth / boardDim).dp
+    val boardSize = cellSize * boardDim
+    Log.v("DIVISION", "cellSize: $cellSize, boardSize: $boardSize")
     repeat(boardDim) { row ->
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.width(boardSize).background(Brown),
         ) {
             repeat(boardDim) { col ->
-                val resourceId = getResourceId(Cell(row, col), boardDim)
-                if (resourceId != 0)
+                val resourceId = getResourceId(row, col, boardDim)
+                if (resourceId != 0) {
                     Border(resourceId, cellSize)
-                else {
-                    val pos = Cell(row - 1, col - 1)
-                    CellView(board.moves[pos], cellSize) {
+                } else {
+                    val pos = Cell(row, col)
+                    if (board == null) CellView(null, cellSize)
+                    else CellView(
+                        board.moves[pos],
+                        cellSize
+                    ) {
                         onClick(pos)
                         Log.v("Piece", "(${pos.row.index}, ${pos.col.index})")
                     }
@@ -125,40 +106,30 @@ private fun BorderConstructor(
             }
         }
     }
-
 }
 
-
 @Composable
-fun CellView(player: Player?, cellSize: Dp, onClick: () -> Unit) {
-    val mod = Modifier
-        .size(cellSize)
-        .background(Brown)
-        .testTag(PIECE_TEST_TAG)
+fun CellView(
+    player: Piece?,
+    cellSize: Dp,
+    modifier : Modifier = Modifier.size(cellSize).background(Brown).testTag(PIECE_TEST_TAG),
+    onClick: () -> Unit = {}
+) {
     if (player == null)
-        Box(
-            modifier = mod
-                .clip(CircleShape)
-                .clickable { onClick() }
-        ) {
-            Log.v("Piece", "Inside if on CellView")
-            val resourceId = R.drawable.cross
-            Image(painter = painterResource(id = resourceId), contentDescription = "Cross")
+        Box(modifier = modifier.clickable { onClick() }) {
+            Image(painter = painterResource(id = R.drawable.cross), contentDescription = "Cross")
         }
     else
-        Box(
-            modifier = mod,
-            contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = modifier, contentAlignment = Alignment.Center) {
             var fill by remember(player) { mutableStateOf(0.1f) }
             val image = when (player) {
-                Player.WHITE -> R.drawable.checkers_white
-                Player.BLACK -> R.drawable.checkers_black
+                Piece.WHITE -> R.drawable.checkers_white
+                Piece.BLACK -> R.drawable.checkers_black
             }
             Image(
                 painter = painterResource(image),
                 modifier = Modifier.fillMaxSize(fill),
-                contentDescription = "image"
+                contentDescription = "piece"
             )
             LaunchedEffect(player) {
                 while (fill < 1f) {
@@ -168,28 +139,23 @@ fun CellView(player: Player?, cellSize: Dp, onClick: () -> Unit) {
                 fill = 1f
             }
         }
-
 }
 
 @Composable
-fun Border(resourceId: Int, cellSize: Dp) {
+fun Border(resourceId: Int, cellSize: Dp) =
     Box(
         modifier = Modifier
             .size(cellSize)
             .background(Brown)
     ) {
-        Image(
-            painter = painterResource(id = resourceId),
-            contentDescription = "top"
-        )
+        Image(painter = painterResource(id = resourceId), contentDescription = "border")
     }
-}
 
-private fun getResourceId(cell: Cell, boardDim: Int): Int {
-    val isTopRow = cell.row.index == 0
-    val isBottomRow = cell.row.index == boardDim - 1
-    val isLeftCol = cell.col.index == 0
-    val isRightCol = cell.col.index == boardDim - 1
+private fun getResourceId(row: Int, col: Int, boardDim: Int): Int {
+    val isTopRow = row == 0
+    val isBottomRow = row == boardDim - 1
+    val isLeftCol = col == 0
+    val isRightCol = col == boardDim - 1
 
     return when {
         isTopRow && isLeftCol -> R.drawable.top_left_corner_border
@@ -204,20 +170,22 @@ private fun getResourceId(cell: Cell, boardDim: Int): Int {
     }
 }
 
+private fun roundToNearestMultipleOf4(value: Int): Int {
+    val remainder = value % 4
+    return if (remainder < 2) {
+        value - remainder
+    } else {
+        value + (4 - remainder)
+    }
+}
+
+private fun boarDimWithBorder(size: Int) = size + 1
+
 @Composable
 @Preview
 fun BoardViewPreview() {
-    BoardView(BoardRun(emptyMap(), Player.BLACK), BOARD_DIM, onClick = {})
+    BoardView(
+        BoardRun(emptyMap(), Piece.BLACK, Variants.STANDARD),
+        BoardDim.STANDARD.toInt(),
+        onClick = {})
 }
-
-
-
-
-
-
-
-
-
-
-
-
