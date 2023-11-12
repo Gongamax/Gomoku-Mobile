@@ -13,13 +13,12 @@ import pt.isel.pdm.gomokuroyale.game.play.domain.createGame
 import pt.isel.pdm.gomokuroyale.game.play.domain.makeMove
 import java.lang.Exception
 
-class GomokuViewModel() : ViewModel() {
+class GameViewmodel() : ViewModel() {
     var game : Game? by mutableStateOf(null)
         private set
 
     fun newGame() {
         try {
-            Log.v("Viewmodel", "Creating New Game")
             val g = game
             if (g == null || g.board.moves.isNotEmpty())
                 game = createGame()
@@ -30,7 +29,6 @@ class GomokuViewModel() : ViewModel() {
 
     fun makeMove(cell: Cell) =
         try {
-            Log.v("Viewmodel", "Inside makeMove of class Viewmodel")
             viewModelScope.launch {
                 game = game?.makeMove(cell)
             }

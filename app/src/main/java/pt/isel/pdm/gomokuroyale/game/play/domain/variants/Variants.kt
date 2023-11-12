@@ -2,8 +2,12 @@ package pt.isel.pdm.gomokuroyale.game.play.domain.variants
 
 import pt.isel.pdm.gomokuroyale.game.play.domain.BoardDim
 
-enum class Variants(val boardDim: BoardDim, val openingRule: OpeningRule, val playingRule: PlayingRule) :
-    Variant {
+enum class Variants(
+    val boardDim: BoardDim,
+    val openingRule: OpeningRule,
+    val playingRule: PlayingRule
+) : Variant {
+
     STANDARD(
         boardDim = BoardDim.STANDARD,
         openingRule = OpeningRule.STANDARD,

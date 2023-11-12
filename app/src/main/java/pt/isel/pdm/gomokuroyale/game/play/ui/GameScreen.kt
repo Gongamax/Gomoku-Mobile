@@ -156,8 +156,7 @@ fun GameScreen(
     GomokuRoyaleTheme {
         Column(
             modifier = Modifier
-                //TODO: FIX BOARD SIZE BUG
-                .fillMaxSize() // This is affecting the size of the board, but it shouldn't
+                .fillMaxSize()
                 .background(color = Violet)
                 .testTag(GameScreenTestTag),
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
@@ -116,7 +118,7 @@ fun CellView(
     onClick: () -> Unit = {}
 ) {
     if (player == null)
-        Box(modifier = modifier.clickable { onClick() }) {
+        Box(modifier = modifier.clip(CircleShape).clickable { onClick() }) {
             Image(painter = painterResource(id = R.drawable.cross), contentDescription = "Cross")
         }
     else

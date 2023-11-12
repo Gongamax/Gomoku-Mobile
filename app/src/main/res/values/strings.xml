@@ -15,4 +15,6 @@
     <string name="register_confirm_password">Confirm Password</string>
     <string name="register_email">Email</string>
     <string name="play_title">Play</string>
+    <string name="play_menu_title">Play</string>
+    <string name="play_find_game">Find Game</string>
 </resources>

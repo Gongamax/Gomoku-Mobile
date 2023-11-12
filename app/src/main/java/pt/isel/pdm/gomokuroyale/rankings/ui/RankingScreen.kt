@@ -53,7 +53,7 @@ data class RankingTable(
     val table: List<PlayerInfo>
 )
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RankingScreen(
     onBackRequested: () -> Unit = { },
