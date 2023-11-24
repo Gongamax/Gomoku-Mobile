@@ -1,6 +1,10 @@
 package pt.isel.pdm.gomokuroyale.game.play.ui
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -80,7 +84,9 @@ private fun BorderConstructor(
     val boardSize = cellSize * boardDim
     repeat(boardDim) { row ->
         Row(
-            modifier = Modifier.width(boardSize).background(Brown),
+            modifier = Modifier
+                .width(boardSize)
+                .background(Brown),
         ) {
             repeat(boardDim) { col ->
                 val resourceId = getResourceId(row, col, boardDim)
@@ -102,15 +108,21 @@ private fun BorderConstructor(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CellView(
     player: Piece?,
     cellSize: Dp,
-    modifier : Modifier = Modifier.size(cellSize).background(Brown).testTag(PIECE_TEST_TAG),
+    modifier: Modifier = Modifier
+        .size(cellSize)
+        .background(Brown)
+        .testTag(PIECE_TEST_TAG),
     onClick: () -> Unit = {}
 ) {
     if (player == null)
-        Box(modifier = modifier.clip(CircleShape).clickable { onClick() }) {
+        Box(modifier = modifier
+            .clip(CircleShape)
+            .clickable { onClick() }) {
             Image(painter = painterResource(id = R.drawable.cross), contentDescription = "Cross")
         }
     else
@@ -132,6 +144,16 @@ fun CellView(
                 }
                 fill = 1f
             }
+//            AnimatedVisibility(
+//                visible = true,
+//                enter = scaleIn(initialScale = 0.1f) + expandVertically(expandFrom = Alignment.CenterVertically),
+//            ) {
+//                Image(
+//                    painter = painterResource(image),
+//                    modifier = Modifier.fillMaxSize(),
+//                    contentDescription = "piece"
+//                )
+//            }
         }
 }
 
