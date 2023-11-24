@@ -13,7 +13,7 @@ import pt.isel.pdm.gomokuroyale.game.play.domain.createGame
 import pt.isel.pdm.gomokuroyale.game.play.domain.makeMove
 import java.lang.Exception
 
-class GameViewmodel() : ViewModel() {
+class GameScreenViewModel() : ViewModel() {
     var game : Game? by mutableStateOf(null)
         private set
 

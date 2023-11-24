@@ -1,6 +1,6 @@
 package pt.isel.pdm.gomokuroyale.game.play.domain
 
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 
 
 typealias Moves = Map<Cell, Piece>
@@ -12,7 +12,7 @@ typealias Moves = Map<Cell, Piece>
  * There are four possible states of board: [BoardRun], [BoardWin] and [BoardDraw]
  * These hierarchies are to be used by pattern matching.
  */
-sealed class Board(val moves: Moves, val variant: Variants = Variants.STANDARD) {
+sealed class Board(val moves: Moves, val variant: Variant = Variant.STANDARD) {
     private val boardSize = variant.boardDim.toInt()
     val maxMoves = boardSize * boardSize
 
@@ -42,12 +42,12 @@ sealed class Board(val moves: Moves, val variant: Variants = Variants.STANDARD) 
     override fun hashCode(): Int = moves.hashCode()
 
     companion object {
-        fun createBoard(piece: Piece, variant: Variants) = BoardOpen(emptyMap(), piece, variant)
+        fun createBoard(piece: Piece, variant: Variant) = BoardOpen(emptyMap(), piece, variant)
     }
 }
 
-class BoardOpen(moves: Moves, val turn: Piece, variant: Variants) : Board(moves, variant)
-class BoardRun(moves: Moves, val turn: Piece, variant: Variants) : Board(moves, variant )
+class BoardOpen(moves: Moves, val turn: Piece, variant: Variant) : Board(moves, variant)
+class BoardRun(moves: Moves, val turn: Piece, variant: Variant) : Board(moves, variant )
 class BoardWin(moves: Moves, val winner: Piece) : Board(moves)
 class BoardDraw(moves: Moves) : Board(moves)
 

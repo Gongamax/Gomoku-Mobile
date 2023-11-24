@@ -21,8 +21,11 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,8 +37,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.valentinilk.shimmer.shimmer
 import pt.isel.pdm.gomokuroyale.R
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
+import pt.isel.pdm.gomokuroyale.rankings.ui.PlayerInfo
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
@@ -51,15 +56,18 @@ const val LobbyScreenTestTag = "LOBBY_SCREEN_TEST_TAG"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LobbyScreen(
-    onFindGame: () -> Unit = {},
-    onExit: () -> Unit = {}
+    modifier: Modifier = Modifier,
+    onPlayEnabled: Boolean = true,
+    onFindGame: (Variant) -> Unit = {},
+    playerInfo: PlayerInfo? = null,
+    onNavigationBackRequested: () -> Unit = {}
 ) {
     GomokuRoyaleTheme {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
                 .testTag(LobbyScreenTestTag),
-            topBar = { TopBar(NavigationHandlers(onBackRequested = onExit)) },
+            topBar = { TopBar(NavigationHandlers(onBackRequested = onNavigationBackRequested)) },
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -69,7 +77,7 @@ fun LobbyScreen(
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                PlayerLobbyInfo()
+                PlayerLobbyInfo(playerInfo)
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -80,8 +88,17 @@ fun LobbyScreen(
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    var selectedVariant by remember { mutableStateOf(Variant.STANDARD) }
                     Row(
-                        modifier = Modifier,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.variant),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                    Row(
+                        modifier = modifier,
                         verticalAlignment = Alignment.Top,
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
@@ -95,9 +112,10 @@ fun LobbyScreen(
                         Column(horizontalAlignment = Alignment.Start) {
                             ListRadioButtons(listSplitter.second, radioButtons)
                         }
+                        selectedVariant = radioButtons.first { it.isChecked }.variant
                     }
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        GradientButton(onFindGame)
+                    Row(modifier = modifier, horizontalArrangement = Arrangement.Center) {
+                        GradientButton(enabled = onPlayEnabled) { onFindGame(selectedVariant) }
                     }
                 }
             }
@@ -106,12 +124,13 @@ fun LobbyScreen(
 }
 
 @Composable
-private fun GradientButton(onFindGame: () -> Unit) {
+private fun GradientButton(enabled : Boolean = true, onClick: () -> Unit) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 32.dp, end = 32.dp),
-        onClick = onFindGame,
+        onClick = onClick,
+        enabled = enabled,
         contentPadding = PaddingValues(),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent
@@ -141,9 +160,9 @@ private val gradientColors = listOf(
 )
 
 @Composable
-private fun PlayerLobbyInfo(/* Future Player Info*/) {
+private fun PlayerLobbyInfo(playerInfo: PlayerInfo?) {
     Image(
-        modifier = Modifier
+        modifier = Modifier.shimmer()
             .padding(top = 16.dp)
             .clip(CircleShape)
             .background(Color.White),
@@ -151,10 +170,10 @@ private fun PlayerLobbyInfo(/* Future Player Info*/) {
         contentDescription = "Player Icon"
     )
     Text(
-        text = "Player Name",
+        text = playerInfo?.username ?: "",
         style = MaterialTheme.typography.titleLarge
     )
-    Text(text = "Player points")
+    Text(text = playerInfo?.points.toString())
 }
 
 @Composable
@@ -191,13 +210,19 @@ private fun ListRadioButtons(
 }
 
 private val listOfVariants: List<ToggleableInfo> =
-    Variants.entries.map {
+    Variant.entries.map {
         ToggleableInfo(
-            isChecked = it == Variants.STANDARD,
+            isChecked = it == Variant.STANDARD,
             variant = it,
             text = it.name
         )
     }
+
+private data class ToggleableInfo(
+    val isChecked: Boolean,
+    val variant: Variant,
+    val text: String
+)
 
 fun <T> splitList(inputList: MutableList<T>): Pair<MutableList<T>, MutableList<T>> {
     val size = inputList.size
@@ -207,14 +232,8 @@ fun <T> splitList(inputList: MutableList<T>): Pair<MutableList<T>, MutableList<T
     return Pair(firstHalf, secondHalf)
 }
 
-private data class ToggleableInfo(
-    val isChecked: Boolean,
-    val variant: Variants,
-    val text: String
-)
-
 @Preview(showBackground = true)
 @Composable
 fun LobbyScreenPreview() {
-    LobbyScreen()
+    LobbyScreen(playerInfo = PlayerInfo("Player Name", 1000), modifier = Modifier.shimmer())
 }

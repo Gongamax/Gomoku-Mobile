@@ -1,0 +1,31 @@
+package pt.isel.pdm.gomokuroyale
+
+import com.google.gson.Gson
+import okhttp3.OkHttpClient
+import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
+import pt.isel.pdm.gomokuroyale.http.GomokuService
+
+/**
+ * The contract to be supported by the application's class used to resolve dependencies.
+ */
+interface DependenciesContainer {
+    /**
+     * The JSON serializer/deserializer used to convert JSON into DTOs
+     */
+    val gson: Gson
+
+    /**
+     * The HTTP client used to perform HTTP requests
+     */
+    val client: OkHttpClient
+
+    /**
+     * The repository used to access the user's information
+     */
+    val userInfoRepository: UserInfoRepository
+
+    /**
+     * The service used to access the Gomoku Royale API
+     */
+    val gomokuService: GomokuService
+}

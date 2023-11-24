@@ -18,3 +18,14 @@ fun validateRegister(user: User, passwordConfirmation: String): Boolean{
     return user.password == passwordConfirmation && validateUser(user)
 }
 
+data class UserInfo(val accessToken: String, val refreshToken: String, val username: String) {
+
+    init {
+        require(validateUserInfo(this))
+    }
+
+    private fun validateUserInfo(userInfo: UserInfo): Boolean {
+        return userInfo.accessToken.isNotBlank() && userInfo.refreshToken.isNotBlank() &&
+                userInfo.username.isNotBlank()
+    }
+}

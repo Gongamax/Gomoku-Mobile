@@ -47,7 +47,7 @@ import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 
 const val MAX_RANKING_NUMBER = 50
 
-data class PlayerInfo(val userName: String, val points: Int)
+data class PlayerInfo(val username: String, val points: Int)
 
 data class RankingTable(
     val table: List<PlayerInfo>
@@ -115,7 +115,7 @@ fun RankingLazyColumn(
         items(ranks.table.size) {
             Button(
                 shape = CircleShape,
-                onClick = { onPlayerClicked(ranks.table[it].userName) },
+                onClick = { onPlayerClicked(ranks.table[it].username) },
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
                     .padding(1.dp),
@@ -209,7 +209,7 @@ fun PlayerView(
             }
         }
         Text(
-            text = playerInfo.userName,
+            text = playerInfo.username,
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
             maxLines = 1,

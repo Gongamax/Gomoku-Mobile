@@ -2,7 +2,7 @@ package pt.isel.pdm.gomokuroyale.game.play.domain
 
 import android.util.Log
 import pt.isel.pdm.gomokuroyale.game.play.domain.Board.Companion.createBoard
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 
 data class Game(
     val localPlayer: Piece, //
@@ -23,4 +23,4 @@ fun Game.makeMove(at: Cell): Game {
     return copy(board = board.playRound(at, turn.other()))
 }
 
-fun createGame() = Game(Piece.BLACK, createBoard(Piece.BLACK, Variants.STANDARD))
+fun createGame() = Game(Piece.BLACK, createBoard(Piece.BLACK, Variant.STANDARD))

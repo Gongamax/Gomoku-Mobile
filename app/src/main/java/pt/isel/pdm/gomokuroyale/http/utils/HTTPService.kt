@@ -5,6 +5,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import okhttp3.internal.EMPTY_REQUEST
 import pt.isel.pdm.gomokuroyale.http.dto.DTO
 
@@ -15,8 +16,9 @@ abstract class HTTPService(
     val jsonEncoder: Gson,
     val apiEndpoint: String
 ) {
-    suspend inline fun Request.getResponse(responseType: Class<out DTO>): APIResponse<DTO> =
+    suspend inline fun Request.getResponse(responseType: Class<out DTO>) : APIResponse<DTO> =  //Response
         makeAPIRequest(httpClient, responseType, jsonEncoder)
+
 
     suspend inline fun get(path: String, responseType: Class<out DTO>): APIResponse<DTO> =
         Request.Builder()

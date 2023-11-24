@@ -9,6 +9,7 @@ import pt.isel.pdm.gomokuroyale.about.ui.AboutActivity
 import pt.isel.pdm.gomokuroyale.authentication.ui.login.LoginActivity
 import pt.isel.pdm.gomokuroyale.authentication.ui.register.RegisterActivity
 import pt.isel.pdm.gomokuroyale.GomokuRoyaleApplication
+import pt.isel.pdm.gomokuroyale.game.lobby.ui.LobbyActivity
 import pt.isel.pdm.gomokuroyale.rankings.ui.RankingActivity
 
 const val TAG = "GOMOKU_ROYALE_TAG"
@@ -24,7 +25,7 @@ class MainActivity : ComponentActivity() {
             MainScreen(
                 onLoginRequested = { LoginActivity.navigateTo(this) },
                 onRegisterRequested = { RegisterActivity.navigateTo(this) },
-                onCreateGameRequested = { GameActivity.navigateTo(this) },
+                onCreateGameRequested = { LobbyActivity.navigateTo(this) },
                 onInfoRequested = { AboutActivity.navigateTo(this) },
                 onRankingRequested = { RankingActivity.navigateTo(this) }
             )

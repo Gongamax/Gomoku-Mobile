@@ -10,11 +10,10 @@ import androidx.activity.viewModels
 
 class GameActivity : ComponentActivity() {
 
-    private val viewModel by viewModels<GameViewmodel>()
+    private val viewModel by viewModels<GameScreenViewModel>()
 
     companion object {
         fun navigateTo(context : Context) {
-            Log.v("GameActivity", "On navigate to")
             with(context) {
                 val intent = Intent(this, GameActivity::class.java)
                 startActivity(intent)

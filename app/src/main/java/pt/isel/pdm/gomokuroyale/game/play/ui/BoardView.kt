@@ -10,12 +10,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,15 +22,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
-import androidx.compose.ui.unit.min
 import kotlinx.coroutines.delay
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.game.play.domain.Board
@@ -42,7 +35,7 @@ import pt.isel.pdm.gomokuroyale.game.play.domain.BoardDim
 import pt.isel.pdm.gomokuroyale.game.play.domain.BoardRun
 import pt.isel.pdm.gomokuroyale.game.play.domain.Cell
 import pt.isel.pdm.gomokuroyale.game.play.domain.Piece
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import pt.isel.pdm.gomokuroyale.ui.theme.AlabasterWhite
 import pt.isel.pdm.gomokuroyale.ui.theme.Brown
 
@@ -85,7 +78,6 @@ private fun BorderConstructor(
     val roundedWidth = roundToNearestMultipleOf4(maxWidth.value.toInt())
     val cellSize: Dp = (roundedWidth / boardDim).dp
     val boardSize = cellSize * boardDim
-    Log.v("DIVISION", "cellSize: $cellSize, boardSize: $boardSize")
     repeat(boardDim) { row ->
         Row(
             modifier = Modifier.width(boardSize).background(Brown),
@@ -187,7 +179,7 @@ private fun boarDimWithBorder(size: Int) = size + 1
 @Preview
 fun BoardViewPreview() {
     BoardView(
-        BoardRun(emptyMap(), Piece.BLACK, Variants.STANDARD),
+        BoardRun(emptyMap(), Piece.BLACK, Variant.STANDARD),
         BoardDim.STANDARD.toInt(),
         onClick = {})
 }

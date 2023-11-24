@@ -1,20 +1,88 @@
 package pt.isel.pdm.gomokuroyale.game.lobby.ui
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
+import com.valentinilk.shimmer.shimmer
+import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
+import pt.isel.pdm.gomokuroyale.DependenciesContainer
+import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchedMatchInfo
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchedPlayerInfo
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchingMatchInfo
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchingPlayerInfo
+import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakerActivity
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
+import pt.isel.pdm.gomokuroyale.rankings.ui.PlayerInfo
 
 class LobbyActivity : ComponentActivity() {
 
-    private val viewModel by viewModels<LobbyScreenViewmodel>()
+    private val repo by lazy { (application as DependenciesContainer).userInfoRepository }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            LobbyScreen()
+    private val viewModel by viewModels<LobbyScreenViewModel> {
+        LobbyScreenViewModel.factory(repo)
+    }
+
+    companion object {
+        fun navigateTo(origin: ComponentActivity) {
+            with(origin) {
+                val intent = Intent(origin, LobbyActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
+        lifecycleScope.launch {
+            viewModel.state.collect {
+                if (it is FetchingPlayerInfo) {
+                    viewModel.fetchPlayerInfo()
+                }
+                if (it is FetchedMatchInfo) {
+                    val playerInfo = playerInfoExtra(it.matchInfo!!.variant, it.matchInfo.userInfo)
+                    MatchmakerActivity.navigateTo(this@LobbyActivity, playerInfo)
+                    viewModel.resetToFetchingPlayerInfo()
+                }
+            }
+        }
+
+        setContent {
+            val state by viewModel.state.collectAsState(initial = FetchingPlayerInfo)
+            val userInfo = if (state !is FetchingPlayerInfo) (state as FetchedPlayerInfo).userInfo else null
+            LobbyScreen(
+                modifier = if (state is FetchingPlayerInfo) Modifier.shimmer() else Modifier,
+                onPlayEnabled =  state !is FetchingMatchInfo && state !is FetchedMatchInfo,
+                onFindGame = { variant -> viewModel.fetchMatchInfo(variant) },
+                playerInfo = if (userInfo != null) PlayerInfo(userInfo.username, 0) else null,
+                onNavigationBackRequested = { finish() }
+            )
+        }
+    }
+
+    @Parcelize
+    data class PlayerInfoExtra(
+        val username: String,
+        val token: String,
+        val points: Int,
+        val variant: Variant
+    ) : Parcelable
+
+    private suspend fun playerInfoExtra(variant: Variant, userInfo: UserInfo): PlayerInfoExtra {
+        return PlayerInfoExtra(
+            username = userInfo.username,
+            token = userInfo.accessToken,
+            points = 0,
+            variant = variant
+        )
+    }
 }

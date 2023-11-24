@@ -35,7 +35,7 @@ import pt.isel.pdm.gomokuroyale.game.play.domain.BoardDim
 import pt.isel.pdm.gomokuroyale.game.play.domain.BoardRun
 import pt.isel.pdm.gomokuroyale.game.play.domain.Cell
 import pt.isel.pdm.gomokuroyale.game.play.domain.Piece
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 import pt.isel.pdm.gomokuroyale.ui.theme.Violet
@@ -195,5 +195,5 @@ fun GameScreen(
 @Preview(showBackground = true)
 @Composable
 fun GameScreenPreview() {
-    GameScreen(BoardRun(emptyMap(), Piece.BLACK, Variants.STANDARD))
+    GameScreen(BoardRun(emptyMap(), Piece.BLACK, Variant.STANDARD))
 }
