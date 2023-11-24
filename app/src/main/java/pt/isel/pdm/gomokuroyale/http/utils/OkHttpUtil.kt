@@ -11,7 +11,7 @@ import pt.isel.pdm.gomokuroyale.http.utils.Problem.Companion.problemMediaType
 import kotlin.coroutines.resumeWithException
 
 suspend fun <T> Request.makeAPIRequest(client: OkHttpClient, responseType : Class<out DTO>, jsonEncoder: Gson) : T =
-    suspendCancellableCoroutine { continuation ->
+    suspendCancellableCoroutine<T> { continuation ->
         val newCall = client.newCall(this)
         newCall.enqueue(object : okhttp3.Callback {
             override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
@@ -32,15 +32,15 @@ suspend fun <T> Request.makeAPIRequest(client: OkHttpClient, responseType : Clas
                 val resJson = JsonReader(body.charStream())
 
                 when {
-                    response.isSuccessful -> {
-                        Success<T>(//TODO: REMOVE DOUBLE BANG
-                            jsonEncoder.fromJson(resJson, responseType)
+                    response.isSuccessful /*&& contentType == sirenMediaType*/-> {
+                        continuation.resumeWith(
+                            Result.success(jsonEncoder.fromJson(resJson, responseType))
                         )
                     }
 
                     !response.isSuccessful && contentType == problemMediaType ->
-                        Failure(
-                            jsonEncoder.fromJson<Problem>(resJson, Problem::class.java)
+                        continuation.resumeWith(
+                            Result.success(jsonEncoder.fromJson(resJson, Problem::class.java))
                         )
 
                     else ->

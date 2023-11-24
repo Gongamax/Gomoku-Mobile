@@ -73,6 +73,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     implementation("com.valentinilk.shimmer:compose-shimmer:1.2.0")
+    implementation ("com.github.bumptech.glide:glide:4.9.0")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")

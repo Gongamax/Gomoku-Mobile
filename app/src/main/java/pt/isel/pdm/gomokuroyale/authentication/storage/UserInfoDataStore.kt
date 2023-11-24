@@ -15,7 +15,7 @@ class UserInfoDataStore(
 
     private val usernameKey = stringPreferencesKey(USER_NAME)
     private val accessToken = stringPreferencesKey(ACCESS_TOKEN)
-    private val refreshToken = stringPreferencesKey(REFRESH_TOKEN)
+//    private val refreshToken = stringPreferencesKey(REFRESH_TOKEN)
     private val points = stringPreferencesKey(POINTS)
     override val isLoggedIn: Boolean    //TODO: IMPROVE THIS CONDITION
         get() = store.data.toString().isNotEmpty()
@@ -24,7 +24,7 @@ class UserInfoDataStore(
         store.edit { preferences ->
             preferences[usernameKey] = userInfo.username
             preferences[accessToken] = userInfo.accessToken
-            preferences[refreshToken] = userInfo.refreshToken
+//            preferences[refreshToken] = userInfo.refreshToken
         }
     }
 
@@ -38,8 +38,8 @@ class UserInfoDataStore(
         val preferences = store.data.first()
         val username = preferences[usernameKey] ?: return null
         val accessToken = preferences[accessToken] ?: return null
-        val refreshToken = preferences[refreshToken] ?: return null
-        return UserInfo(username, accessToken, refreshToken)
+//        val refreshToken = preferences[refreshToken] ?: return null
+        return UserInfo(username, accessToken/*, refreshToken*/)
     }
 
     companion object {

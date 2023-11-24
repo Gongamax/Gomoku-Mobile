@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import pt.isel.pdm.gomokuroyale.http.dto.DTO
 import pt.isel.pdm.gomokuroyale.http.dto.GetHomeOutputModel
-import pt.isel.pdm.gomokuroyale.http.utils.APIResponse
 import pt.isel.pdm.gomokuroyale.http.utils.HTTPService
 import pt.isel.pdm.gomokuroyale.http.utils.Uris
 
@@ -17,6 +16,6 @@ class GomokuService(
 
     val gameService = GameService(client, gson, apiEndpoint)
 
-    suspend fun getHome(): APIResponse<DTO> =
+    suspend fun getHome(): Result<DTO> =
         get(path = Uris.HOME, responseType = GetHomeOutputModel::class.java)
 }

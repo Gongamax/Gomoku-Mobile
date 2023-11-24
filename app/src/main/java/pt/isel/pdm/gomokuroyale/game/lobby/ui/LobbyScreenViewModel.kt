@@ -18,39 +18,6 @@ import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import java.lang.IllegalStateException
 
-//class LobbyScreenViewModel(
-//    private val repository: UserInfoRepository
-//) : ViewModel() {
-//
-//    companion object {
-//        fun factory(userInfoRepository: UserInfoRepository) = viewModelFactory {
-//            initializer { LobbyScreenViewModel(userInfoRepository) }
-//        }
-//    }
-//
-//    private val _userInfo: MutableStateFlow<LoadState<UserInfo?>> = MutableStateFlow(idle())
-//
-//    val userInfo: Flow<LoadState<UserInfo?>> get() = _userInfo.asStateFlow()
-//
-//    fun getUserInfo() {
-//        if (_userInfo.value !is Idle)
-//            throw IllegalStateException("Cannot get user info while loading")
-//
-//        _userInfo.value = loading()
-//        viewModelScope.launch {
-//            val result = kotlin.runCatching { repository.getUserInfo() }
-//            _userInfo.value = loaded(result)
-//        }
-//    }
-//
-//    fun resetToIdle() {
-//        if (_userInfo.value !is Loaded)
-//            throw IllegalStateException("The view model is not in the idle state.")
-//
-//        _userInfo.value = idle()
-//    }
-//}
-
 class LobbyScreenViewModel(
     private val repository: UserInfoRepository
 ) : ViewModel() {

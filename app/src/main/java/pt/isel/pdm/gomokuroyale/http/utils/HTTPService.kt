@@ -9,18 +9,16 @@ import okhttp3.Response
 import okhttp3.internal.EMPTY_REQUEST
 import pt.isel.pdm.gomokuroyale.http.dto.DTO
 
-typealias GetResponseResult = Either<FetchFromAPIException, DTO>
-
 abstract class HTTPService(
     val httpClient: OkHttpClient,
     val jsonEncoder: Gson,
     val apiEndpoint: String
 ) {
-    suspend inline fun Request.getResponse(responseType: Class<out DTO>) : APIResponse<DTO> =  //Response
+    suspend inline fun Request.getResponse(responseType: Class<out DTO>) : Result<DTO> =
         makeAPIRequest(httpClient, responseType, jsonEncoder)
 
 
-    suspend inline fun get(path: String, responseType: Class<out DTO>): APIResponse<DTO> =
+    suspend inline fun get(path: String, responseType: Class<out DTO>): Result<DTO> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -31,7 +29,7 @@ abstract class HTTPService(
         path: String,
         responseType: Class<out DTO>,
         token: String
-    ): APIResponse<DTO> =
+    ): Result<DTO> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -43,7 +41,7 @@ abstract class HTTPService(
         path: String,
         responseType: Class<out DTO>,
         body: Any
-    ): APIResponse<DTO> =
+    ): Result<DTO> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -56,7 +54,7 @@ abstract class HTTPService(
         responseType: Class<out DTO>,
         token: String,
         body: Any? = null
-    ): APIResponse<DTO> =
+    ): Result<DTO> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -73,7 +71,7 @@ abstract class HTTPService(
         responseType: Class<out DTO>,
         token: String,
         body: Any
-    ): APIResponse<DTO> =
+    ): Result<DTO> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -90,7 +88,7 @@ abstract class HTTPService(
         responseType: Class<out DTO>,
         token: String,
         body: Any
-    ): APIResponse<DTO> =
+    ): Result<DTO> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)

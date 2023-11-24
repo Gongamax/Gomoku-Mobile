@@ -9,7 +9,6 @@ import pt.isel.pdm.gomokuroyale.http.dto.GameMatchmakingInputModel
 import pt.isel.pdm.gomokuroyale.http.dto.GameMatchmakingStatusOutputModel
 import pt.isel.pdm.gomokuroyale.http.dto.GameOutputModel
 import pt.isel.pdm.gomokuroyale.http.dto.GamePlayInputModel
-import pt.isel.pdm.gomokuroyale.http.utils.APIResponse
 import pt.isel.pdm.gomokuroyale.http.utils.HTTPService
 import pt.isel.pdm.gomokuroyale.http.utils.Uris
 
@@ -19,7 +18,7 @@ class GameService(
     apiEndpoint: String
 ) : HTTPService(client, gson, apiEndpoint) {
 
-    suspend fun getGame(gameId: String, token: String): APIResponse<DTO> =
+    suspend fun getGame(gameId: String, token: String): Result<DTO> =
         get(
             path = Uris.Games.GET_GAME_BY_ID,
             token = token,
@@ -30,7 +29,7 @@ class GameService(
         gameId: String,
         token: String,
         play: GamePlayInputModel
-    ): APIResponse<DTO> =
+    ): Result<DTO> =
         put(
             path = Uris.Games.PLAY,
             token = token,
@@ -39,7 +38,7 @@ class GameService(
         )
 
 
-    suspend fun surrender(gameId: String, token: String): APIResponse<DTO> =
+    suspend fun surrender(gameId: String, token: String): Result<DTO> =
         put(
             path = Uris.Games.LEAVE,
             token = token,
@@ -47,14 +46,14 @@ class GameService(
             body = gameId
         )
 
-    suspend fun getUserGames(token: String): APIResponse<DTO> =
+    suspend fun getUserGames(token: String): Result<DTO> =
         get(
             path = Uris.Games.GET_ALL_GAMES_BY_USER,
             responseType = GameGetAllByUserOutputModel::class.java,
             token = token
         )
 
-    suspend fun matchmaking(token: String, input: GameMatchmakingInputModel): APIResponse<DTO> =
+    suspend fun matchmaking(token: String, input: GameMatchmakingInputModel): Result<DTO> =
         post(
             path = Uris.Games.MATCHMAKING,
             responseType = GameOutputModel::class.java,
@@ -62,7 +61,7 @@ class GameService(
             body = input
         )
 
-    suspend fun cancelMatchmaking(token: String): APIResponse<DTO> =
+    suspend fun cancelMatchmaking(token: String): Result<DTO> =
         delete(
             path = Uris.Games.EXIT_MATCHMAKING_QUEUE,
             responseType = GameEmptyOutputModel::class.java,
@@ -70,7 +69,7 @@ class GameService(
             body = ""
         )
 
-    suspend fun getMatchmakingStatus(token: String): APIResponse<DTO> =
+    suspend fun getMatchmakingStatus(token: String): Result<DTO> =
         get(
             path = Uris.Games.GET_MATCHMAKING_STATUS,
             token = token,

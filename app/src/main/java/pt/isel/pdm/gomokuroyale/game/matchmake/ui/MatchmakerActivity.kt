@@ -3,20 +3,25 @@ package pt.isel.pdm.gomokuroyale.game.matchmake.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
-import pt.isel.pdm.gomokuroyale.game.lobby.ui.LobbyActivity
+import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
+import pt.isel.pdm.gomokuroyale.util.getOrNull
 import pt.isel.pdm.gomokuroyale.util.getOrThrow
 
-const val MATCHMAKER_ACTIVITY_TAG = "MatchmakerActivity"
-const val USER_INFO_EXTRA = "USER_INFO_EXTRA"
+const val MATCHMAKER_ACTIVITY_TAG = "MATCHMAKER_ACTIVITY_TAG"
+const val PLAYER_INFO_EXTRA = "PLAYER_INFO_EXTRA"
 
 class MatchmakerActivity : ComponentActivity() {
 
@@ -25,18 +30,18 @@ class MatchmakerActivity : ComponentActivity() {
     private val viewModel by viewModels<MatchmakerViewModel> {
         MatchmakerViewModel.factory(
             dependencies.gomokuService,
-            playerInfo!! // TODO: remove !! (not null assertion)
+            matchInfo
         )
     }
 
     companion object {
-        fun navigateTo(ctx: Context, info: LobbyActivity.PlayerInfoExtra) {
+        fun navigateTo(ctx: Context, info: MatchInfo? = null) {
             ctx.startActivity(createIntent(ctx, info))
         }
 
-        private fun createIntent(ctx: Context, info: LobbyActivity.PlayerInfoExtra): Intent {
+        private fun createIntent(ctx: Context, matchInfo: MatchInfo? = null): Intent {
             val intent = Intent(ctx, MatchmakerActivity::class.java)
-            intent.putExtra(USER_INFO_EXTRA, info)
+            matchInfo?.let { intent.putExtra(PLAYER_INFO_EXTRA, PlayerInfoExtra(it)) }
             return intent
         }
     }
@@ -44,40 +49,47 @@ class MatchmakerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                viewModel.match.collect {
-//                    if (it is Loaded) {
-//                        //TODO
-//                    }
-//                }
+
+
             }
-        }
 
         setContent {
-            MatchmakerScreen(viewModel.status.getOrThrow())
+            MatchmakerScreen(
+                status = viewModel.status.collectAsState().value.getOrThrow(),  //TODO: REVISE THIS
+                onCancelingMatchmaking = viewModel::leaveQueue,
+                //onCancelingEnabled = viewModel::cancelMatchmakingEnabled.getOrNull() ?: false,
+                variant = matchInfo?.variant ?: Variant.STANDARD
+            )
         }
     }
 
-    private val playerInfo: PlayerInfo? by lazy { getPlayerInfoExtra()?.toPlayerInfo() }
+
+    private val matchInfo: MatchInfo? by lazy { getPlayerInfoExtra()?.toMatchInfo() }
 
     @Suppress("DEPRECATION")
-    private fun getPlayerInfoExtra(): LobbyActivity.PlayerInfoExtra? =
+    private fun getPlayerInfoExtra(): PlayerInfoExtra? =
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU)
-            intent?.getParcelableExtra(USER_INFO_EXTRA, LobbyActivity.PlayerInfoExtra::class.java)
+            intent?.getParcelableExtra(PLAYER_INFO_EXTRA, PlayerInfoExtra::class.java)
         else
-            intent?.getParcelableExtra(USER_INFO_EXTRA)
+            intent?.getParcelableExtra(PLAYER_INFO_EXTRA)
 
-    data class PlayerInfo(
+    @Parcelize
+    data class PlayerInfoExtra(
         val username: String,
-        val token : String,
+        val token: String,
         val points: Int,
         val variant: Variant
-    )
+    ) : Parcelable {
+        constructor(matchInfo: MatchInfo) : this(
+            username = matchInfo.userInfo.username,
+            token = matchInfo.userInfo.accessToken,
+            points = 0,
+            variant = matchInfo.variant
+        )
+    }
 
-    private fun LobbyActivity.PlayerInfoExtra.toPlayerInfo() = PlayerInfo(
-        username = username,
-        token = token,
-        points = points,
+    private fun PlayerInfoExtra.toMatchInfo() = MatchInfo(
+        userInfo = UserInfo(username, token),
         variant = variant
     )
 }

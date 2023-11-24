@@ -3,6 +3,7 @@ package pt.isel.pdm.gomokuroyale.game.lobby.ui
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -45,12 +46,12 @@ class LobbyActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             viewModel.state.collect {
+                Log.v("LobbyActivity", "State: $it")
                 if (it is FetchingPlayerInfo) {
                     viewModel.fetchPlayerInfo()
                 }
                 if (it is FetchedMatchInfo) {
-                    val playerInfo = playerInfoExtra(it.matchInfo!!.variant, it.matchInfo.userInfo)
-                    MatchmakerActivity.navigateTo(this@LobbyActivity, playerInfo)
+                    MatchmakerActivity.navigateTo(this@LobbyActivity, it.matchInfo)
                     viewModel.resetToFetchingPlayerInfo()
                 }
             }
@@ -67,22 +68,5 @@ class LobbyActivity : ComponentActivity() {
                 onNavigationBackRequested = { finish() }
             )
         }
-    }
-
-    @Parcelize
-    data class PlayerInfoExtra(
-        val username: String,
-        val token: String,
-        val points: Int,
-        val variant: Variant
-    ) : Parcelable
-
-    private suspend fun playerInfoExtra(variant: Variant, userInfo: UserInfo): PlayerInfoExtra {
-        return PlayerInfoExtra(
-            username = userInfo.username,
-            token = userInfo.accessToken,
-            points = 0,
-            variant = variant
-        )
     }
 }

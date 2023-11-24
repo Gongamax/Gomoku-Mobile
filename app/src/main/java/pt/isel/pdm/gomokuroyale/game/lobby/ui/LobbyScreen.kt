@@ -77,7 +77,7 @@ fun LobbyScreen(
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                PlayerLobbyInfo(playerInfo)
+                PlayerLobbyInfo(playerInfo, modifier)
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -160,9 +160,9 @@ private val gradientColors = listOf(
 )
 
 @Composable
-private fun PlayerLobbyInfo(playerInfo: PlayerInfo?) {
+private fun PlayerLobbyInfo(playerInfo: PlayerInfo?, modifier: Modifier) {
     Image(
-        modifier = Modifier.shimmer()
+        modifier = modifier
             .padding(top = 16.dp)
             .clip(CircleShape)
             .background(Color.White),
@@ -170,10 +170,11 @@ private fun PlayerLobbyInfo(playerInfo: PlayerInfo?) {
         contentDescription = "Player Icon"
     )
     Text(
+        modifier = modifier,
         text = playerInfo?.username ?: "",
         style = MaterialTheme.typography.titleLarge
     )
-    Text(text = playerInfo?.points.toString())
+    Text(modifier = modifier, text = playerInfo?.points.toString())
 }
 
 @Composable
