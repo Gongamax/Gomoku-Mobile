@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.authentication.domain.validatePassword
 import pt.isel.pdm.gomokuroyale.authentication.domain.validateUsername
-import pt.isel.pdm.gomokuroyale.game.lobby.ui.LobbyScreenTestTag
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
 import pt.isel.pdm.gomokuroyale.ui.components.ButtonComponent
@@ -65,8 +64,8 @@ fun LoginScreen(
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
-                .testTag(LobbyScreenTestTag),
-            topBar = { TopBar(NavigationHandlers(onBackRequested = onBackRequested)) },
+                .testTag(LoginScreenTestTag),
+            topBar = { TopBar(title={},NavigationHandlers(onBackRequested = onBackRequested)) },
         ) { innerPadding ->
             Box(
                 modifier = Modifier

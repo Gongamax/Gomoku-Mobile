@@ -4,7 +4,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.first
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository

@@ -37,10 +37,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.valentinilk.shimmer.shimmer
 import pt.isel.pdm.gomokuroyale.R
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.PlayerInfo
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
-import pt.isel.pdm.gomokuroyale.rankings.ui.PlayerInfo
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
@@ -67,7 +66,7 @@ fun LobbyScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .testTag(LobbyScreenTestTag),
-            topBar = { TopBar(NavigationHandlers(onBackRequested = onNavigationBackRequested)) },
+            topBar = { TopBar(title = {}, NavigationHandlers(onBackRequested = onNavigationBackRequested)) },
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -166,7 +165,7 @@ private fun PlayerLobbyInfo(playerInfo: PlayerInfo?, modifier: Modifier) {
             .padding(top = 16.dp)
             .clip(CircleShape)
             .background(Color.White),
-        painter = painterResource(id = R.drawable.arqueiro),
+        painter = painterResource(id = R.drawable.chapeleiro_louco),
         contentDescription = "Player Icon"
     )
     Text(

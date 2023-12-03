@@ -2,14 +2,13 @@ package pt.isel.pdm.gomokuroyale.http.services.users
 
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
-import pt.isel.pdm.gomokuroyale.http.dto.DTO
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.RankingInfoOutputModel
-import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserStatsOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserCreateInputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserCreateTokenInputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserEmptyOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserGetByIdOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserHomeOutputModel
+import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserStatsOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserTokenCreateOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserTokenRemoveOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.models.GetRankingOutput
@@ -77,9 +76,9 @@ class UserService(
             responseType = UserStatsOutputModel::class.java
         )
 
-    suspend fun getRankingInfo(): Result<GetRankingOutput> =
+    suspend fun getRankingInfo(page: Int): Result<GetRankingOutput> =
         get(
-            path = "/api/ranking?page=0",
+            path = "/api/ranking?page=$page",
             responseType = RankingInfoOutputModel::class.java
         )
 
