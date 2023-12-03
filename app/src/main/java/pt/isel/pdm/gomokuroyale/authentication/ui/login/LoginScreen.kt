@@ -7,25 +7,31 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pt.isel.pdm.gomokuroyale.R
+import pt.isel.pdm.gomokuroyale.authentication.domain.validatePassword
+import pt.isel.pdm.gomokuroyale.authentication.domain.validateUsername
+import pt.isel.pdm.gomokuroyale.game.lobby.ui.LobbyScreenTestTag
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
 import pt.isel.pdm.gomokuroyale.ui.components.ButtonComponent
 import pt.isel.pdm.gomokuroyale.ui.components.DivideComponent
+import pt.isel.pdm.gomokuroyale.ui.components.FieldType
 import pt.isel.pdm.gomokuroyale.ui.components.IconButtonWithBorder
 import pt.isel.pdm.gomokuroyale.ui.components.InformationBox
 import pt.isel.pdm.gomokuroyale.ui.components.TextComponent
-import pt.isel.pdm.gomokuroyale.ui.components.TextComponent1
 import pt.isel.pdm.gomokuroyale.ui.components.VerificationComponent
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
@@ -36,19 +42,30 @@ TODO:
 
 
 const val BACKGROUND = 0xFFFF4FC3F7
-const val TEXT_BOX = 0xFFBDBDBD
 
 const val LoginScreenTestTag = "LoginScreenTestTag"
 private val paddingHead = 30.dp
+const val INVALID_USERNAME = "Invalid username. Must be between 5 and 20 characters"
+const val INVALID_PASSWORD = "Password must be at least 8 characters and include at least one letter and one number"
+const val LOGIN = "Login"
+const val FORGOT_PASSWORD = "Forgot Password?"
+const val NO_HAVE_ACCOUNT = "Don't have an account yet?"
+const val HELP_USERNAME ="Between 5 and 20 characters"
+const val HELP_PASSWORD = "At least 8 characters and include at least one letter and one number"
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(onBackRequested: () -> Unit = { }) {
+fun LoginScreen(
+    onBackRequested: () -> Unit = { },
+    onRegisterRequested: () -> Unit = { },
+    onLoginRequested: (username: String, password: String) -> Unit
+) {
     GomokuRoyaleTheme {
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
-                .testTag(LoginScreenTestTag),
+                .testTag(LobbyScreenTestTag),
             topBar = { TopBar(NavigationHandlers(onBackRequested = onBackRequested)) },
         ) { innerPadding ->
             Box(
@@ -59,27 +76,57 @@ fun LoginScreen(onBackRequested: () -> Unit = { }) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding),
+                        .padding(innerPadding)
+                        .testTag(LoginScreenTestTag),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    TextComponent( R.string.login_title)
+                    var username by rememberSaveable { mutableStateOf("") }
+                    var password by rememberSaveable { mutableStateOf("") }
+                    var isUsernameValid by rememberSaveable { mutableStateOf(false) }
+                    var isPasswordValid by rememberSaveable { mutableStateOf(false) }
+
+
+                    var isButtonClicked by rememberSaveable { mutableStateOf(false) }
+
+
+                    TextComponent(R.string.login_title)
                     InformationBox(
-                        text = "Enter Email...",
-                        value = "",
-                        onValueChange = {},
-                        resourceId = R.drawable.email
+                        label = "Username",
+                        value = username,
+                        onValueChange = {
+                            username = it
+                        },
+                        resourceId = R.drawable.ic_user,
+                        fieldType = FieldType.EMAIL_USER,
+                        validateField = validateUsername(username),
+                        isError = !isUsernameValid && isButtonClicked,
+                        supportText = if (!isUsernameValid && isButtonClicked) INVALID_USERNAME else HELP_USERNAME
                     )
                     InformationBox(
-                        text = "Password",
-                        value = "",
-                        onValueChange = {},
-                        resourceId = R.drawable.password
+                        label = "Password",
+                        value = password,
+                        onValueChange = {
+                            password = it
+                        },
+                        resourceId = R.drawable.password,
+                        fieldType = FieldType.PASSWORD,
+                        validateField = validatePassword(password),
+                        isError = !isPasswordValid && isButtonClicked,
+                        supportText = if (!isPasswordValid && isButtonClicked) INVALID_PASSWORD else HELP_PASSWORD
                     )
-                    VerificationComponent(textUnderline = "Forgot Password?", onClick = {})
+                    VerificationComponent(textUnderline = FORGOT_PASSWORD, onClick = {})
                     ButtonComponent(
                         iconResourceId = R.drawable.ic_enter,
-                        text = "Login",
-                        onClick = {})
+                        text = LOGIN,
+                        onClick = {
+                            isButtonClicked = true
+                            isUsernameValid = validateUsername(username)
+                            isPasswordValid = validatePassword(password)
+                            if (isUsernameValid && isPasswordValid) {
+                                onLoginRequested(username, password)
+                            }
+
+                        })
                     DivideComponent()
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -95,17 +142,18 @@ fun LoginScreen(onBackRequested: () -> Unit = { }) {
                     }
 
                     VerificationComponent(
-                        text = "Don't have an account yet?",
+                        text = NO_HAVE_ACCOUNT,
                         textUnderline = "Sign Up",
-                        onClick = {})
+                        onClick = { onRegisterRequested() })
 
                 }
 
 
             }
-
         }
     }
+
+
 }
 
 
@@ -113,5 +161,7 @@ fun LoginScreen(onBackRequested: () -> Unit = { }) {
 @Composable
 private fun InfoScreenPreview() {
 
-    LoginScreen()
+    LoginScreen(
+        onLoginRequested = { _, _ -> }
+    )
 }
