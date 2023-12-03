@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.first
+import pt.isel.pdm.gomokuroyale.authentication.domain.User
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 
@@ -28,6 +29,13 @@ class UserInfoDataStore(
         }
     }
 
+    // Verification of the user's credentials
+//    override suspend fun register(user: User) {
+//        store.edit { preferences ->
+//            preferences[usernameKey] = user.username
+//            preferences[accessToken] = user.password
+//        }
+//    }
     override suspend fun logout() {
         store.edit { preferences ->
             preferences.clear()
@@ -39,7 +47,7 @@ class UserInfoDataStore(
         val username = preferences[usernameKey] ?: return null
         val accessToken = preferences[accessToken] ?: return null
 //        val refreshToken = preferences[refreshToken] ?: return null
-        return UserInfo(username, accessToken/*, refreshToken*/)
+        return UserInfo(accessToken,username)
     }
 
     companion object {

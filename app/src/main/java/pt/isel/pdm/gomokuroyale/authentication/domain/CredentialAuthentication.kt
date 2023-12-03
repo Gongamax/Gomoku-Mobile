@@ -1,16 +1,16 @@
 package pt.isel.pdm.gomokuroyale.authentication.domain
 
-private const val MIN_USERNAME_LENGTH = 3
-const val MAX_USERNAME_LENGTH = 30
-private const val MIN_PASSWORD_LENGTH = 8
-const val MAX_PASSWORD_LENGTH = 127
+import android.util.Patterns
+
+private const val MIN_USERNAME_LENGTH = 5
+const val MAX_USERNAME_LENGTH = 20
+private const val MIN_PASSWORD_LENGTH = 6
+const val MAX_PASSWORD_LENGTH = 20
 
 private const val USERNAME_REGEX = "^[a-zA-Z0-9_]*$"
 private const val PASSWORD_REGEX = "^[a-zA-Z0-9_]*$"
 
-private const val PASSWORD_HASH_ALGORITHM = "SHA-256"
 
-private const val EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@(.+)$"
 
 
 fun validateUsername(username: String): Boolean {
@@ -20,9 +20,13 @@ fun validateUsername(username: String): Boolean {
 
 fun validatePassword(password: String): Boolean {
     return password.length in MIN_PASSWORD_LENGTH..MAX_PASSWORD_LENGTH &&
-            password.matches(PASSWORD_REGEX.toRegex())
+            password.matches(PASSWORD_REGEX.toRegex()) && password.any { it.isLetter() } && password.any { it.isDigit() }
+}
+
+fun validateConfirmationPassword(password: String, confirmationPassword: String): Boolean {
+    return password == confirmationPassword && password.isNotBlank() && confirmationPassword.isNotBlank()
 }
 
 fun validateEmail(email: String): Boolean {
-    return email.matches(EMAIL_REGEX.toRegex())
+    return email.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }

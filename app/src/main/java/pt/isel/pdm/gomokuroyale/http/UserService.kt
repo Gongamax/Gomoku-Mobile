@@ -2,6 +2,7 @@ package pt.isel.pdm.gomokuroyale.http
 
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
+import pt.isel.pdm.gomokuroyale.http.dto.DTO
 import pt.isel.pdm.gomokuroyale.http.dto.RankingInfoOutputModel
 import pt.isel.pdm.gomokuroyale.http.dto.UserStatsOutputModel
 import pt.isel.pdm.gomokuroyale.http.dto.UserCreateInputModel
@@ -26,7 +27,7 @@ class UserService(
             body = UserCreateInputModel(username, email, password)
         )
 
-    suspend fun login(username: String, password: String) =
+    suspend fun login(username: String, password: String) : Result<DTO> =
         post(
             path = Uris.Users.TOKEN,
             responseType = UserTokenCreateOutputModel::class.java,

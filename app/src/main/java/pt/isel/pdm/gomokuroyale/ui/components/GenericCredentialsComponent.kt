@@ -1,6 +1,5 @@
 package pt.isel.pdm.gomokuroyale.ui.components
 
-
 //TODO: REMOVE ALL HARDCODED VALUES
 
 import androidx.compose.foundation.clickable
@@ -20,31 +19,41 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import pt.isel.pdm.gomokuroyale.authentication.ui.login.TEXT_BOX
+import pt.isel.pdm.gomokuroyale.R
 
 const val BUTTON_COLOR = 0xFF7E91DB
+const val TEXT_BOX = 0xFFBDBDBD
 
 @Composable
-fun TextComponent(value: Int, fontSize: TextUnit = 35.sp, height: Dp = 80.dp) {
+fun TextComponent(value: Int, fontSize: TextUnit = 35.sp, height: Dp = 40.dp) {
     Text(
         text = stringResource(id = value),
         modifier = Modifier
@@ -61,33 +70,91 @@ fun TextComponent(value: Int, fontSize: TextUnit = 35.sp, height: Dp = 80.dp) {
     )
 }
 
-//preciso uma variavel que guarde o valor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InformationBox(
-    text: String,
     value: String,
+    label: String,
     onValueChange: (String) -> Unit,
-    resourceId: Int
+    resourceId: Int,
+    fieldType: FieldType,
+    validateField: Boolean ,
+    isError: Boolean,
+    supportText: String? = "",
+    minCharacters: Int = 0,
+    maxCharacters: Int = 24
 ) {
+    var passwordVisibility by rememberSaveable { mutableStateOf(false) }
 
-    OutlinedTextField(modifier = Modifier
-        .fillMaxWidth()
-        .clip(RoundedCornerShape(4.dp)),
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(4.dp)),
         value = value,
-        onValueChange = onValueChange,
-        label = { Text(text = text, fontStyle = FontStyle.Italic, color = Color(TEXT_BOX)) },
-
+        onValueChange = {
+            val newValue = if (it.length > maxCharacters) it.substring(0, maxCharacters) else it
+            onValueChange(newValue)
+        },
+        label = { Text(text = label, fontStyle = FontStyle.Italic, color = Color(TEXT_BOX)) },
         leadingIcon = {
-            Icon(
-                painter = painterResource(id = resourceId),
-                contentDescription = "",
-                modifier = Modifier
-                    .height(24.dp)
-                    .padding(4.dp)
-            )
+            IconSpecial(painterId = resourceId)
+        },
+        visualTransformation = when (fieldType) {
+            FieldType.PASSWORD -> if (!passwordVisibility) PasswordVisualTransformation() else VisualTransformation.None
+            FieldType.EMAIL_USER  -> VisualTransformation.None
+        },
+        isError = isError,
+        supportingText = {
+            if (supportText != null) {
+                Text(
+                    text = supportText,
+                    color = if(isError) MaterialTheme.colorScheme.error else Color.DarkGray,
+                )
+            }
+        },
+        trailingIcon = {
+            when (fieldType) {
+                FieldType.PASSWORD -> {
+                    IconButton(
+                        onClick = { passwordVisibility = !passwordVisibility },
+                    ) {
+                        IconSpecial(
+                            painterId = if (passwordVisibility) R.drawable.icon_eye_open else R.drawable.icon_eye_close,
+                            color = if (validateField) Color.Green else Color.Red
+                        )
+                    }
+                }
+
+                FieldType.EMAIL_USER -> {
+                    if (validateField) {
+                        IconSpecial(painterId = R.drawable.icon_correct)
+                    } else {
+                        IconSpecial(painterId = R.drawable.icon_incorrect)
+                    }
+                }
+            }
         }
+
     )
+}
+
+
+@Composable
+fun IconSpecial(painterId: Int, color: Color = Color.Unspecified) {
+    Icon(
+        modifier = Modifier
+            .height(24.dp)
+            .padding(4.dp),
+        painter = painterResource(id = painterId),
+        contentDescription = "",
+        tint = color
+    )
+}
+
+
+enum class FieldType {
+    EMAIL_USER,
+    PASSWORD
 }
 
 
@@ -96,6 +163,7 @@ fun TextComponent1(
     text: String,
     underline: Boolean = false,
     enableClick: Boolean = false,
+    fontSize: TextUnit = 15.sp,
     onClick: () -> Unit = {}
 ) {
     if (underline && enableClick) {
@@ -114,7 +182,7 @@ fun TextComponent1(
         Text(
             text, color = Color.Gray,
             fontStyle = FontStyle.Italic,
-            fontSize = 15.sp,
+            fontSize = fontSize,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
         )
@@ -152,10 +220,11 @@ fun VerificationComponent(text: String? = null, textUnderline: String, onClick: 
 }
 
 @Composable
-fun ButtonComponent(iconResourceId: Int, text: String, onClick: () -> Unit) {
+fun ButtonComponent(iconResourceId: Int, text: String, onClick: () -> Unit, enabled: Boolean = true) {
     Button(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(1f),
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(Color(BUTTON_COLOR))
     ) {
         Icon(
