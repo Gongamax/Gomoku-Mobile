@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.http.utils
+package pt.isel.pdm.gomokuroyale.http.media
 
 import okhttp3.MediaType.Companion.toMediaType
 import java.net.URI

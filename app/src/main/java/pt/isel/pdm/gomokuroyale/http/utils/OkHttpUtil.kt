@@ -7,11 +7,17 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import pt.isel.pdm.gomokuroyale.http.dto.DTO
-import pt.isel.pdm.gomokuroyale.http.utils.Problem.Companion.problemMediaType
+import pt.isel.pdm.gomokuroyale.http.media.Problem
+import pt.isel.pdm.gomokuroyale.http.media.Problem.Companion.problemMediaType
+import pt.isel.pdm.gomokuroyale.http.media.siren.SirenModel.Companion.sirenMediaType
 import kotlin.coroutines.resumeWithException
 
-suspend fun <T> Request.makeAPIRequest(client: OkHttpClient, responseType : Class<out DTO>, jsonEncoder: Gson) : T =
-    suspendCancellableCoroutine<T> { continuation ->
+suspend fun <T> Request.makeAPIRequest(
+    client: OkHttpClient,
+    responseType: Class<out DTO>,
+    gson: Gson
+): T =
+    suspendCancellableCoroutine { continuation ->
         val newCall = client.newCall(this)
         newCall.enqueue(object : okhttp3.Callback {
             override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
@@ -32,15 +38,16 @@ suspend fun <T> Request.makeAPIRequest(client: OkHttpClient, responseType : Clas
                 val resJson = JsonReader(body.charStream())
 
                 when {
-                    response.isSuccessful /*&& contentType == sirenMediaType*/-> {
+                    response.isSuccessful && contentType == sirenMediaType -> {
+                        println("Response type: ${responseType}")
                         continuation.resumeWith(
-                            Result.success(jsonEncoder.fromJson(resJson, responseType))
+                            Result.success(gson.fromJson(resJson, responseType))
                         )
                     }
 
                     !response.isSuccessful && contentType == problemMediaType ->
                         continuation.resumeWith(
-                            Result.success(jsonEncoder.fromJson(resJson, Problem::class.java))
+                            Result.failure(gson.fromJson(resJson, Problem::class.java))
                         )
 
                     else ->

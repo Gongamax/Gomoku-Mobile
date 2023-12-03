@@ -1,5 +1,6 @@
-package pt.isel.pdm.gomokuroyale.http.dto
+package pt.isel.pdm.gomokuroyale.http.services.users.dto
 
+import pt.isel.pdm.gomokuroyale.http.dto.DTO
 import pt.isel.pdm.gomokuroyale.http.dto.util.RankingEntry
 
 data class UserCreateInputModel(
@@ -80,8 +81,24 @@ data class UserTokenRemoveOutputModel(
 }
 
 //TODO: remove this class, it's only here to make the compiler happy TEMPORARILY
-class UserEmptyOutputModel() : DTO {
+data class UserEmptyOutputModel(
+    val classList: List<String>,
+    val properties: Properties,
+    val links: List<Link>,
+    val entities: List<Any>,
+    val actions: List<Any>,
+    val requireAuth: List<Boolean>
+) : DTO {
     override fun getType(): Class<out DTO> {
         return this::class.java
     }
 }
+
+data class Properties(
+    val uid: Int
+)
+
+data class Link(
+    val rel: List<String>,
+    val href: String
+)

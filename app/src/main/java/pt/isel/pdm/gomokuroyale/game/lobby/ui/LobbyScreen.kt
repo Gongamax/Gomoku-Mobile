@@ -236,5 +236,5 @@ fun <T> splitList(inputList: MutableList<T>): Pair<MutableList<T>, MutableList<T
 @Preview(showBackground = true)
 @Composable
 fun LobbyScreenPreview() {
-    LobbyScreen(playerInfo = PlayerInfo("Player Name", 1000), modifier = Modifier.shimmer())
+    LobbyScreen(playerInfo = PlayerInfo("Player Name", 1000))
 }

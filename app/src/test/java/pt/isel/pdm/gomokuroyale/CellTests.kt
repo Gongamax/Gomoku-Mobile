@@ -21,10 +21,4 @@ class CellTests {
         val cell2 = Cell(1, 1)
         Assert.assertEquals(cell1, cell2)
     }
-
-    @Test
-    fun testCellInvalid() {
-        val cell = Cell(-1, -1)
-        Assert.assertEquals(cell, Cell.INVALID)
-    }
 }

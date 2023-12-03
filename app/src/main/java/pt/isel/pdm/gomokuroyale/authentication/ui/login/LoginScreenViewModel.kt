@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
-import pt.isel.pdm.gomokuroyale.authentication.domain.validateUsername
-import pt.isel.pdm.gomokuroyale.http.UserService
+import pt.isel.pdm.gomokuroyale.http.services.users.UserService
 import pt.isel.pdm.gomokuroyale.util.IOState
 import pt.isel.pdm.gomokuroyale.util.Idle
 import pt.isel.pdm.gomokuroyale.util.Loading
 import pt.isel.pdm.gomokuroyale.util.Saving
 import pt.isel.pdm.gomokuroyale.util.idle
+import pt.isel.pdm.gomokuroyale.util.loadFailure
 import pt.isel.pdm.gomokuroyale.util.loading
 import pt.isel.pdm.gomokuroyale.util.saved
 import pt.isel.pdm.gomokuroyale.util.saving
@@ -54,8 +54,8 @@ class LoginScreenViewModel(
 //            if (response.isFailure)
 //                _state.value = loadFailure(response.exceptionOrNull() ?: Exception("UNKNOWN"))
 //
-//            val body = response.getOrNull() as UserTokenCreateOutputModel
-//            val userInfo = UserInfo(body.token, username)
+//            val body = response.getOrNull() ?: return@launch
+//            val userInfo = UserInfo(body.properties.token, username)
             val userInfo = UserInfo("token", username)
             _state.value = saving()
             val result = kotlin.runCatching { userInfoRepository.login(userInfo); userInfo }
@@ -75,5 +75,4 @@ class LoginScreenViewModel(
             userInfoRepository.logout()
         }
     }
-
 }

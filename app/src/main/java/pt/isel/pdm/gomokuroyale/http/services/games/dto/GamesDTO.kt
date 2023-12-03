@@ -1,7 +1,8 @@
-package pt.isel.pdm.gomokuroyale.http.dto
+package pt.isel.pdm.gomokuroyale.http.services.games.dto
 
 import pt.isel.pdm.gomokuroyale.authentication.domain.User
 import pt.isel.pdm.gomokuroyale.game.play.domain.Board
+import pt.isel.pdm.gomokuroyale.http.dto.DTO
 import pt.isel.pdm.gomokuroyale.http.dto.util.MatchmakingStatus
 
 data class GamePlayInputModel(val row: Int, val column: Int) : DTO {

@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
 import pt.isel.pdm.gomokuroyale.http.GomokuService
-import pt.isel.pdm.gomokuroyale.http.dto.GameMatchmakingInputModel
-import pt.isel.pdm.gomokuroyale.http.dto.GameMatchmakingStatusOutputModel
+import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingInputModel
+import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingStatusOutputModel
 import pt.isel.pdm.gomokuroyale.http.dto.util.MatchmakingStatus
 import pt.isel.pdm.gomokuroyale.util.IOState
 import pt.isel.pdm.gomokuroyale.util.idle

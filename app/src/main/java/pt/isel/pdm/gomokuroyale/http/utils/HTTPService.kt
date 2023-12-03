@@ -1,6 +1,7 @@
 package pt.isel.pdm.gomokuroyale.http.utils
 
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -8,28 +9,28 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.internal.EMPTY_REQUEST
 import pt.isel.pdm.gomokuroyale.http.dto.DTO
+import pt.isel.pdm.gomokuroyale.http.media.siren.SirenModel
 
 abstract class HTTPService(
     val httpClient: OkHttpClient,
     val jsonEncoder: Gson,
     val apiEndpoint: String
 ) {
-    suspend inline fun Request.getResponse(responseType: Class<out DTO>) : Result<DTO> =
-        makeAPIRequest(httpClient, responseType, jsonEncoder)
+    suspend inline fun <T> Request.getResponse(responseType: Class<out DTO>): Result<SirenModel<T>> =
+        makeAPIRequest(httpClient, responseType, jsonEncoder) as Result<SirenModel<T>>
 
-
-    suspend inline fun get(path: String, responseType: Class<out DTO>): Result<DTO> =
+    suspend inline fun <T> get(path: String, responseType: Class<out DTO>): Result<SirenModel<T>> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
             .build()
             .getResponse(responseType)
 
-    suspend inline fun get(
+    suspend inline fun <T> get(
         path: String,
         responseType: Class<out DTO>,
         token: String
-    ): Result<DTO> =
+    ): Result<SirenModel<T>> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -37,11 +38,11 @@ abstract class HTTPService(
             .build()
             .getResponse(responseType)
 
-    suspend inline fun post(
+    suspend inline fun <T> post(
         path: String,
         responseType: Class<out DTO>,
         body: Any
-    ): Result<DTO> =
+    ): Result<SirenModel<T>> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -49,12 +50,12 @@ abstract class HTTPService(
             .build()
             .getResponse(responseType)
 
-    suspend inline fun post(
+    suspend inline fun <T> post(
         path: String,
         responseType: Class<out DTO>,
         token: String,
         body: Any? = null
-    ): Result<DTO> =
+    ): Result<SirenModel<T>> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -66,12 +67,12 @@ abstract class HTTPService(
             .build()
             .getResponse(responseType)
 
-    suspend inline fun put(
+    suspend inline fun <T> put(
         path: String,
         responseType: Class<out DTO>,
         token: String,
-        body: Any
-    ): Result<DTO> =
+        body: Any = EMPTY_REQUEST
+    ): Result<SirenModel<T>> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -83,12 +84,12 @@ abstract class HTTPService(
             .build()
             .getResponse(responseType)
 
-    suspend inline fun delete(
+    suspend inline fun <T> delete(
         path: String,
         responseType: Class<out DTO>,
         token: String,
-        body: Any
-    ): Result<DTO> =
+        body: Any = EMPTY_REQUEST
+    ): Result<SirenModel<T>> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -99,7 +100,6 @@ abstract class HTTPService(
             )
             .build()
             .getResponse(responseType)
-
 
     companion object {
         const val APPLICATION_JSON = "application/json"
