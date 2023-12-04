@@ -53,14 +53,14 @@ class MatchmakerActivity : ComponentActivity() {
 
             }
 
-        setContent {
-            MatchmakerScreen(
-                status = viewModel.status.collectAsState().value.getOrThrow(),  //TODO: REVISE THIS
-                onCancelingMatchmaking = viewModel::leaveQueue,
-                //onCancelingEnabled = viewModel::cancelMatchmakingEnabled.getOrNull() ?: false,
-                variant = matchInfo?.variant ?: Variant.STANDARD
-            )
-        }
+//        setContent {
+//            MatchmakerScreen(
+//                status = viewModel.status.collectAsState().value.getOrThrow(),  //TODO: REVISE THIS
+//                onCancelingMatchmaking = viewModel::leaveQueue,
+//                //onCancelingEnabled = viewModel::cancelMatchmakingEnabled.getOrNull() ?: false,
+//                variant = matchInfo?.variant ?: Variant.STANDARD
+//            )
+//        }
     }
 
 

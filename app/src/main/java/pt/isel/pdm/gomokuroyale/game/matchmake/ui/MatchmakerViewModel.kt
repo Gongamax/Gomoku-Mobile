@@ -12,8 +12,7 @@ import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingInputModel
-import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingStatusOutputModel
-import pt.isel.pdm.gomokuroyale.http.dto.util.MatchmakingStatus
+import pt.isel.pdm.gomokuroyale.http.domain.MatchmakingStatus
 import pt.isel.pdm.gomokuroyale.util.IOState
 import pt.isel.pdm.gomokuroyale.util.idle
 import pt.isel.pdm.gomokuroyale.util.loadFailure
@@ -28,7 +27,7 @@ class MatchmakerViewModel(
     private val _status: MutableStateFlow<IOState<MatchmakingStatus>> = MutableStateFlow(idle())
     val status: StateFlow<IOState<MatchmakingStatus>> = _status.asStateFlow()
 
-    private
+    private val gameService = service.gameService
 
     fun findGame() {
         viewModelScope.launch {
@@ -39,36 +38,20 @@ class MatchmakerViewModel(
 
             _status.value = loading()
 
-            val response = service.gameService.matchmaking(
+            val response = gameService.matchmaking(
                 token = matchInfo.userInfo.accessToken,
                 GameMatchmakingInputModel(variant = matchInfo.variant.toString())
             )
 
-            if (response.isFailure)
-                _status.value =
-                    loadFailure(response.exceptionOrNull() ?: Exception("Unknown error"))
-
             while (true) {
-
-                val matchStatus =
-                    service.gameService.getMatchmakingStatus(matchInfo.userInfo.accessToken)
-                when {
-                    matchStatus.isSuccess -> {
-                        val body = matchStatus.getOrNull() as GameMatchmakingStatusOutputModel
-                        _status.value = loadSuccess(body.status)
-                        if (body.status == MatchmakingStatus.MATCHED) {
-                            //TODO: navigate to game
-                            break
-                        } else {
-                            delay(POOLING_DELAY)
-                        }
-                    }
-
-                    else -> {
-                        _status.value =
-                            loadFailure(response.exceptionOrNull() ?: Exception("Unknown error"))
-                        break
-                    }
+                val matchEntry = gameService.getMatchmakingStatus(matchInfo.userInfo.accessToken)
+                val matchStatus = MatchmakingStatus.valueOf(matchEntry.properties.state)
+                _status.value = loadSuccess(matchStatus)
+                if (matchStatus == MatchmakingStatus.MATCHED) {
+                    //TODO: navigate to game
+                    break
+                } else {
+                    delay(POOLING_DELAY)
                 }
             }
         }
@@ -81,12 +64,7 @@ class MatchmakerViewModel(
                 return@launch
             }
             val response = service.gameService.cancelMatchmaking(matchInfo.userInfo.accessToken)
-            if (response.isFailure) {
-                _status.value =
-                    loadFailure(response.exceptionOrNull() ?: Exception("Unknown error"))
-            } else {
-                _status.value = loadSuccess(MatchmakingStatus.LEFT_QUEUE)
-            }
+            _status.value = loadSuccess(MatchmakingStatus.LEFT_QUEUE)
         }
     }
 
@@ -97,5 +75,4 @@ class MatchmakerViewModel(
                 initializer { MatchmakerViewModel(service, matchInfo) }
             }
     }
-
 }

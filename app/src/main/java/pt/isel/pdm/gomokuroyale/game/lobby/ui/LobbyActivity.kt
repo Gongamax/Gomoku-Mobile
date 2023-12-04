@@ -2,7 +2,6 @@ package pt.isel.pdm.gomokuroyale.game.lobby.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,16 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
-import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchedMatchInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchedPlayerInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchingMatchInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchingPlayerInfo
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.PlayerInfo
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakerActivity
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
-import pt.isel.pdm.gomokuroyale.rankings.ui.PlayerInfo
 
 class LobbyActivity : ComponentActivity() {
 

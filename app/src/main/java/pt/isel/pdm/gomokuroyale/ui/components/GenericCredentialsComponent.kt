@@ -1,5 +1,6 @@
 package pt.isel.pdm.gomokuroyale.ui.components
 
+
 //TODO: REMOVE ALL HARDCODED VALUES
 
 import androidx.compose.foundation.clickable
@@ -32,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -78,7 +78,7 @@ fun InformationBox(
     onValueChange: (String) -> Unit,
     resourceId: Int,
     fieldType: FieldType,
-    validateField: Boolean ,
+    validateField: Boolean = true,
     isError: Boolean,
     supportText: String? = "",
     minCharacters: Int = 0,

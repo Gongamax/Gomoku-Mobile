@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.http.dto.util
+package pt.isel.pdm.gomokuroyale.http.domain
 
 enum class MatchmakingStatus {
     PENDING,

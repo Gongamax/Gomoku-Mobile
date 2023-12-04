@@ -71,7 +71,7 @@ fun RegisterScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .testTag(RegisterScreenTestTag),
-            topBar = { TopBar(NavigationHandlers(onBackRequested = onBackRequested)) },
+            topBar = { TopBar(navigation = NavigationHandlers(onBackRequested = onBackRequested)) },
         ) { innerPadding ->
             Box(
                 modifier = Modifier

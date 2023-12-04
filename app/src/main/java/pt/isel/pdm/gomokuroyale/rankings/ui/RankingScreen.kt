@@ -1,79 +1,120 @@
-@file:OptIn(FlowPreview::class)
-
 package pt.isel.pdm.gomokuroyale.rankings.ui
 
-import android.content.SharedPreferences
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
-import pt.isel.pdm.gomokuroyale.ui.TopBar
-import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.about.ui.AboutScreenTestTag
-import pt.isel.pdm.gomokuroyale.ui.components.TextComponent
+import pt.isel.pdm.gomokuroyale.http.domain.RankingEntry
+import pt.isel.pdm.gomokuroyale.http.domain.unitsConverter
+import pt.isel.pdm.gomokuroyale.rankings.domain.FetchedPlayerInfo
+import pt.isel.pdm.gomokuroyale.rankings.domain.FetchedRankingInfo
+import pt.isel.pdm.gomokuroyale.rankings.domain.FetchingRankingInfo
+import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState
+import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
+import pt.isel.pdm.gomokuroyale.ui.TopBar
+import pt.isel.pdm.gomokuroyale.ui.components.LoadingView
+import pt.isel.pdm.gomokuroyale.ui.components.MyIcon
+import pt.isel.pdm.gomokuroyale.ui.components.MySearchBar
+import pt.isel.pdm.gomokuroyale.ui.components.UserInfoPopUp
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
+import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
-const val MAX_RANKING_NUMBER = 50
-
-data class PlayerInfo(val username: String, val points: Int)
-
-data class RankingTable(
-    val table: List<PlayerInfo>
-)
-
-@OptIn(ExperimentalMaterial3Api::class)
+const val SearchBarTestTag = "SearchBar"
 @Composable
 fun RankingScreen(
+    vmState: RankingScreenState,
+    modifier: Modifier = Modifier,
     onBackRequested: () -> Unit = { },
-    onPlayerClicked: (String) -> Unit = { },
-    rankingTable: RankingTable,
-    prefs: SharedPreferences
-) {
+    onPagedRequested: (Int) -> Unit = { },
+    onMatchHistoryRequested: (Int, String) -> Unit = { _, _ -> },
+    onSearchRequested: (String) -> Unit = { },
+    onPlayerSelected: (Int) -> Unit = { },
+    onPlayerDismissed: () -> Unit = { },
+){
     GomokuRoyaleTheme {
+        var query by remember { mutableStateOf("") }
+        val listState = rememberLazyListState()
+        var page by remember { mutableIntStateOf(0) }
+        val rank by remember { mutableStateOf((vmState as FetchedRankingInfo).rankingInfo.rank) }
         Scaffold(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .testTag(AboutScreenTestTag),
-            topBar = { TopBar(NavigationHandlers(onBackRequested = onBackRequested)) },
+            topBar = {
+                TopBar(
+                    title = {
+                            Spacer(modifier = Modifier.padding(5.dp))
+                            Text(
+                                text = stringResource(id = R.string.ranking_title),
+                                textAlign = TextAlign.Center
+                            )
+                    },
+                    navigation = NavigationHandlers(onBackRequested = onBackRequested)) },
         ) { innerPadding ->
-            RankingLazyColumn(
-                ranks = rankingTable,
-                modifier = Modifier.padding(innerPadding),
-                onPlayerClicked = onPlayerClicked,
-                prefs = prefs
-            )
+            run {
+                RankingLazyColumn(
+                    query = query,
+                    listState = listState,
+                    rank = rank,
+                    state = vmState,
+                    modifier = modifier.padding(innerPadding),
+                    onMatchHistoryRequested = onMatchHistoryRequested,
+                    onSearchRequested = { onSearchRequested(it) },
+                    onQueryChanged = { query = it },
+                    onClearSearch = { query = "" },
+                    onPlayerSelected = { onPlayerSelected(it) },
+                    onPlayerDismissed = onPlayerDismissed
+                )
+                LaunchedEffect(key1 = page){
+                    if(page == 0){
+                        listState.scrollToItem(0)
+                    } else {
+                        onPagedRequested(page)
+                    }
+                }
+                LaunchedEffect(key1 = listState){
+                    snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+                        .collectLatest { itemIndex ->
+                            if(vmState is FetchingRankingInfo && itemIndex != null && itemIndex >= rank.size - 1)
+                                page++
+                        }
+                }
+            }
         }
     }
 }
@@ -82,163 +123,113 @@ fun RankingScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RankingLazyColumn(
-    ranks: RankingTable,
+    query: String,
+    listState: LazyListState,
+    state: RankingScreenState,
+    rank: List<RankingEntry>,
     modifier: Modifier = Modifier,
-    onPlayerClicked: (String) -> Unit = { },
-    prefs: SharedPreferences
-) {
-    val scrollPosition = prefs.getInt("scroll_position", 0)
-    val lazyListState = rememberLazyListState(
-        initialFirstVisibleItemIndex = scrollPosition
-    )
-
-    LaunchedEffect(key1 = lazyListState) {
-        snapshotFlow { lazyListState.firstVisibleItemIndex }
-            .debounce(500L)
-            .collectLatest { index ->
-                prefs.edit()
-                    .putInt("scroll_position", index)
-                    .apply()
-            }
-    }
-
+    onMatchHistoryRequested: (Int, String) -> Unit = { _, _ -> },
+    onSearchRequested: (String) -> Unit = { },
+    onQueryChanged: (String) -> Unit = { },
+    onClearSearch: () -> Unit = { },
+    onPlayerSelected: (Int) -> Unit = { },
+    onPlayerDismissed: () -> Unit = { },
+){
     LazyColumn(
-        state = lazyListState,
+        userScrollEnabled = true,
+        state = listState,
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
         stickyHeader {
-            RankingHeader()
+            MySearchBar(query, onSearchRequested, onQueryChanged, onClearSearch)
+            Spacer(modifier = Modifier.padding(5.dp))
         }
-        items(ranks.table.size) {
-            Button(
-                shape = CircleShape,
-                onClick = { onPlayerClicked(ranks.table[it].username) },
-                modifier = Modifier
-                    .fillMaxWidth(0.85f)
-                    .padding(1.dp),
-                colors = ButtonDefaults.buttonColors(DarkViolet)
-            ) {
-                PlayerView(ranks.table[it], it)
+        rank.forEach{ player ->
+            item {
+                PlayerView(player, onPlayerSelected)
+                Spacer(modifier = Modifier.padding(1.dp))
             }
         }
-    }
-}
-
-@Composable
-fun RankingHeader() {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .background(Color.White)) {
-        Row() {
-            TextComponent(R.string.ranking_title, 20.sp, 40.dp)
+        if(state is FetchingRankingInfo){
+            item {
+                LoadingView()
+            }
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Spacer(modifier = Modifier.padding(horizontal = 35.dp))
-            Text(
-                text = "Place",
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Start,
-                maxLines = 1,
-                modifier = Modifier
-            )
-            Spacer(modifier = Modifier.padding(horizontal = 35.dp))
-            Text(
-                text = "Name",
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                modifier = Modifier
-            )
-            Spacer(modifier = Modifier.padding(horizontal = 35.dp))
-            Text(
-                text = "Points",
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.End,
-                maxLines = 1,
-                modifier = Modifier
-            )
+        if (state is FetchedPlayerInfo) {
+            item {
+                UserInfoPopUp(
+                    onDismissRequest = { },
+                    onMatchHistoryRequested = onMatchHistoryRequested,
+                    playerInfo = state.playerInfo,
+                )
+            }
         }
     }
 }
 
 @Composable
 fun PlayerView(
-    playerInfo: PlayerInfo,
-    ranking: Int
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+    playerInfo: RankingEntry,
+    onPlayerSelected: (Int) -> Unit = { },
+){
+    Card(
+        shape = RectangleShape,
+        modifier = Modifier
+            .fillMaxWidth(0.7f)
+            .clip(RoundedCornerShape(10.dp))
+            .clickable {
+                onPlayerSelected(playerInfo.id)
+            },
+        colors = CardDefaults.cardColors(containerColor = DarkViolet)
     ) {
-
-        when (val res = ranking + 1) {
-            1 -> IconButton(onClick = { }, enabled = false) {
-                Image(
-                    painter = painterResource(id = R.drawable.first_place),
-                    contentDescription = "1st"
-                )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(modifier = Modifier.padding(10.dp))
+            when (val res = playerInfo.rank) {
+                in top3.keys -> top3[res]?.invoke()
+                else -> IconButton(onClick = { }, enabled = false) {
+                    Text(
+                        text = "${res}.",
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                        color = Color.Black
+                    )
+                }
             }
-
-            2 -> IconButton(onClick = { }, enabled = false) {
-                Image(
-                    painter = painterResource(id = R.drawable.second_place),
-                    contentDescription = "2nd"
-                )
-            }
-
-            3 -> IconButton(onClick = { }, enabled = false) {
-                Image(
-                    painter = painterResource(id = R.drawable.third_place),
-                    contentDescription = "3rd"
-                )
-            }
-
-            else -> IconButton(onClick = { }, enabled = false) {
-                Text(
-                    text = "${res}th",
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center,
-                    color = Color.Black
-                )
-            }
-        }
-        Text(
-            text = playerInfo.username,
-            style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-
+            Spacer(modifier = Modifier.padding(10.dp))
+            Text(
+                text = playerInfo.username,
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
             )
-        Text(
-            text = "${playerInfo.points}",
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            modifier = Modifier
-                .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp),
-        )
+            Spacer(modifier = Modifier.padding(15.dp))
+            Text(
+                text = playerInfo.points.unitsConverter(),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+            )
+            MyIcon(resultId = R.drawable.ic_coins, size = 40.dp)
+        }
     }
 }
 
-//    @Preview(showBackground = true)
-//    @Composable
-//    private fun LeaderboardWithoutPlayerPreview() {
-//        RankingScreen(
-//            onBackRequested = {},
-//            onPlayerClicked = {},
-//            rankingTable = RankingTable(leaderboard),
-//            prefs = remember {  }
-//        )
-//    }
-
-
-val leaderboard = buildList {
-    repeat(MAX_RANKING_NUMBER) {
-        add(PlayerInfo("Player$it", it * 3))
+    @Preview(showBackground = true)
+    @Composable
+    private fun LeaderboardPreview() {
+        RankingScreen(
+            vmState = FetchingRankingInfo,
+            onBackRequested = {},
+            onMatchHistoryRequested = { _, _ -> },
+        )
     }
-}.asReversed()
+
+private val top3 = hashMapOf<Int, @Composable () -> Unit>(
+    1 to { MyIcon(resultId = R.drawable.first_place) },
+    2 to { MyIcon(resultId = R.drawable.second_place) },
+    3 to { MyIcon(resultId = R.drawable.third_place) }
+)

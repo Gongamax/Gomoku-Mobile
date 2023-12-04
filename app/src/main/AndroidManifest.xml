@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GomokuRoyale"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
             android:name=".game.matchmake.ui.MatchmakerActivity"
@@ -48,6 +49,13 @@
             android:name=".authentication.ui.register.RegisterActivity"
             android:exported="false"
             android:noHistory="true" />
+        <activity
+            android:name=".matchHistory.ui.MatchHistoryActivity"
+            android:exported="false"
+            android:noHistory="true" />
     </application>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 </manifest>
