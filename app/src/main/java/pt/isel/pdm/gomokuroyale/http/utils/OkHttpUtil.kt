@@ -1,20 +1,20 @@
 package pt.isel.pdm.gomokuroyale.http.utils
 
 import com.google.gson.Gson
-import com.google.gson.stream.JsonReader
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import pt.isel.pdm.gomokuroyale.http.dto.DTO
-import pt.isel.pdm.gomokuroyale.http.media.Problem
 import pt.isel.pdm.gomokuroyale.http.media.Problem.Companion.problemMediaType
 import pt.isel.pdm.gomokuroyale.http.media.siren.SirenModel.Companion.sirenMediaType
+import java.lang.reflect.Type
+import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-suspend fun <T> Request.makeAPIRequest(
+suspend inline fun <reified T> Request.makeAPIRequest(
     client: OkHttpClient,
-    responseType: Class<out DTO>,
+    responseType: Type,
     gson: Gson
 ): T =
     suspendCancellableCoroutine { continuation ->
@@ -35,19 +35,20 @@ suspend fun <T> Request.makeAPIRequest(
                     null
                 )
                 val contentType = body.contentType()
-                val resJson = JsonReader(body.charStream())
+                val resJson = body.string()
 
                 when {
                     response.isSuccessful && contentType == sirenMediaType -> {
-                        println("Response type: ${responseType}")
-                        continuation.resumeWith(
-                            Result.success(gson.fromJson(resJson, responseType))
-                        )
+                        println("Response type: $responseType")
+                        val res: T = gson.fromJson(resJson, responseType)
+                        println(res)
+                        //val success: Result<T> = Result.success(res)
+                        continuation.resume(res)
                     }
 
                     !response.isSuccessful && contentType == problemMediaType ->
                         continuation.resumeWith(
-                            Result.failure(gson.fromJson(resJson, Problem::class.java))
+                            Result.failure(Exception())//(gson.fromJson(resJson, Problem::class.java))
                         )
 
                     else ->

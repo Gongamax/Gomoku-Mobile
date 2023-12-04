@@ -39,8 +39,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collectLatest
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.about.ui.AboutScreenTestTag
-import pt.isel.pdm.gomokuroyale.http.dto.util.RankingEntry
-import pt.isel.pdm.gomokuroyale.http.dto.util.unitsConverter
+import pt.isel.pdm.gomokuroyale.http.domain.RankingEntry
+import pt.isel.pdm.gomokuroyale.http.domain.unitsConverter
 import pt.isel.pdm.gomokuroyale.rankings.domain.FetchedPlayerInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.FetchedRankingInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.FetchingRankingInfo

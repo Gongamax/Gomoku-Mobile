@@ -7,8 +7,9 @@ import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserStatsOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserTokenCreateOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserTokenRemoveOutputModel
 import pt.isel.pdm.gomokuroyale.http.media.siren.SirenModel
+import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserCreateOutputModel
 
-typealias RegisterOutput = SirenModel<Unit>
+typealias RegisterOutput = SirenModel<UserCreateOutputModel>
 
 typealias LoginOutput = SirenModel<UserTokenCreateOutputModel>
 

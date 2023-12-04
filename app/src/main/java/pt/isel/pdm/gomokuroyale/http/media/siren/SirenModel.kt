@@ -1,5 +1,6 @@
 package pt.isel.pdm.gomokuroyale.http.media.siren
 
+import com.google.gson.reflect.TypeToken
 import okhttp3.MediaType.Companion.toMediaType
 
 /**
@@ -14,7 +15,7 @@ import okhttp3.MediaType.Companion.toMediaType
  * */
 
 data class SirenModel<T>(
-    val clazz: List<String>,
+    val `class`: List<String>,
     val properties: T,
     val links: List<LinkModel>,
     val entities: List<EntityModel<*>>,
@@ -23,8 +24,10 @@ data class SirenModel<T>(
 ) {
     companion object {
         private const val MEDIA_TYPE = "application/vnd.siren+json"
-
         val sirenMediaType = MEDIA_TYPE.toMediaType()
+
+        inline fun <reified T> getType(): TypeToken<SirenModel<T>> =
+            object : TypeToken<SirenModel<T>>() {}
     }
 }
 

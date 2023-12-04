@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import pt.isel.pdm.gomokuroyale.http.dto.util.RankingEntry
+import pt.isel.pdm.gomokuroyale.http.domain.RankingEntry
 import pt.isel.pdm.gomokuroyale.http.services.users.UserService
 import pt.isel.pdm.gomokuroyale.rankings.domain.FetchedPlayerInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.FetchedPlayersBySearch
@@ -36,7 +36,7 @@ class RankingViewModel (private val service: UserService) : ViewModel() {
         _state.value = FetchingRankingInfo
         viewModelScope.launch {
             val result =  service.getRankingInfo(page)
-            val rankingInfo = checkNotNull(result.getOrNull())
+            val rankingInfo = result
             _state.value = FetchedRankingInfo(RankingState( rankingInfo.properties.rankingTable))
         }
     }
@@ -52,7 +52,7 @@ class RankingViewModel (private val service: UserService) : ViewModel() {
         _state.value = FetchingPlayersBySearch
         viewModelScope.launch{
             val result = service.getRankingInfo(1)
-            val search = checkNotNull(result.getOrNull())
+            val search = result
             _state.value = FetchedPlayersBySearch(RankingState(search.properties.rankingTable))
         }
     }
@@ -63,7 +63,7 @@ class RankingViewModel (private val service: UserService) : ViewModel() {
         _state.value = FetchingPlayerInfo
         viewModelScope.launch {
             val result = service.getStatsById(id, "token")
-            val userInfo = checkNotNull(result.getOrNull())
+            val userInfo = result
             _state.value = FetchedPlayerInfo(
                 RankingEntry(
                     userInfo.properties.id,

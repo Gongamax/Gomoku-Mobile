@@ -20,7 +20,6 @@ object Uris {
     }
 
     object Games {
-        const val CREATE_GAME = "$PREFIX/games"
         const val GET_GAME_BY_ID = "$PREFIX/games/{id}"
         const val PLAY = "$PREFIX/games/{id}/play"
         const val MATCHMAKING = "$PREFIX/games/matchmaking"

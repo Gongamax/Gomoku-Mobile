@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.http.dto.util
+package pt.isel.pdm.gomokuroyale.http.domain
 
 data class RankingEntry (
     val id : Int,

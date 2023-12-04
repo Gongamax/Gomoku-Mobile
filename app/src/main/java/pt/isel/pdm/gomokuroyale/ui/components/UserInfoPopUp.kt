@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import pt.isel.pdm.gomokuroyale.http.dto.util.RankingEntry
+import pt.isel.pdm.gomokuroyale.http.domain.RankingEntry
 
 @Composable
 fun UserInfoPopUp(

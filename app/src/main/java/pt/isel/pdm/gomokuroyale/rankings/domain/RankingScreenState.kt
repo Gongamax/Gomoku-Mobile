@@ -1,6 +1,6 @@
 package pt.isel.pdm.gomokuroyale.rankings.domain
 
-import pt.isel.pdm.gomokuroyale.http.dto.util.RankingEntry
+import pt.isel.pdm.gomokuroyale.http.domain.RankingEntry
 
 /**
  * Represents the state of the ranking screen.

@@ -78,7 +78,7 @@ fun InformationBox(
     onValueChange: (String) -> Unit,
     resourceId: Int,
     fieldType: FieldType,
-    validateField: Boolean ,
+    validateField: Boolean = true,
     isError: Boolean,
     supportText: String? = "",
     minCharacters: Int = 0,

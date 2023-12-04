@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
-import pt.isel.pdm.gomokuroyale.http.dto.util.MatchmakingStatus
+import pt.isel.pdm.gomokuroyale.http.domain.MatchmakingStatus
 import pt.isel.pdm.gomokuroyale.ui.TipInfoBox
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 

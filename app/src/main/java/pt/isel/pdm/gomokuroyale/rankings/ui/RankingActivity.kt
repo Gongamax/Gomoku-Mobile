@@ -19,7 +19,7 @@ import pt.isel.pdm.gomokuroyale.rankings.domain.WantsToGoToMatchHistory
 
 class RankingActivity: ComponentActivity() {
 
-    private val repo by lazy { (application as DependenciesContainer).gomokuService.userService }
+    private val userService by lazy { (application as DependenciesContainer).gomokuService.userService }
 
     companion object {
         fun navigateTo(origin : Activity){
@@ -33,7 +33,7 @@ class RankingActivity: ComponentActivity() {
      */
     private val viewModel by viewModels<RankingViewModel> (
         factoryProducer = {
-            RankingViewModel.factory(repo)
+            RankingViewModel.factory(userService)
         }
     )
 
