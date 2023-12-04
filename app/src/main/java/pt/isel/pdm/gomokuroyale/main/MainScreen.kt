@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
+import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
 const val MainScreenTestTag = "MainScreenTestTag"
@@ -111,7 +112,8 @@ fun MainScreen(
 private fun ButtonMenu(icon: ImageVector, stringId: Int, onClick: () -> Unit) {
     Button(
         modifier = Modifier.fillMaxWidth(0.8f),
-        onClick = onClick
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(DarkViolet)
     ) {
         Icon(
             imageVector = icon,

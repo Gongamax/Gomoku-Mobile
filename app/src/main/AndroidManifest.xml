@@ -48,6 +48,10 @@
             android:name=".authentication.ui.register.RegisterActivity"
             android:exported="false"
             android:noHistory="true" />
+        <activity
+            android:name=".matchHistory.ui.MatchHistoryActivity"
+            android:exported="false"
+            android:noHistory="true" />
     </application>
 
 </manifest>

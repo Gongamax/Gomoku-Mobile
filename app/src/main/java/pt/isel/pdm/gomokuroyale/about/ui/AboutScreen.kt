@@ -55,7 +55,7 @@ fun AboutScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .testTag(AboutScreenTestTag),
-            topBar = { TopBar(NavigationHandlers(onBackRequested = onBackRequested)) },
+            topBar = { TopBar(navigation = NavigationHandlers(onBackRequested = onBackRequested)) },
         ) { innerPadding ->
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,

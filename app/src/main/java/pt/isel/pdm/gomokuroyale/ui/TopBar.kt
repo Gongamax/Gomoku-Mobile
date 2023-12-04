@@ -1,5 +1,7 @@
 package pt.isel.pdm.gomokuroyale.ui
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
@@ -9,6 +11,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -27,9 +30,22 @@ const val NavigateToInfoTestTag = "NavigateToInfo"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navigation: NavigationHandlers = NavigationHandlers()) {
+fun TopBar(
+    title: @Composable () -> Unit =  { Text(
+        text = stringResource(id = R.string.app_name),
+        modifier = Modifier.testTag("TopBarTitle"),
+    ) },
+    navigation: NavigationHandlers = NavigationHandlers()
+) {
     TopAppBar(
-        title = { Text(text = stringResource(id = R.string.app_name)) },
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                title()
+            }
+        },
         navigationIcon = {
             if (navigation.onBackRequested != null) {
                 IconButton(
