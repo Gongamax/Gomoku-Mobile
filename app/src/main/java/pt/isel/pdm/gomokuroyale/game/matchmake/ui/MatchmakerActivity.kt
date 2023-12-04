@@ -11,12 +11,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
+import pt.isel.pdm.gomokuroyale.http.domain.MatchmakingStatus
+import pt.isel.pdm.gomokuroyale.util.Idle
+import pt.isel.pdm.gomokuroyale.util.Loaded
 import pt.isel.pdm.gomokuroyale.util.getOrNull
 import pt.isel.pdm.gomokuroyale.util.getOrThrow
 
@@ -49,18 +53,26 @@ class MatchmakerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {
-
+                viewModel.status.collect {
+                    if (it is Idle) {
+                        viewModel.findGame()
+                    }
+                    if (it is Loaded) {
+                        finish()
+                    }
+                }
 
             }
 
-//        setContent {
-//            MatchmakerScreen(
-//                status = viewModel.status.collectAsState().value.getOrThrow(),  //TODO: REVISE THIS
-//                onCancelingMatchmaking = viewModel::leaveQueue,
-//                //onCancelingEnabled = viewModel::cancelMatchmakingEnabled.getOrNull() ?: false,
-//                variant = matchInfo?.variant ?: Variant.STANDARD
-//            )
-//        }
+        setContent {
+            val state = viewModel.status.collectAsState().value
+            MatchmakerScreen(
+                status = MatchmakingStatus.PENDING,
+                onCancelingMatchmaking = viewModel::leaveQueue,
+                onCancelingEnabled = true,
+                variant = matchInfo?.variant ?: Variant.STANDARD
+            )
+        }
     }
 
 
@@ -89,7 +101,7 @@ class MatchmakerActivity : ComponentActivity() {
     }
 
     private fun PlayerInfoExtra.toMatchInfo() = MatchInfo(
-        userInfo = UserInfo(username, token),
+        userInfo = UserInfo(token, username),
         variant = variant
     )
 }

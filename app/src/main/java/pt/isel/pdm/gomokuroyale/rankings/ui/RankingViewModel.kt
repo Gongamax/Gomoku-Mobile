@@ -2,6 +2,7 @@ package pt.isel.pdm.gomokuroyale.rankings.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +24,7 @@ class RankingViewModel (private val service: UserService) : ViewModel() {
 
     companion object {
        fun factory(rankingInfoService: UserService) = viewModelFactory {
-              RankingViewModel(rankingInfoService)
+              initializer { RankingViewModel(rankingInfoService) }
        }
     }
 

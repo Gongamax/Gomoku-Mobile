@@ -31,11 +31,9 @@ class RankingActivity: ComponentActivity() {
     /**
      * The application's dependency provider.
      */
-    private val viewModel by viewModels<RankingViewModel> (
-        factoryProducer = {
-            RankingViewModel.factory(userService)
-        }
-    )
+    private val viewModel by viewModels<RankingViewModel> {
+        RankingViewModel.factory(userService)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

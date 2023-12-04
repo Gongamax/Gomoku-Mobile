@@ -49,10 +49,10 @@ fun MatchmakerScreen(
                     MatchmakingStatus.PENDING -> {
                         Text(text = "Matchmaking...", style = MaterialTheme.typography.titleLarge)
                         Spacer(modifier = Modifier.size(16.dp))
-                        Image(
-                            bitmap = ImageBitmap.imageResource(id = R.drawable.matchmaking),
-                            contentDescription = "Matchmaking"
-                        )
+//                        Image(
+//                            bitmap = ImageBitmap.imageResource(id = R.drawable.matchmaking),
+//                            contentDescription = "Matchmaking"
+//                        )
                     }
 
                     MatchmakingStatus.MATCHED -> {

@@ -24,32 +24,26 @@ class UserService(
         username: String,
         email: String,
         password: String
-    ): RegisterOutput {
-        val res: RegisterOutput = post(path = Uris.Users.CREATE_USER, body = UserCreateInputModel(username, email, password))
-        return res
-    }
+    ): RegisterOutput =
+        post(path = Uris.Users.createUser(), body = UserCreateInputModel(username, email, password))
 
 
     suspend fun login(username: String, password: String): LoginOutput =
-        post(path = Uris.Users.TOKEN, body = UserCreateTokenInputModel(username, password))
+        post(path = Uris.Users.token(), body = UserCreateTokenInputModel(username, password))
 
     suspend fun logout(token: String): LogoutOutput =
-        post(path = Uris.Users.LOGOUT, token = token,)
+        post(path = Uris.Users.logout(), token = token,)
 
     suspend fun getUser(id: Int): GetUserOutput =
-        get(path = Uris.Users.GET_USER_BY_ID,)
-
-    suspend fun updateUser() {
-        // TODO
-    }
+        get(path = Uris.Users.getUserById(id))
 
     suspend fun getAuthHome(token: String): GetUserHomeOutput =
-        get(path = Uris.Users.AUTH_HOME, token = token,)
+        get(path = Uris.Users.authHome(), token = token,)
 
     suspend fun getStatsById(id: Int, token: String): GetStatsOutput =
-        get(path = Uris.Users.GET_STATS_BY_ID, token = token,)
+        get(path = Uris.Users.getStatsById(id), token = token,)
 
     suspend fun getRankingInfo(page: Int): GetRankingOutput =
-        get(path = Uris.Users.RANKING_INFO + "?page=" + page)
+        get(path = Uris.Users.rankingInfo() + "?page=" + page)
 
 }

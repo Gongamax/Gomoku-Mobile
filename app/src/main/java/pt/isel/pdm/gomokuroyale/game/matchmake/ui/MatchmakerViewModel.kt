@@ -1,5 +1,6 @@
 package pt.isel.pdm.gomokuroyale.game.matchmake.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import pt.isel.pdm.gomokuroyale.TAG
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingInputModel
@@ -37,6 +39,8 @@ class MatchmakerViewModel(
             }
 
             _status.value = loading()
+            Log.v(TAG, "Finding game with variant ${matchInfo.variant}")
+            Log.v(TAG, "Finding game with token ${matchInfo.userInfo.accessToken}")
 
             val response = gameService.matchmaking(
                 token = matchInfo.userInfo.accessToken,
@@ -44,7 +48,11 @@ class MatchmakerViewModel(
             )
 
             while (true) {
-                val matchEntry = gameService.getMatchmakingStatus(matchInfo.userInfo.accessToken)
+                val matchEntry = gameService.getMatchmakingStatus(
+                    matchInfo.userInfo.accessToken,
+                    response.properties.id
+                )
+                Log.v("MatchmakerViewModel", "Matchmaking status: $matchEntry")
                 val matchStatus = MatchmakingStatus.valueOf(matchEntry.properties.state)
                 _status.value = loadSuccess(matchStatus)
                 if (matchStatus == MatchmakingStatus.MATCHED) {
@@ -63,7 +71,9 @@ class MatchmakerViewModel(
                 _status.value = loadFailure(Exception("MatchInfo is null"))
                 return@launch
             }
-            val response = service.gameService.cancelMatchmaking(matchInfo.userInfo.accessToken)
+            val HARDCODED_ID = 1 //TODO: REMOVE HARDCODED ID
+            val response =
+                service.gameService.cancelMatchmaking(matchInfo.userInfo.accessToken, HARDCODED_ID)
             _status.value = loadSuccess(MatchmakingStatus.LEFT_QUEUE)
         }
     }
