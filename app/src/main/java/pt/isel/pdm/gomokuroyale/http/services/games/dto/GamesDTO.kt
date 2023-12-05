@@ -12,6 +12,8 @@ data class GameMatchmakingInputModel(val variant: String)
 //Output Models
 data class GameRoundOutputModel(val game: GameOutputModel, val state: String)
 
+data class GameMatchmakingOutputModel(val message: String, val idType: String, val id: Int)
+
 data class GameOutputModel(
     val id: Int,
     val board: Board,

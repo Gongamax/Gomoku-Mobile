@@ -43,6 +43,7 @@ class LoginActivity : ComponentActivity() {
                 Log.v("LoginActivity", "State : $it")
                 if (it is Saved && it.value.isSuccess) {
                     finish()
+                    viewModel.resetToIdle()
                 }
             }
         }

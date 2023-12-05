@@ -21,53 +21,53 @@ class GameService(
     apiEndpoint: String
 ) : HTTPService(client, gson, apiEndpoint) {
 
-    suspend fun getGame(gameId: String, token: String): GetGameOutput =
+    suspend fun getGame(gameId: Int, token: String): GetGameOutput =
         get(
-            path = Uris.Games.GET_GAME_BY_ID,
+            path = Uris.Games.getGame(gameId),
             token = token,
         )
 
     suspend fun play(
-        gameId: String,
+        gameId: Int,
         token: String,
         play: GamePlayInputModel
     ): PlayGameOutput =
         put(
-            path = Uris.Games.PLAY,
+            path = Uris.Games.play(gameId),
             token = token,
             body = play
         )
 
 
-    suspend fun surrender(gameId: String, token: String): SurrenderGameOutput =
+    suspend fun surrender(gameId: Int, token: String): SurrenderGameOutput =
         put(
-            path = Uris.Games.LEAVE,
+            path = Uris.Games.leave(gameId),
             token = token,
             body = gameId
         )
 
-    suspend fun getUserGames(token: String): GetUserGamesOutput =
+    suspend fun getUserGames(token: String, userId: Int): GetUserGamesOutput =
         get(
-            path = Uris.Games.GET_ALL_GAMES_BY_USER,
+            path = Uris.Games.getAllGamesByUser(userId),
             token = token
         )
 
     suspend fun matchmaking(token: String, input: GameMatchmakingInputModel): MatchmakingOutput =
         post(
-            path = Uris.Games.MATCHMAKING,
+            path = Uris.Games.matchmaking(),
             token = token,
             body = input
         )
 
-    suspend fun cancelMatchmaking(token: String): CancelMatchmakingOutput =
+    suspend fun cancelMatchmaking(token: String, id: Int): CancelMatchmakingOutput =
         delete(
-            path = Uris.Games.EXIT_MATCHMAKING_QUEUE,
+            path = Uris.Games.exitMatchmakingQueue(id),
             token = token
         )
 
-        suspend fun getMatchmakingStatus(token: String): GetMatchmakingStatusOutput =
+    suspend fun getMatchmakingStatus(token: String, id: Int): GetMatchmakingStatusOutput =
         get(
-            path = Uris.Games.GET_MATCHMAKING_STATUS,
+            path = Uris.Games.getMatchmakingStatus(id),
             token = token,
         )
 }
