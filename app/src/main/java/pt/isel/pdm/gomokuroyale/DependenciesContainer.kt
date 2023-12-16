@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 import pt.isel.pdm.gomokuroyale.http.GomokuService
+import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
 
 /**
  * The contract to be supported by the application's class used to resolve dependencies.
@@ -28,4 +29,9 @@ interface DependenciesContainer {
      * The service used to access the Gomoku Royale API
      */
     val gomokuService: GomokuService
+
+    /**
+     * The repository used to access API URI's templates
+     */
+    val uriRepository: UriRepository
 }

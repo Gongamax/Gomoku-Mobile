@@ -9,6 +9,8 @@ import okhttp3.OkHttpClient
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 import pt.isel.pdm.gomokuroyale.authentication.storage.UserInfoDataStore
 import pt.isel.pdm.gomokuroyale.http.GomokuService
+import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
+import pt.isel.pdm.gomokuroyale.http.storage.UriDataStore
 import java.util.concurrent.TimeUnit
 
 /**
@@ -32,6 +34,9 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
         get() = UserInfoDataStore(dataStore)
 
     override val gomokuService = GomokuService(client, gson, API_ENDPOINT)
+
+    override val uriRepository: UriRepository
+        get() = UriDataStore(gomokuService, dataStore)
 
     companion object {
         private const val API_ENDPOINT =

@@ -18,6 +18,5 @@ class GomokuService(
 
     val gameService = GameService(client, gson, apiEndpoint)
 
-    //TODO: FIX THIS
     suspend fun getHome(): SirenModel<Unit> = get(path = Uris.HOME)
 }
