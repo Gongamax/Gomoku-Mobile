@@ -6,25 +6,40 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.EMPTY_REQUEST
+import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
+import pt.isel.pdm.gomokuroyale.http.media.Problem
 import pt.isel.pdm.gomokuroyale.http.media.siren.SirenModel
 import pt.isel.pdm.gomokuroyale.http.utils.makeAPIRequest
+import pt.isel.pdm.gomokuroyale.util.ApiError
+import pt.isel.pdm.gomokuroyale.util.HttpResult
 
 abstract class HTTPService(
     val httpClient: OkHttpClient,
     val jsonEncoder: Gson,
-    val apiEndpoint: String
+    val apiEndpoint: String,
+    val uriRepository : UriRepository
 ) {
-    suspend inline fun <reified T> Request.getResponse(): SirenModel<T> =
-        makeAPIRequest(httpClient, SirenModel.getType<T>().type, jsonEncoder)
+    suspend inline fun <reified T> Request.getResponse(): HttpResult<SirenModel<T>> =
+        try {
+            val res = makeAPIRequest<T>(httpClient, SirenModel.getType<T>().type, jsonEncoder)
+            HttpResult.Success(res as SirenModel<T>)
+        } catch (e: Problem.ProblemException) {
+            HttpResult.Failure(ApiError(e.problem.detail ?: e.problem.title))
+        } catch (e: Exception) {
+            HttpResult.Failure(ApiError(e.message ?: "Unknown error"))
+        }
 
-    suspend inline fun <reified T> get(path: String): SirenModel<T> =
+    protected suspend inline fun <reified T> get(path: String): HttpResult<SirenModel<T>> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
             .build()
             .getResponse()
 
-    suspend inline fun <reified T> get(path: String, token: String): SirenModel<T> =
+    protected suspend inline fun <reified T> get(
+        path: String,
+        token: String
+    ): HttpResult<SirenModel<T>> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -32,17 +47,22 @@ abstract class HTTPService(
             .build()
             .getResponse()
 
-    suspend inline fun <reified T> post(path: String, body: Any): SirenModel<T> {
-        val request = Request.Builder()
+    protected suspend inline fun <reified T> post(
+        path: String,
+        body: Any
+    ): HttpResult<SirenModel<T>> =
+        Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
             .post(jsonEncoder.toJson(body).toRequestBody(contentType = applicationJsonMediaType))
             .build()
-        val response: SirenModel<T> = request.getResponse<T>()
-        return response
-    }
+            .getResponse()
 
-    suspend inline fun <reified T> post(path: String, token: String, body: Any? = null): SirenModel<T> =
+    protected suspend inline fun <reified T> post(
+        path: String,
+        token: String,
+        body: Any? = null
+    ): HttpResult<SirenModel<T>> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -55,7 +75,11 @@ abstract class HTTPService(
             .build()
             .getResponse()
 
-    suspend inline fun <reified T> put(path: String, token: String, body: Any = EMPTY_REQUEST): SirenModel<T> =
+    protected suspend inline fun <reified T> put(
+        path: String,
+        token: String,
+        body: Any = EMPTY_REQUEST
+    ): HttpResult<SirenModel<T>> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)
@@ -67,7 +91,11 @@ abstract class HTTPService(
             .build()
             .getResponse()
 
-    suspend inline fun <reified T> delete(path: String, token: String, body: Any = EMPTY_REQUEST): SirenModel<T> =
+    protected suspend inline fun <reified T> delete(
+        path: String,
+        token: String,
+        body: Any = EMPTY_REQUEST
+    ): HttpResult<SirenModel<T>> =
         Request.Builder()
             .url("$apiEndpoint/$path")
             .addHeader("accept", APPLICATION_JSON)

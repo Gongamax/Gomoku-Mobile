@@ -1,6 +1,5 @@
 package pt.isel.pdm.gomokuroyale.http.services.games.models
 
-import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameOutputModel
 import pt.isel.pdm.gomokuroyale.http.media.siren.SirenModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameGetAllByUserOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameGetByIdOutputModel

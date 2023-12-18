@@ -6,7 +6,9 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import pt.isel.pdm.gomokuroyale.http.media.Problem
 import pt.isel.pdm.gomokuroyale.http.media.Problem.Companion.problemMediaType
+import pt.isel.pdm.gomokuroyale.http.media.Problem.Companion.toProblemException
 import pt.isel.pdm.gomokuroyale.http.media.siren.SirenModel.Companion.sirenMediaType
 import java.lang.reflect.Type
 import kotlin.coroutines.resume
@@ -46,10 +48,12 @@ suspend inline fun <reified T> Request.makeAPIRequest(
                         continuation.resume(res)
                     }
 
-                    !response.isSuccessful && contentType == problemMediaType ->
+                    !response.isSuccessful && contentType == problemMediaType -> {
+                        val problem = gson.fromJson(resJson, Problem::class.java)
                         continuation.resumeWith(
-                            Result.failure(Exception())//(gson.fromJson(resJson, Problem::class.java))
+                            Result.failure(exception = problem.toProblemException())
                         )
+                    }
 
                     else ->
                         continuation.resumeWithException(

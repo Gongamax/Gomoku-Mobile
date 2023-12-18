@@ -28,19 +28,20 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
             .callTimeout(10, TimeUnit.SECONDS)
             .build()
 
-    private val dataStore: DataStore<Preferences> by preferencesDataStore(USER_INFO_DATA_STORE)
+    //TODO: THINK ABOUT IF THERE IS A NEED TO CREATE A NEW DATASTORE FOR EACH REPOSITORY
+    private val dataStore: DataStore<Preferences> by preferencesDataStore(name = USER_INFO_DATA_STORE)
 
     override val userInfoRepository: UserInfoRepository
         get() = UserInfoDataStore(dataStore)
 
-    override val gomokuService = GomokuService(client, gson, API_ENDPOINT)
-
     override val uriRepository: UriRepository
-        get() = UriDataStore(gomokuService, dataStore)
+        get() = UriDataStore(dataStore)
+
+    override val gomokuService = GomokuService(client, gson, API_ENDPOINT, uriRepository)
 
     companion object {
         private const val API_ENDPOINT =
-            "https://1cbc-2001-8a0-f978-ae00-3412-9dd6-6b5a-dec1.ngrok-free.app"//"API NGROK URL"
+            "https://24ad-2001-8a0-f978-ae00-3875-fc5b-3a01-9992.ngrok-free.app"//"API NGROK URL"
         private const val USER_INFO_DATA_STORE = "user_info"
     }
 }

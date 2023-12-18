@@ -20,6 +20,10 @@ import pt.isel.pdm.gomokuroyale.util.Saved
 import pt.isel.pdm.gomokuroyale.util.Saving
 import pt.isel.pdm.gomokuroyale.util.idle
 import pt.isel.pdm.gomokuroyale.util.loading
+import pt.isel.pdm.gomokuroyale.util.onFailureResult
+import pt.isel.pdm.gomokuroyale.util.onSuccess
+import pt.isel.pdm.gomokuroyale.util.onSuccessResult
+import pt.isel.pdm.gomokuroyale.util.saveFailure
 import pt.isel.pdm.gomokuroyale.util.saved
 import pt.isel.pdm.gomokuroyale.util.saving
 
@@ -29,22 +33,9 @@ class LoginScreenViewModel(
     private val userService: UserService,
 ) : ViewModel() {
 
-    companion object {
-        fun factory(
-            userInfoRepository: UserInfoRepository,
-
-            userService: UserService
-        ) = viewModelFactory {
-            initializer { LoginScreenViewModel(userInfoRepository, userService) }
-        }
-    }
-
     private val _state = MutableStateFlow<IOState<UserInfo?>>(idle())
 
     val state: Flow<IOState<UserInfo?>> get() = _state.asStateFlow()
-
-
-    // TODO - Check if return a problem
 
     fun login(username: String, password: String) {
         if (_state.value !is Idle)
@@ -52,11 +43,14 @@ class LoginScreenViewModel(
         _state.value = loading()
         viewModelScope.launch {
             val response = userService.login(username, password)
-            val userInfo = UserInfo(response.properties.token, username)
-            _state.value = saving()
-            Log.v(TAG, "Saving user info $userInfo")
-            val result = kotlin.runCatching { userInfoRepository.login(userInfo); userInfo }
-            _state.value = saved(result)
+            response.onSuccessResult {
+                _state.value = saving()
+                val userInfo = UserInfo(it.token, username)
+                val result = kotlin.runCatching { userInfoRepository.login(userInfo); userInfo }
+                _state.value = saved(result)
+            }.onFailureResult {
+                _state.value = saveFailure(it)
+            }
         }
     }
 
@@ -70,5 +64,12 @@ class LoginScreenViewModel(
         viewModelScope.launch {
             userInfoRepository.logout()
         }
+    }
+
+    companion object {
+        fun factory(userInfoRepository: UserInfoRepository, userService: UserService) =
+            viewModelFactory {
+                initializer { LoginScreenViewModel(userInfoRepository, userService) }
+            }
     }
 }

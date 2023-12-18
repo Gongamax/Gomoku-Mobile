@@ -33,35 +33,35 @@ class MatchmakerViewModel(
 
     fun findGame() {
         viewModelScope.launch {
-            if (matchInfo == null) {
-                _status.value = loadFailure(Exception("MatchInfo is null"))
-                return@launch
-            }
-
-            _status.value = loading()
-            Log.v(TAG, "Finding game with variant ${matchInfo.variant}")
-            Log.v(TAG, "Finding game with token ${matchInfo.userInfo.accessToken}")
-
-            val response = gameService.matchmaking(
-                token = matchInfo.userInfo.accessToken,
-                GameMatchmakingInputModel(variant = matchInfo.variant.toString())
-            )
-
-            while (true) {
-                val matchEntry = gameService.getMatchmakingStatus(
-                    matchInfo.userInfo.accessToken,
-                    response.properties.id
-                )
-                Log.v("MatchmakerViewModel", "Matchmaking status: $matchEntry")
-                val matchStatus = MatchmakingStatus.valueOf(matchEntry.properties.state)
-                _status.value = loadSuccess(matchStatus)
-                if (matchStatus == MatchmakingStatus.MATCHED) {
-                    //TODO: navigate to game
-                    break
-                } else {
-                    delay(POOLING_DELAY)
-                }
-            }
+//            if (matchInfo == null) {
+//                _status.value = loadFailure(Exception("MatchInfo is null"))
+//                return@launch
+//            }
+//
+//            _status.value = loading()
+//            Log.v(TAG, "Finding game with variant ${matchInfo.variant}")
+//            Log.v(TAG, "Finding game with token ${matchInfo.userInfo.accessToken}")
+//
+//            val response = gameService.matchmaking(
+//                token = matchInfo.userInfo.accessToken,
+//                GameMatchmakingInputModel(variant = matchInfo.variant.toString())
+//            )
+//
+//            while (true) {
+//                val matchEntry = gameService.getMatchmakingStatus(
+//                    matchInfo.userInfo.accessToken,
+//                    response.properties.id
+//                )
+//                Log.v("MatchmakerViewModel", "Matchmaking status: $matchEntry")
+//                val matchStatus = MatchmakingStatus.valueOf(matchEntry.properties.state)
+//                _status.value = loadSuccess(matchStatus)
+//                if (matchStatus == MatchmakingStatus.MATCHED) {
+//                    //TODO: navigate to game
+//                    break
+//                } else {
+//                    delay(POOLING_DELAY)
+//                }
+//            }
         }
     }
 

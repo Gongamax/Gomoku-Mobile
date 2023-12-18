@@ -38,7 +38,7 @@ class RankingViewModel (private val service: UserService) : ViewModel() {
         viewModelScope.launch {
             val result =  service.getRankingInfo(page)
             val rankingInfo = result
-            _state.value = FetchedRankingInfo(RankingState( rankingInfo.properties.rankingTable))
+//            _state.value = FetchedRankingInfo(RankingState( rankingInfo.properties.rankingTable))
         }
     }
 
@@ -54,7 +54,7 @@ class RankingViewModel (private val service: UserService) : ViewModel() {
         viewModelScope.launch{
             val result = service.getRankingInfo(1)
             val search = result
-            _state.value = FetchedPlayersBySearch(RankingState(search.properties.rankingTable))
+//            _state.value = FetchedPlayersBySearch(RankingState(search.properties.rankingTable))
         }
     }
 
@@ -65,17 +65,17 @@ class RankingViewModel (private val service: UserService) : ViewModel() {
         viewModelScope.launch {
             val result = service.getStatsById(id, "token")
             val userInfo = result
-            _state.value = FetchedPlayerInfo(
-                RankingEntry(
-                    userInfo.properties.id,
-                    userInfo.properties.username,
-                    userInfo.properties.gamesPlayed,
-                    userInfo.properties.wins,
-                    userInfo.properties.losses,
-                    userInfo.properties.points,
-                    userInfo.properties.rank
-                ),
-            )
+//            _state.value = FetchedPlayerInfo(
+//                RankingEntry(
+//                    userInfo.properties.id,
+//                    userInfo.properties.username,
+//                    userInfo.properties.gamesPlayed,
+//                    userInfo.properties.wins,
+//                    userInfo.properties.losses,
+//                    userInfo.properties.points,
+//                    userInfo.properties.rank
+//                ),
+//            )
         }
     }
 

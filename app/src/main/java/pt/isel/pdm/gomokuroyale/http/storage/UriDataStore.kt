@@ -8,33 +8,41 @@ import kotlinx.coroutines.flow.first
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.Recipe
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
+import pt.isel.pdm.gomokuroyale.util.HttpResult
 
 class UriDataStore(
-    private val gomokuService: GomokuService,
     private val store: DataStore<Preferences>
 ) : UriRepository {
-
-    override suspend fun getRecipeLinks(): List<Recipe> =
-        gomokuService.getHome().links.map { link ->
-            Recipe(getRelName(link.rel.first()), link.href)
-        }.also { recipes ->
-            store.edit { preferences ->
-                recipes.forEach { recipe ->
-                    val key = stringPreferencesKey(recipe.rel)
-                    preferences[key] = recipe.href
-                }
+    override suspend fun updateRecipeLinks(recipeLinks: List<Recipe>): List<Recipe> {
+        store.edit { preferences ->
+            recipeLinks.forEach { recipe ->
+                val key = stringPreferencesKey(recipe.rel)
+                preferences[key] = recipe.href
             }
         }
+        return recipeLinks
+    }
+
+
+//    override suspend fun updateRecipeLinks(): List<Recipe> =
+//        when (val response = gomokuService.getHome()) {
+//            is HttpResult.Success -> response.value.recipeLinks
+//                .map { link ->
+//                    Recipe(getRelName(link.rel.first()), link.href)
+//                }.also { recipes ->
+//                    store.edit { preferences ->
+//                        recipes.forEach { recipe ->
+//                            val key = stringPreferencesKey(recipe.rel)
+//                            preferences[key] = recipe.href
+//                        }
+//                    }
+//                }
+//            else -> emptyList()
+//        }
 
     override suspend fun getRecipeLink(rel: String): Recipe? =
         store.data.first().let { preferences ->
             val href = preferences[stringPreferencesKey(rel)] ?: return null
             return Recipe(rel, href)
         }
-
-    private fun getRelName(relUrl: String) = relUrl.split(DELIMITER).last()
-
-    companion object {
-        private const val DELIMITER = "/"
-    }
 }
