@@ -19,7 +19,8 @@
             android:exported="false" />
         <activity
             android:name=".game.lobby.ui.LobbyActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:noHistory="true" />
         <activity
             android:name=".main.MainActivity"
             android:exported="true"

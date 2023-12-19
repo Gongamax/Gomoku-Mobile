@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import pt.isel.pdm.gomokuroyale.R
-import pt.isel.pdm.gomokuroyale.main.TAG
+import pt.isel.pdm.gomokuroyale.TAG
 
 private const val EMAIL_SUBJECT = "About Gomoku Royale"
 

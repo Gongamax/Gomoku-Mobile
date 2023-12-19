@@ -60,12 +60,6 @@ class LoginScreenViewModel(
         _state.value = idle()
     }
 
-    fun logout() {
-        viewModelScope.launch {
-            userInfoRepository.logout()
-        }
-    }
-
     companion object {
         fun factory(userInfoRepository: UserInfoRepository, userService: UserService) =
             viewModelFactory {

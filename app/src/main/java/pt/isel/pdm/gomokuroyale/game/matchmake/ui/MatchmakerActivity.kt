@@ -54,12 +54,10 @@ class MatchmakerActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {
                 viewModel.status.collect {
-                    if (it is Idle) {
+                    if (it is Idle)
                         viewModel.findGame()
-                    }
-                    if (it is Loaded) {
+                    if (it is Loaded)
                         finish()
-                    }
                 }
 
             }

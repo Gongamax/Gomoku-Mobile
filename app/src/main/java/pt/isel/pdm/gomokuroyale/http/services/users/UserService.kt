@@ -2,29 +2,18 @@ package pt.isel.pdm.gomokuroyale.http.services.users
 
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
-import pt.isel.pdm.gomokuroyale.authentication.domain.Email
-import pt.isel.pdm.gomokuroyale.authentication.domain.Id
-import pt.isel.pdm.gomokuroyale.authentication.domain.User
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
-import pt.isel.pdm.gomokuroyale.http.domain.users.UserHome
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserId
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserToken
 import pt.isel.pdm.gomokuroyale.http.services.HTTPService
+import pt.isel.pdm.gomokuroyale.http.services.users.dto.RankingInfoOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserCreateInputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserCreateOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserCreateTokenInputModel
-import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserGetByIdOutputModel
-import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserHomeOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserStatsOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserTokenCreateOutputModel
-import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserTokenRemoveOutputModel
-import pt.isel.pdm.gomokuroyale.http.services.users.models.GetRankingOutput
-import pt.isel.pdm.gomokuroyale.http.services.users.models.GetStatsOutput
-import pt.isel.pdm.gomokuroyale.http.services.users.models.GetUserHomeOutput
-import pt.isel.pdm.gomokuroyale.http.services.users.models.LogoutOutput
 import pt.isel.pdm.gomokuroyale.http.utils.Rels
-import pt.isel.pdm.gomokuroyale.http.utils.Uris
 import pt.isel.pdm.gomokuroyale.util.ApiError
 import pt.isel.pdm.gomokuroyale.util.HttpResult
 import pt.isel.pdm.gomokuroyale.util.onError
@@ -52,76 +41,79 @@ class UserService(
         return response.onSuccess {
             HttpResult.Success(UserId(it.properties.uid))
         }.onError {
-            val message = it.message ?: "Unknown error"
+            val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
     }
 
     suspend fun login(username: String, password: String): HttpResult<UserToken> {
+        val path = uriRepository.getRecipeLink(Rels.LOGIN) ?: return HttpResult.Failure(
+            ApiError("Login link not found")
+        )
         val response = post<UserTokenCreateOutputModel>(
-            path = Uris.Users.token(),
+            path = path.href,
             body = UserCreateTokenInputModel(username, password)
         )
         return response.onSuccess {
             HttpResult.Success(UserToken(it.properties.token))
         }.onError {
-            val message = it.message ?: "Unknown error"
+            val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
     }
 
-    suspend fun logout(token: String): HttpResult<LogoutOutput> {
-        val response = post<UserTokenRemoveOutputModel>(
-            path = Uris.Users.logout(),
-            body = ""
-        )
-        return response.onSuccess {
-            HttpResult.Success(it)
-        }.onError {
-            val message = it.message ?: "Unknown error"
-            HttpResult.Failure(ApiError(message))
-        }
-    }
-
-    suspend fun getUser(id: Int): HttpResult<User> {
-        val response = get<UserGetByIdOutputModel>(
-            path = Uris.Users.getUserById(id)
-        )
-        return response.onSuccess {
-            HttpResult.Success(
-                User(
-                    id = Id(it.properties.id),
-                    username = it.properties.username,
-                    email = Email(it.properties.email),
-                )
-            )
-        }.onError {
-            val message = it.message ?: "Unknown error"
-            HttpResult.Failure(ApiError(message))
-        }
-    }
-
-    suspend fun getAuthHome(token: String): HttpResult<UserHome> {
-        val response = get<UserHomeOutputModel>(
-            path = Uris.Users.authHome(),
-            token = token
-        )
-        return response.onSuccess {
-            HttpResult.Success(
-                UserHome(
-                    id = it.properties.id,
-                    username = it.properties.username,
-                )
-            )
-        }.onError {
-            val message = it.message ?: "Unknown error"
-            HttpResult.Failure(ApiError(message))
-        }
-    }
+//    suspend fun logout(token: String): HttpResult<LogoutOutput> {
+//        val response = post<UserTokenRemoveOutputModel>(path = Uris.Users.logout(), token = token)
+//        return response.onSuccess {
+//            HttpResult.Success(it)
+//        }.onError {
+//            val message = it.message.errorMessage
+//            HttpResult.Failure(ApiError(message))
+//        }
+//    }
+//
+//    suspend fun getUser(id: Int): HttpResult<User> {
+//        val response = get<UserGetByIdOutputModel>(
+//            path = Uris.Users.getUserById(id)
+//        )
+//        return response.onSuccess {
+//            HttpResult.Success(
+//                User(
+//                    id = Id(it.properties.id),
+//                    username = it.properties.username,
+//                    email = Email(it.properties.email),
+//                )
+//            )
+//        }.onError {
+//            val message = it.message ?: "Unknown error"
+//            HttpResult.Failure(ApiError(message))
+//        }
+//    }
+//
+//    suspend fun getAuthHome(token: String): HttpResult<UserHome> {
+//        val response = get<UserHomeOutputModel>(
+//            path = Uris.Users.authHome(),
+//            token = token
+//        )
+//        return response.onSuccess {
+//            HttpResult.Success(
+//                UserHome(
+//                    id = it.properties.id,
+//                    username = it.properties.username,
+//                )
+//            )
+//        }.onError {
+//            val message = it.message.errorMessage
+//            HttpResult.Failure(ApiError(message))
+//        }
+//    }
 
     suspend fun getStatsById(id: Int, token: String): HttpResult<UserRanking> {
+        val path = uriRepository.getRecipeLink(Rels.USER_STATS) ?: return HttpResult.Failure(
+            ApiError("User stats link not found")
+        )
         val response = get<UserStatsOutputModel>(
-            path = Uris.Users.getStatsById(id),
+            path = path.href.replace("{uid}", id.toString()),
             token = token
         )
         return response.onSuccess {
@@ -137,14 +129,17 @@ class UserService(
                 )
             )
         }.onError {
-            val message = it.message ?: "Unknown error"
+            val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
     }
 
     suspend fun getRankingInfo(page: Int): HttpResult<List<UserRanking>> {
-        val response = get<GetRankingOutput>(
-            path = Uris.Users.rankingInfo(),
+        val path = uriRepository.getRecipeLink(Rels.RANKING_INFO) ?: return HttpResult.Failure(
+            ApiError("Ranking link not found")
+        )
+        val response = get<RankingInfoOutputModel>(
+            path = path.href.replace("{page}", page.toString())
         )
         return response.onSuccess {
             HttpResult.Success(
@@ -162,9 +157,11 @@ class UserService(
                 }
             )
         }.onError {
-            val message = it.message ?: "Unknown error"
+            val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
     }
 
+    private val String?.errorMessage get () = this ?: unknownError
+    private val unknownError get () = "Unknown error"
 }

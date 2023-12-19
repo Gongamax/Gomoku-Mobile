@@ -23,23 +23,6 @@ class UriDataStore(
         return recipeLinks
     }
 
-
-//    override suspend fun updateRecipeLinks(): List<Recipe> =
-//        when (val response = gomokuService.getHome()) {
-//            is HttpResult.Success -> response.value.recipeLinks
-//                .map { link ->
-//                    Recipe(getRelName(link.rel.first()), link.href)
-//                }.also { recipes ->
-//                    store.edit { preferences ->
-//                        recipes.forEach { recipe ->
-//                            val key = stringPreferencesKey(recipe.rel)
-//                            preferences[key] = recipe.href
-//                        }
-//                    }
-//                }
-//            else -> emptyList()
-//        }
-
     override suspend fun getRecipeLink(rel: String): Recipe? =
         store.data.first().let { preferences ->
             val href = preferences[stringPreferencesKey(rel)] ?: return null

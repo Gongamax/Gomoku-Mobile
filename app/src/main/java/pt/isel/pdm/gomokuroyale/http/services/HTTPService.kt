@@ -1,5 +1,6 @@
 package pt.isel.pdm.gomokuroyale.http.services
 
+import android.util.Log
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -17,9 +18,10 @@ abstract class HTTPService(
     val httpClient: OkHttpClient,
     val jsonEncoder: Gson,
     val apiEndpoint: String,
-    val uriRepository : UriRepository
+    val uriRepository: UriRepository
 ) {
-    suspend inline fun <reified T> Request.getResponse(): HttpResult<SirenModel<T>> =
+
+    protected suspend inline fun <reified T> Request.getResponse(): HttpResult<SirenModel<T>> =
         try {
             val res = makeAPIRequest<T>(httpClient, SirenModel.getType<T>().type, jsonEncoder)
             HttpResult.Success(res as SirenModel<T>)
@@ -31,7 +33,7 @@ abstract class HTTPService(
 
     protected suspend inline fun <reified T> get(path: String): HttpResult<SirenModel<T>> =
         Request.Builder()
-            .url("$apiEndpoint/$path")
+            .url("$apiEndpoint$path")
             .addHeader("accept", APPLICATION_JSON)
             .build()
             .getResponse()
@@ -41,7 +43,7 @@ abstract class HTTPService(
         token: String
     ): HttpResult<SirenModel<T>> =
         Request.Builder()
-            .url("$apiEndpoint/$path")
+            .url("$apiEndpoint$path")
             .addHeader("accept", APPLICATION_JSON)
             .addHeader(AUTHORIZATION_HEADER, "$TOKEN_TYPE $token")
             .build()
@@ -49,10 +51,10 @@ abstract class HTTPService(
 
     protected suspend inline fun <reified T> post(
         path: String,
-        body: Any
+        body: Any = EMPTY_REQUEST
     ): HttpResult<SirenModel<T>> =
         Request.Builder()
-            .url("$apiEndpoint/$path")
+            .url("$apiEndpoint$path")
             .addHeader("accept", APPLICATION_JSON)
             .post(jsonEncoder.toJson(body).toRequestBody(contentType = applicationJsonMediaType))
             .build()
@@ -64,7 +66,7 @@ abstract class HTTPService(
         body: Any? = null
     ): HttpResult<SirenModel<T>> =
         Request.Builder()
-            .url("$apiEndpoint/$path")
+            .url("$apiEndpoint$path")
             .addHeader("accept", APPLICATION_JSON)
             .addHeader(AUTHORIZATION_HEADER, "$TOKEN_TYPE $token")
             .post(
@@ -81,7 +83,7 @@ abstract class HTTPService(
         body: Any = EMPTY_REQUEST
     ): HttpResult<SirenModel<T>> =
         Request.Builder()
-            .url("$apiEndpoint/$path")
+            .url("$apiEndpoint$path")
             .addHeader("accept", APPLICATION_JSON)
             .addHeader(AUTHORIZATION_HEADER, "$TOKEN_TYPE $token")
             .put(
@@ -97,7 +99,7 @@ abstract class HTTPService(
         body: Any = EMPTY_REQUEST
     ): HttpResult<SirenModel<T>> =
         Request.Builder()
-            .url("$apiEndpoint/$path")
+            .url("$apiEndpoint$path")
             .addHeader("accept", APPLICATION_JSON)
             .addHeader(AUTHORIZATION_HEADER, "$TOKEN_TYPE $token")
             .delete(

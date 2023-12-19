@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.FailedToFetch
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchedMatchInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchedPlayerInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchingMatchInfo
@@ -40,7 +41,10 @@ class LobbyScreenViewModel(
         _state.value = FetchingPlayerInfo
         viewModelScope.launch {
             val result = kotlin.runCatching { repository.getUserInfo() }
-            _state.value = FetchedPlayerInfo(result.getOrNull())
+            if (result.getOrNull() == null)
+                _state.value = FailedToFetch(result.exceptionOrNull() ?: Exception())
+            else
+                _state.value = FetchedPlayerInfo(result.getOrNull())
         }
     }
 

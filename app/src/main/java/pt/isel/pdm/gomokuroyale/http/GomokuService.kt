@@ -8,8 +8,6 @@ import pt.isel.pdm.gomokuroyale.http.media.siren.SirenModel
 import pt.isel.pdm.gomokuroyale.http.services.HTTPService
 import pt.isel.pdm.gomokuroyale.http.services.games.GameService
 import pt.isel.pdm.gomokuroyale.http.services.users.UserService
-import pt.isel.pdm.gomokuroyale.http.utils.Rels
-import pt.isel.pdm.gomokuroyale.http.utils.Uris
 import pt.isel.pdm.gomokuroyale.util.ApiError
 import pt.isel.pdm.gomokuroyale.util.HttpResult
 import pt.isel.pdm.gomokuroyale.util.onError
@@ -30,9 +28,6 @@ class GomokuService(
     val gameService = GameService(client, gson, apiEndpoint, uriRepository)
 
     suspend fun getHome(): HttpResult<List<LinkModel>> {
-        val path = uriRepository.getRecipeLink(Rels.HOME) ?: return HttpResult.Failure(
-            ApiError("Home link not found")
-        )
         val response = get<HomeOutputModel>(HOME_PATH)
         return response.onSuccess {
             HttpResult.Success(it.recipeLinks)
@@ -43,6 +38,6 @@ class GomokuService(
     }
 
     companion object {
-        private const val HOME_PATH = "/api/"
+        private const val HOME_PATH = "api/"
     }
 }

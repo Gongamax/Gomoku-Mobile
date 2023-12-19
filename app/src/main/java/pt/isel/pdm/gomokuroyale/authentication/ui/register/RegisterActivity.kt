@@ -7,10 +7,13 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
 import pt.isel.pdm.gomokuroyale.authentication.ui.login.LoginActivity
+import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
+import pt.isel.pdm.gomokuroyale.util.Idle
 import pt.isel.pdm.gomokuroyale.util.Loaded
 import pt.isel.pdm.gomokuroyale.util.Saved
 
@@ -35,7 +38,6 @@ class RegisterActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {
             viewModel.state.collect {
-                Log.v("RegisterActivity", "State : $it")
                 if (it is Loaded && it.value.isSuccess) {
                     finish()
                     viewModel.resetToIdle()
@@ -44,12 +46,24 @@ class RegisterActivity : ComponentActivity() {
         }
 
         setContent {
+            val currentState = viewModel.state.collectAsState(initial = Idle).value
             RegisterScreen(
                 onBackRequested = { finish() },
                 onLoginActivity = { LoginActivity.navigateTo(this) },
                 onRegisterRequested = { username, email, password ->
                     viewModel.register(username, email, password)
                 })
+
+            currentState.let {
+                if (it is Loaded && it.value.isFailure) {
+                    ErrorAlert(
+                        title = "Failed to register",
+                        message = it.value.exceptionOrNull()?.message ?: "Unknown error",
+                        buttonText = "Ok",
+                        onDismiss = { viewModel.resetToIdle() }
+                    )
+                }
+            }
         }
     }
 }

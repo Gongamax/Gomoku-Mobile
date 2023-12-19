@@ -1,7 +1,6 @@
 package pt.isel.pdm.gomokuroyale.http.utils
 
 import com.google.gson.Gson
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -11,7 +10,6 @@ import pt.isel.pdm.gomokuroyale.http.media.Problem.Companion.problemMediaType
 import pt.isel.pdm.gomokuroyale.http.media.Problem.Companion.toProblemException
 import pt.isel.pdm.gomokuroyale.http.media.siren.SirenModel.Companion.sirenMediaType
 import java.lang.reflect.Type
-import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 suspend inline fun <reified T> Request.makeAPIRequest(
@@ -41,11 +39,9 @@ suspend inline fun <reified T> Request.makeAPIRequest(
 
                 when {
                     response.isSuccessful && contentType == sirenMediaType -> {
-                        println("Response type: $responseType")
-                        val res: T = gson.fromJson(resJson, responseType)
-                        println(res)
-                        //val success: Result<T> = Result.success(res)
-                        continuation.resume(res)
+                        continuation.resumeWith(
+                            Result.success(gson.fromJson(resJson, responseType))
+                        )
                     }
 
                     !response.isSuccessful && contentType == problemMediaType -> {

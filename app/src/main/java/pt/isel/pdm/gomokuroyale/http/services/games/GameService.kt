@@ -14,8 +14,8 @@ import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingInputMode
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingStatusOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GamePlayInputModel
+import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameRoundOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.SurrenderGameOutputModel
-import pt.isel.pdm.gomokuroyale.http.services.games.models.CancelMatchmakingOutput
 import pt.isel.pdm.gomokuroyale.http.utils.Rels
 import pt.isel.pdm.gomokuroyale.util.ApiError
 import pt.isel.pdm.gomokuroyale.util.HttpResult
@@ -48,7 +48,7 @@ class GameService(
                 )
             )
         }.onError {
-            val message = it.message ?: "Unknown error"
+            val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
     }
@@ -61,7 +61,7 @@ class GameService(
         val path = uriRepository.getRecipeLink(Rels.GAME) ?: return HttpResult.Failure(
             ApiError("Game link not found")
         )
-        val response = post<GameGetByIdOutputModel>(
+        val response = post<GameRoundOutputModel>(
             path = path.href.replace("{gid}", gameId.toString()),
             token = token,
             body = play
@@ -77,7 +77,7 @@ class GameService(
                 )
             )
         }.onError {
-            val message = it.message ?: "Unknown error"
+            val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
     }
@@ -94,36 +94,36 @@ class GameService(
         return response.onSuccess {
             HttpResult.Success(Unit)
         }.onError {
-            val message = it.message ?: "Unknown error"
+            val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
     }
 
-    suspend fun getUserGames(token: String, userId: Int): HttpResult<List<Game>> {
-        val path = uriRepository.getRecipeLink(Rels.GAME) ?: return HttpResult.Failure(
-            ApiError("Game link not found")
-        )
-        val response = get<GameGetAllByUserOutputModel>(
-            path = path.href.replace("{uid}", userId.toString()),
-            token = token,
-        )
-        return response.onSuccess {
-            HttpResult.Success(
-                it.properties.games.map { game ->
-                    Game(
-                        id = game.id,
-                        players = Pair(game.userBlack, game.userWhite),
-                        board = game.board,
-                        state = game.state,
-                        variant = game.variant
-                    )
-                }
-            )
-        }.onError {
-            val message = it.message ?: "Unknown error"
-            HttpResult.Failure(ApiError(message))
-        }
-    }
+//    suspend fun getUserGames(token: String, userId: Int): HttpResult<List<Game>> {
+//        val path = uriRepository.getRecipeLink(Rels.GAME) ?: return HttpResult.Failure(
+//            ApiError("Game link not found")
+//        )
+//        val response = get<GameGetAllByUserOutputModel>(
+//            path = path.href.replace("{uid}", userId.toString()),
+//            token = token,
+//        )
+//        return response.onSuccess {
+//            HttpResult.Success(
+//                it.properties.games.map { game ->
+//                    Game(
+//                        id = game.id,
+//                        players = Pair(game.userBlack, game.userWhite),
+//                        board = game.board,
+//                        state = game.state,
+//                        variant = game.variant
+//                    )
+//                }
+//            )
+//        }.onError {
+//            val message = it.message.errorMessage
+//            HttpResult.Failure(ApiError(message))
+//        }
+//    }
 
     suspend fun matchmaking(
         token: String,
@@ -146,7 +146,7 @@ class GameService(
                 )
             )
         }.onError {
-            val message = it.message ?: "Unknown error"
+            val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
     }
@@ -162,7 +162,7 @@ class GameService(
         return response.onSuccess {
             HttpResult.Success(Unit)
         }.onError {
-            val message = it.message ?: "Unknown error"
+            val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
     }
@@ -188,10 +188,13 @@ class GameService(
                 )
             )
         }.onError {
-            val message = it.message ?: "Unknown error"
+            val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
     }
+
+    private val String?.errorMessage get () = this ?: unknownError
+    private val unknownError get () = "Unknown error"
 }
 
 

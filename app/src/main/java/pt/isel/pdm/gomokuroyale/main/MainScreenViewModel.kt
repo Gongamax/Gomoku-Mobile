@@ -44,7 +44,6 @@ class MainScreenViewModel(
         }
     }
 
-
     private fun getRelName(relUrl: String) = relUrl.split(DELIMITER).last()
 
     companion object {
