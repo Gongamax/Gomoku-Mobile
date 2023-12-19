@@ -5,12 +5,14 @@ import pt.isel.pdm.gomokuroyale.game.play.domain.Board
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 
 
-//Input Models
+// region Input Models
 data class GamePlayInputModel(val row: Int, val column: Int)
 
 data class GameMatchmakingInputModel(val variant: String)
 
-//Output Models
+// endregion
+
+// region Output Models
 data class GameRoundOutputModel(val game: GameOutputModel)
 
 data class GameMatchmakingOutputModel(val message: String, val idType: String, val id: Int)
@@ -48,3 +50,5 @@ data class SurrenderGameOutputModel(val message: String)
 data class CancelMatchmakingOutputModel(val message: String)
 
 data class GetVariantsOutputModel(val variants: List<Variant>)
+
+// endregion

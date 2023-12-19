@@ -36,15 +36,12 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
     override val uriRepository: UriRepository
         get() = UriDataStore(dataStore)
 
-    override lateinit var gomokuService: GomokuService
-
-    fun initializeGomokuService() {
-        gomokuService = GomokuService(client, gson, API_ENDPOINT, uriRepository)
-    }
+    override val gomokuService: GomokuService
+        get() = lazy { GomokuService(client, gson, API_ENDPOINT, uriRepository) }.value
 
     companion object {
         private const val API_ENDPOINT =
-            "https://f1e2-2001-8a0-f978-ae00-dda3-9845-21e0-1fe9.ngrok-free.app" // API NGROK URL
+            "https://1cca-2001-8a0-f978-ae00-4851-cf37-4e53-dff2.ngrok-free.app" // API NGROK URL
         private const val GOMOKU_DATA_STORE = "gomoku_data_store"
     }
 }

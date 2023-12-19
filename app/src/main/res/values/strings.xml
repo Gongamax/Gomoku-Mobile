@@ -16,6 +16,7 @@
     <string name="register_email">Email</string>
     <string name="play_title">Play</string>
     <string name="play_menu_title">Play</string>
+    <string name="logout">Logout</string>
     <string name="play_find_game">Find Game</string>
     <string name="match_history_title">Match History</string>
     <string name="search_hint">Enter search term here</string>

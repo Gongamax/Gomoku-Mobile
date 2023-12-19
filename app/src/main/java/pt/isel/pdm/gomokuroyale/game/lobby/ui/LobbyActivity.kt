@@ -45,7 +45,6 @@ class LobbyActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             viewModel.state.collect {
-                Log.v("LobbyActivity", "State: $it")
                 if (it is FetchingPlayerInfo) {
                     viewModel.fetchPlayerInfo()
                 }

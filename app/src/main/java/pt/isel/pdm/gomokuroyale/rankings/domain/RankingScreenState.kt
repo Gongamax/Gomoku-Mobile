@@ -1,6 +1,6 @@
 package pt.isel.pdm.gomokuroyale.rankings.domain
 
-import pt.isel.pdm.gomokuroyale.http.domain.RankingEntry
+import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
 
 /**
  * Represents the state of the ranking screen.
@@ -27,7 +27,7 @@ data class FailedToFetchRankingInfo(val error : Throwable) : RankingScreenState(
 
 data object FetchingPlayerInfo : RankingScreenState()
 
-data class FetchedPlayerInfo(val playerInfo : RankingEntry) : RankingScreenState()
+data class FetchedPlayerInfo(val playerInfo : UserRanking) : RankingScreenState()
 
 data class FailedToFetchPlayerInfo(val error : Throwable) : RankingScreenState()
 
@@ -47,5 +47,5 @@ fun Int.unitsConverter(): String {
     }
 }
 data class RankingState(
-    val rank: List<RankingEntry>
+    val rank: List<UserRanking>
 )

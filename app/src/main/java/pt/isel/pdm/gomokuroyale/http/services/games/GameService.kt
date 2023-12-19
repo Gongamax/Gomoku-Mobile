@@ -99,31 +99,32 @@ class GameService(
         }
     }
 
-//    suspend fun getUserGames(token: String, userId: Int): HttpResult<List<Game>> {
-//        val path = uriRepository.getRecipeLink(Rels.GAME) ?: return HttpResult.Failure(
-//            ApiError("Game link not found")
-//        )
-//        val response = get<GameGetAllByUserOutputModel>(
-//            path = path.href.replace("{uid}", userId.toString()),
-//            token = token,
-//        )
-//        return response.onSuccess {
-//            HttpResult.Success(
-//                it.properties.games.map { game ->
-//                    Game(
-//                        id = game.id,
-//                        players = Pair(game.userBlack, game.userWhite),
-//                        board = game.board,
-//                        state = game.state,
-//                        variant = game.variant
-//                    )
-//                }
-//            )
-//        }.onError {
-//            val message = it.message.errorMessage
-//            HttpResult.Failure(ApiError(message))
-//        }
-//    }
+    suspend fun getUserGames(token: String, userId: Int): HttpResult<List<Game>> {
+        val path = uriRepository.getRecipeLink(Rels.GAME) ?: return HttpResult.Failure(
+            ApiError("Game link not found")
+        )
+        val response = get<GameGetAllByUserOutputModel>(
+            path = path.href.replace("{uid}", userId.toString()),
+            token = token,
+        )
+        return response.onSuccess {
+            HttpResult.Success(
+                it.entities.map { entity ->
+                    val property = entity.properties as GameGetByIdOutputModel
+                    Game(
+                        id = property.game.id,
+                        players = Pair(property.game.userBlack, property.game.userWhite),
+                        board = property.game.board,
+                        state = property.game.state,
+                        variant = property.game.variant
+                    )
+                }
+            )
+        }.onError {
+            val message = it.message.errorMessage
+            HttpResult.Failure(ApiError(message))
+        }
+    }
 
     suspend fun matchmaking(
         token: String,

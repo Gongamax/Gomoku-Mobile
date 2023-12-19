@@ -1,13 +1,8 @@
 package pt.isel.pdm.gomokuroyale.http.domain
 
 data class RankingEntry (
-    val id : Int,
-    val username: String,
-    val gamesPlayed: Int,
-    val wins: Int,
-    val losses: Int,
-    val points: Int,
-    val rank: Int
+    val page : Int,
+    val pageSize : Int
 )
 
 fun Int.unitsConverter(): String {

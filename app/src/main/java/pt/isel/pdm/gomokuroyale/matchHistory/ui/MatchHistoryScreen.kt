@@ -49,7 +49,6 @@ import pt.isel.pdm.gomokuroyale.ui.components.MyIcon
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserStatsScreen(
     onBackRequested: () -> Unit,
@@ -80,7 +79,7 @@ fun UserStatsScreen(
 }
 
 @Composable
-fun MatchHistoryContent(modifier: Modifier, username: String) {
+private fun MatchHistoryContent(modifier: Modifier, username: String) {
     Column (
         modifier = modifier
             .fillMaxSize()
@@ -92,7 +91,7 @@ fun MatchHistoryContent(modifier: Modifier, username: String) {
     }
 }
 @Composable
-fun MatchHistoryBody(matches: List<MatchInfo> = matchesList) {
+private fun MatchHistoryBody(matches: List<MatchInfo> = matchesList) {
     LazyColumn(
         userScrollEnabled = true,
         verticalArrangement = Arrangement.SpaceEvenly,
@@ -119,7 +118,7 @@ fun MatchHistoryBody(matches: List<MatchInfo> = matchesList) {
 }
 
 @Composable
-fun MatchHistoryHeader(username: String) {
+private fun MatchHistoryHeader(username: String) {
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -159,7 +158,7 @@ fun MatchHistoryHeader(username: String) {
 }
 
 @Composable
-fun UsersProfilePic() {
+private fun UsersProfilePic() {
     Column (
         modifier= Modifier.height(75.dp),
         verticalArrangement = Arrangement.Center,
@@ -173,7 +172,7 @@ fun UsersProfilePic() {
 }
 
 @Composable
-fun UsersProfileName(username: String) {
+private fun UsersProfileName(username: String) {
     Column (
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -193,7 +192,7 @@ fun UsersProfileName(username: String) {
 }
 
 @Composable
-fun MatchView(match: MatchInfo) {
+private fun MatchView(match: MatchInfo) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -213,7 +212,7 @@ fun MatchView(match: MatchInfo) {
     }
 
 @Composable
-fun Match(resultId: Int, match: MatchInfo){
+private fun Match(resultId: Int, match: MatchInfo){
     MyIcon(resultId = resultId)
     Text(
         text = "${match.variant} | You vs ${match.opponent}",
@@ -246,4 +245,10 @@ val matchesList = buildList {
         }
 
     }
+}
+
+@Preview
+@Composable
+fun MatchPreview() {
+    MatchView(MatchInfo(Result.Win, "STANDARD", "Opponent", Piece.BLACK))
 }

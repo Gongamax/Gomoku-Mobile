@@ -38,6 +38,6 @@ class GomokuService(
     }
 
     companion object {
-        private const val HOME_PATH = "api/"
+        private const val HOME_PATH = "/api/"
     }
 }

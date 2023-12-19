@@ -41,10 +41,11 @@ class LobbyScreenViewModel(
         _state.value = FetchingPlayerInfo
         viewModelScope.launch {
             val result = kotlin.runCatching { repository.getUserInfo() }
-            if (result.getOrNull() == null)
-                _state.value = FailedToFetch(result.exceptionOrNull() ?: Exception())
+            val res = result.getOrNull()
+            if (res == null)
+                _state.value = FailedToFetch(Exception("Failed to fetch user info"))
             else
-                _state.value = FetchedPlayerInfo(result.getOrNull())
+                _state.value = FetchedPlayerInfo(res)
         }
     }
 

@@ -1,23 +1,22 @@
-package pt.isel.pdm.gomokuroyale.main
+package pt.isel.pdm.gomokuroyale.main.ui
 
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import pt.isel.pdm.gomokuroyale.DependenciesContainer
-import pt.isel.pdm.gomokuroyale.game.play.ui.GameActivity
 import pt.isel.pdm.gomokuroyale.about.ui.AboutActivity
 import pt.isel.pdm.gomokuroyale.authentication.ui.login.LoginActivity
 import pt.isel.pdm.gomokuroyale.authentication.ui.register.RegisterActivity
 import pt.isel.pdm.gomokuroyale.GomokuRoyaleApplication
 import pt.isel.pdm.gomokuroyale.TAG
 import pt.isel.pdm.gomokuroyale.game.lobby.ui.LobbyActivity
+import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState
 import pt.isel.pdm.gomokuroyale.rankings.ui.RankingActivity
-import pt.isel.pdm.gomokuroyale.util.Idle
-import pt.isel.pdm.gomokuroyale.util.Saved
+import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
 
 class MainActivity : ComponentActivity() {
 
@@ -25,6 +24,7 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel by viewModels<MainScreenViewModel> {
         MainScreenViewModel.factory(
+            app.userInfoRepository,
             app.gomokuService,
             app.uriRepository
         )
@@ -33,25 +33,41 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.v(TAG, "onCreate() called")
-
-        //TODO: ADD TO CHECK IF USER IS LOGGED IN
         lifecycleScope.launch {
-            app.initializeGomokuService()
             viewModel.state.collect {
-                if (it is Idle) {
+                if (it is MainScreenState.Idle) {
                     viewModel.updateRecipes()
+                }
+                if (it is MainScreenState.FetchedRecipes) {
+                    viewModel.fetchPlayerInfo()
                 }
             }
         }
 
         setContent {
+            val currentState = viewModel.state.collectAsState(initial = MainScreenState.Idle).value
+            val token = if (currentState is MainScreenState.FetchedPlayerInfo)
+                currentState.userInfo.getOrNull()?.accessToken
+            else null
             MainScreen(
+                isLoggedIn = token != null,
                 onLoginRequested = { LoginActivity.navigateTo(this) },
                 onRegisterRequested = { RegisterActivity.navigateTo(this) },
                 onCreateGameRequested = { LobbyActivity.navigateTo(this) },
                 onInfoRequested = { AboutActivity.navigateTo(this) },
-                onRankingRequested = { RankingActivity.navigateTo(this) }
+                onRankingRequested = { RankingActivity.navigateTo(this) },
+                onLogoutRequested = { viewModel.logout(token) }
             )
+
+            currentState.let {
+                if (it is MainScreenState.FailedToFetchRecipes || it is MainScreenState.FailedToLogout)
+                    ErrorAlert(
+                        title = "Main Screen Error",
+                        message = "Failed to fetch recipes",
+                        buttonText = "Ok",
+                        onDismiss = { viewModel.resetToIdle() }
+                    )
+            }
         }
     }
 

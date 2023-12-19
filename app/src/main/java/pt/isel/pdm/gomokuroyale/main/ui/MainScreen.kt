@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.main
+package pt.isel.pdm.gomokuroyale.main.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
@@ -41,12 +42,13 @@ const val MainScreenTestTag = "MainScreenTestTag"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    onCreateGameRequested : () -> Unit = {},
+    isLoggedIn: Boolean = false,
+    onCreateGameRequested: () -> Unit = {},
     onInfoRequested: () -> Unit = {},
     onRankingRequested: () -> Unit = {},
     onLoginRequested: () -> Unit = {},
     onRegisterRequested: () -> Unit = {},
-    onLogOutRequested: () -> Unit = {},
+    onLogoutRequested: () -> Unit = {},
 ) {
     GomokuRoyaleTheme {
         Scaffold(
@@ -93,15 +95,20 @@ fun MainScreen(
                     ButtonMenu(icon = Icons.Default.List, stringId = R.string.ranking_menu_title) {
                         onRankingRequested()
                     }
-                    ButtonMenu(icon = Icons.Default.AccountBox, stringId = R.string.register_title) {
-                        onRegisterRequested()
-                    }
-                    ButtonMenu(icon = Icons.Default.Person, stringId = R.string.login_title) {
-                        onLoginRequested()
-                    }
-//                ButtonMenu(icon = Icons.Default.ExitToApp, text = "Logout") {
-//                    onLogOutRequested()
-//                }
+                    if (!isLoggedIn) {
+                        ButtonMenu(
+                            icon = Icons.Default.AccountBox,
+                            stringId = R.string.register_title
+                        ) {
+                            onRegisterRequested()
+                        }
+                        ButtonMenu(icon = Icons.Default.Person, stringId = R.string.login_title) {
+                            onLoginRequested()
+                        }
+                    } else
+                        ButtonMenu(icon = Icons.Default.ExitToApp, stringId = R.string.logout) {
+                            onLogoutRequested()
+                        }
                 }
             }
         }
