@@ -10,77 +10,94 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import pt.isel.pdm.gomokuroyale.TAG
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
+import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Error
+import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Idle
+import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.LookingForMatch
+import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Matched
+import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Queueing
+import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.LeftQueue
 import pt.isel.pdm.gomokuroyale.http.GomokuService
-import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingInputModel
 import pt.isel.pdm.gomokuroyale.http.domain.MatchmakingStatus
-import pt.isel.pdm.gomokuroyale.util.IOState
-import pt.isel.pdm.gomokuroyale.util.idle
-import pt.isel.pdm.gomokuroyale.util.loadFailure
-import pt.isel.pdm.gomokuroyale.util.loadSuccess
-import pt.isel.pdm.gomokuroyale.util.loading
+import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingInputModel
+import pt.isel.pdm.gomokuroyale.util.onFailureResult
+import pt.isel.pdm.gomokuroyale.util.onSuccessResult
 
+//TODO: MOVE POLLING TO SERVICE
 class MatchmakerViewModel(
     private val service: GomokuService,
-    private val matchInfo: MatchInfo?
+    private val matchInfo: MatchInfo
 ) : ViewModel() {
 
-    private val _status: MutableStateFlow<IOState<MatchmakingStatus>> = MutableStateFlow(idle())
-    val status: StateFlow<IOState<MatchmakingStatus>> = _status.asStateFlow()
+    private val _screenStateFlow: MutableStateFlow<MatchmakingScreenState> =
+        MutableStateFlow(Idle)
+
+    val screenState: StateFlow<MatchmakingScreenState> get() = _screenStateFlow.asStateFlow()
 
     private val gameService = service.gameService
 
     fun findGame() {
+        check(_screenStateFlow.value is Idle)
+        { "Cannot find a game while in state ${_screenStateFlow.value}" }
+
+        Log.v(MATCHMAKER_ACTIVITY_TAG, "Finding a game.")
+        Log.v(MATCHMAKER_ACTIVITY_TAG, "Match info: $matchInfo")
+
         viewModelScope.launch {
-//            if (matchInfo == null) {
-//                _status.value = loadFailure(Exception("MatchInfo is null"))
-//                return@launch
-//            }
-//
-//            _status.value = loading()
-//            Log.v(TAG, "Finding game with variant ${matchInfo.variant}")
-//            Log.v(TAG, "Finding game with token ${matchInfo.userInfo.accessToken}")
-//
-//            val response = gameService.matchmaking(
-//                token = matchInfo.userInfo.accessToken,
-//                GameMatchmakingInputModel(variant = matchInfo.variant.toString())
-//            )
-//
-//            while (true) {
-//                val matchEntry = gameService.getMatchmakingStatus(
-//                    matchInfo.userInfo.accessToken,
-//                    response.properties.id
-//                )
-//                Log.v("MatchmakerViewModel", "Matchmaking status: $matchEntry")
-//                val matchStatus = MatchmakingStatus.valueOf(matchEntry.properties.state)
-//                _status.value = loadSuccess(matchStatus)
-//                if (matchStatus == MatchmakingStatus.MATCHED) {
-//                    //TODO: navigate to game
-//                    break
-//                } else {
-//                    delay(POOLING_DELAY)
-//                }
-//            }
+            _screenStateFlow.value = Queueing
+            gameService.matchmaking(
+                matchInfo.userInfo.accessToken,
+                GameMatchmakingInputModel(matchInfo.variant.toString())
+            ).onSuccessResult { queueEntry ->
+                if (queueEntry.idType == GAME_TYPE_ID) {
+                    _screenStateFlow.value = Matched(queueEntry.id)
+                } else {
+                    _screenStateFlow.value = LookingForMatch(queueEntry.id)
+                    while (true) {
+                        val status = gameService.getMatchmakingStatus(
+                            matchInfo.userInfo.accessToken,
+                            queueEntry.id
+                        )
+                        status.onSuccessResult { matchStatus ->
+                            if (matchStatus.state == MatchmakingStatus.MATCHED.toString()) {
+                                _screenStateFlow.value =
+                                    Matched(matchStatus.gid!!) // Safe double bang, because we know it is matched
+                                return@launch
+                            }
+                        }.onFailureResult { error ->
+                            _screenStateFlow.value = Error(error)
+                            return@launch
+                        }
+                        delay(POOLING_DELAY)
+                    }
+                }
+            }.onFailureResult {
+                _screenStateFlow.value = Error(it)
+            }
         }
     }
 
     fun leaveQueue() {
+        check(_screenStateFlow.value is LookingForMatch)
+        { "Cannot leave queue while in state ${_screenStateFlow.value}" }
         viewModelScope.launch {
-            if (matchInfo == null) {
-                _status.value = loadFailure(Exception("MatchInfo is null"))
-                return@launch
+            gameService.cancelMatchmaking(
+                matchInfo.userInfo.accessToken,
+                (_screenStateFlow.value as LookingForMatch).matchId
+            ).onSuccessResult {
+                _screenStateFlow.value = LeftQueue
+            }.onFailureResult {
+                _screenStateFlow.value = Error(it)
             }
-            val HARDCODED_ID = 1 //TODO: REMOVE HARDCODED ID
-            val response =
-                service.gameService.cancelMatchmaking(matchInfo.userInfo.accessToken, HARDCODED_ID)
-            _status.value = loadSuccess(MatchmakingStatus.LEFT_QUEUE)
         }
     }
 
     companion object {
         private const val POOLING_DELAY = 5000L
-        fun factory(service: GomokuService, matchInfo: MatchInfo?) =
+        private const val GAME_TYPE_ID = "gid"
+        private const val MATCH_TYPE_ID = "mid"
+
+        fun factory(service: GomokuService, matchInfo: MatchInfo) =
             viewModelFactory {
                 initializer { MatchmakerViewModel(service, matchInfo) }
             }

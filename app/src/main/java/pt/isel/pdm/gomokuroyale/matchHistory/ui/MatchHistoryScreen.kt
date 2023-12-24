@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,7 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.isel.pdm.gomokuroyale.R
-import pt.isel.pdm.gomokuroyale.game.play.domain.Piece
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Piece
 import pt.isel.pdm.gomokuroyale.matchHistory.model.MatchInfo
 import pt.isel.pdm.gomokuroyale.matchHistory.model.Result
 import pt.isel.pdm.gomokuroyale.matchHistory.model.toColor

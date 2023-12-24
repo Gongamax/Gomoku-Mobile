@@ -24,7 +24,7 @@ import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserTokenRemoveOutputMod
 import pt.isel.pdm.gomokuroyale.http.utils.Rels
 import pt.isel.pdm.gomokuroyale.util.ApiError
 import pt.isel.pdm.gomokuroyale.util.HttpResult
-import pt.isel.pdm.gomokuroyale.util.onError
+import pt.isel.pdm.gomokuroyale.util.onFailure
 import pt.isel.pdm.gomokuroyale.util.onSuccess
 
 private const val UserServicesTag = "USER_SERVICE_TAG"
@@ -50,7 +50,7 @@ class UserService(
         )
         return response.onSuccess {
             HttpResult.Success(UserId(it.properties.uid))
-        }.onError {
+        }.onFailure {
             val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
@@ -66,7 +66,7 @@ class UserService(
         )
         return response.onSuccess {
             HttpResult.Success(UserToken(it.properties.token))
-        }.onError {
+        }.onFailure {
             val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
@@ -79,7 +79,7 @@ class UserService(
         val response = post<UserTokenRemoveOutputModel>(path = path.href, token = token)
         return response.onSuccess {
             HttpResult.Success(Unit)
-        }.onError {
+        }.onFailure {
             val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
@@ -100,7 +100,7 @@ class UserService(
                     email = Email(it.properties.email),
                 )
             )
-        }.onError {
+        }.onFailure {
             val message = it.message ?: "Unknown error"
             HttpResult.Failure(ApiError(message))
         }
@@ -121,7 +121,7 @@ class UserService(
                     username = it.properties.username,
                 )
             )
-        }.onError {
+        }.onFailure {
             val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
@@ -147,7 +147,7 @@ class UserService(
                     points = it.properties.points
                 )
             )
-        }.onError {
+        }.onFailure {
             val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
@@ -182,7 +182,7 @@ class UserService(
                     )
                 }
             )
-        }.onError {
+        }.onFailure {
             val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }

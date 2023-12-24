@@ -1,8 +1,9 @@
 package pt.isel.pdm.gomokuroyale.http.services.games.dto
 
 import pt.isel.pdm.gomokuroyale.authentication.domain.User
-import pt.isel.pdm.gomokuroyale.game.play.domain.Board
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Board
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
 
 
 // region Input Models
@@ -27,7 +28,7 @@ data class GameOutputModel(
     val created: String
 )
 
-data class GameGetByIdOutputModel(val game: GameOutputModel, val pollingTimOut: Int)
+data class GameGetByIdOutputModel(val game: GameOutputModel, val pollingTimeOut: Int)
 
 data class GameMatchmakingStatusOutputModel(
     val mid: Int,
@@ -36,7 +37,7 @@ data class GameMatchmakingStatusOutputModel(
     val state: String,
     val variant: String,
     val created: String,
-    val pollingTimOut : Int
+    val pollingTimeOut: Int
 )
 
 data class GameGetAllByUserOutputModel (

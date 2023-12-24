@@ -2,9 +2,9 @@ package pt.isel.pdm.gomokuroyale
 
 import org.junit.*
 import org.junit.Test
-import pt.isel.pdm.gomokuroyale.game.play.domain.Cell
-import pt.isel.pdm.gomokuroyale.game.play.domain.Column
-import pt.isel.pdm.gomokuroyale.game.play.domain.Row
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Cell
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Column
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Row
 
 class CellTests {
 

@@ -1,26 +1,30 @@
 package pt.isel.pdm.gomokuroyale.game.play.domain
 
-import android.util.Log
-import pt.isel.pdm.gomokuroyale.game.play.domain.Board.Companion.createBoard
+import pt.isel.pdm.gomokuroyale.authentication.domain.User
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Board
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 
 data class Game(
-    val localPlayer: Piece, //
+    val id: Int,
+    val userBlack: User,
+    val userWhite: User,
     val board: Board,
-    val forfeitedBy: Piece? = null,
-)
+    val state: String,
+    val variant: Variant
+) {
+    val isOver: Boolean
+        get() = state == "PLAYER_BLACK_WON" || state == "PLAYER_WHITE_WON" || state == "DRAW"
 
-//TODO: Change this Logic
-fun Game.makeMove(at: Cell): Game {
-    var turn: Piece? = null
-    if (board is BoardRun) {
-        Log.v("Game", "$localPlayer and ${board.turn}")
-        //(localPlayer == board.turn) { "Is not your turn" } //ignoring this check for now
-        turn = board.turn
+    val winner: User?
+        get() = when (state) {
+            GameState.PLAYER_BLACK_WON.toString() -> userBlack
+            GameState.PLAYER_WHITE_WON.toString() -> userWhite
+            else -> null
+        }
+
+    fun isMyTurn(username : String): Boolean = when (state) {
+        GameState.NEXT_PLAYER_BLACK.toString() -> username == userBlack.username
+        GameState.NEXT_PLAYER_WHITE.toString() -> username == userWhite.username
+        else -> false
     }
-    if (turn == null)
-        turn = localPlayer
-    return copy(board = board.playRound(at, turn.other()))
 }
-
-fun createGame() = Game(Piece.BLACK, createBoard(Piece.BLACK, Variant.STANDARD))

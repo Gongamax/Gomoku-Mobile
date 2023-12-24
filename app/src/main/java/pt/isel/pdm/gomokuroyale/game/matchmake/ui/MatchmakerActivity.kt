@@ -4,25 +4,22 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
+import pt.isel.pdm.gomokuroyale.game.matchmake.domain.StartGameInfo
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
+import pt.isel.pdm.gomokuroyale.game.play.ui.GameActivity
 import pt.isel.pdm.gomokuroyale.http.domain.MatchmakingStatus
-import pt.isel.pdm.gomokuroyale.util.Idle
-import pt.isel.pdm.gomokuroyale.util.Loaded
-import pt.isel.pdm.gomokuroyale.util.getOrNull
-import pt.isel.pdm.gomokuroyale.util.getOrThrow
+import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
 
 const val MATCHMAKER_ACTIVITY_TAG = "MATCHMAKER_ACTIVITY_TAG"
 const val PLAYER_INFO_EXTRA = "PLAYER_INFO_EXTRA"
@@ -40,6 +37,8 @@ class MatchmakerActivity : ComponentActivity() {
 
     companion object {
         fun navigateTo(ctx: Context, info: MatchInfo? = null) {
+            Log.v(MATCHMAKER_ACTIVITY_TAG, "Navigating to matchmaker activity.")
+            Log.v(MATCHMAKER_ACTIVITY_TAG, "Match info: $info")
             ctx.startActivity(createIntent(ctx, info))
         }
 
@@ -53,28 +52,54 @@ class MatchmakerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {
-                viewModel.status.collect {
-                    if (it is Idle)
-                        viewModel.findGame()
-                    if (it is Loaded)
-                        finish()
+            viewModel.screenState.collect {
+                if (it is MatchmakingScreenState.Idle) {
+                    viewModel.findGame()
                 }
-
+                if (it is MatchmakingScreenState.Matched) {
+                    GameActivity.navigateTo(
+                        this@MatchmakerActivity,
+                        StartGameInfo(it.gameId, matchInfo.userInfo)
+                    )
+                }
+                if (it is MatchmakingScreenState.LeftQueue) {
+                    finish()
+                }
             }
 
+        }
+
         setContent {
-            val state = viewModel.status.collectAsState().value
+            val currentState = viewModel.screenState.collectAsState().value
+            val status = if (currentState is MatchmakingScreenState.Matched)
+                MatchmakingStatus.MATCHED
+            else
+                MatchmakingStatus.PENDING
+
             MatchmakerScreen(
-                status = MatchmakingStatus.PENDING,
+                status = status,
                 onCancelingMatchmaking = viewModel::leaveQueue,
-                onCancelingEnabled = true,
-                variant = matchInfo?.variant ?: Variant.STANDARD
+                onCancelingEnabled = currentState !is MatchmakingScreenState.Matched,
+                variant = matchInfo.variant
             )
+
+            currentState.let {
+                if (it is MatchmakingScreenState.Error) {
+                    ErrorAlert(
+                        title = "Error",
+                        message = it.error.message ?: "Unknown error",
+                        buttonText = "Ok",
+                        onDismiss = {}
+                    )
+                }
+            }
         }
     }
 
 
-    private val matchInfo: MatchInfo? by lazy { getPlayerInfoExtra()?.toMatchInfo() }
+    private val matchInfo: MatchInfo by lazy {
+        checkNotNull(getPlayerInfoExtra()) { "The match info must be provided." }.toMatchInfo()
+    }
 
     @Suppress("DEPRECATION")
     private fun getPlayerInfoExtra(): PlayerInfoExtra? =
@@ -88,7 +113,7 @@ class MatchmakerActivity : ComponentActivity() {
         val username: String,
         val token: String,
         val points: Int,
-        val variant: Variant
+        val variant: Variants
     ) : Parcelable {
         constructor(matchInfo: MatchInfo) : this(
             username = matchInfo.userInfo.username,

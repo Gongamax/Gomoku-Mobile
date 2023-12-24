@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.game.play.domain
+package pt.isel.pdm.gomokuroyale.game.play.domain.board
 
 /**
  * Class Cell represents a cell in the board.
@@ -70,4 +70,17 @@ fun cellsInDirection(from: Cell, dir: Direction, boardDim: Int) = buildList {
     var cell = from
     val range = Cell(0, 0)..Cell(boardDim, boardDim)
     while ((cell + dir).also { cell = it } in range) add(cell)
+}
+
+/**
+ * Counts the number of consecutive cells in a line starting at [from] (excluding) in the direction [dir].
+ * @param from the cell where the line starts (exclusive)
+ * @param dir the direction of the line starting at [from]
+ * @return The number of consecutive cells in the line.
+ */
+fun countCellsForIsWin(cells : List<Cell>, from: Cell, dir: Direction): Int {
+    var cell = from
+    var count = 0
+    while ((cell + dir).also { cell = it } in cells) count++
+    return count
 }

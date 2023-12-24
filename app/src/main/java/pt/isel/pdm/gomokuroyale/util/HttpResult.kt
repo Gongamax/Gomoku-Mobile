@@ -1,6 +1,5 @@
 package pt.isel.pdm.gomokuroyale.util
 
-import kotlin.Error
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -18,7 +17,7 @@ inline fun <T, R> HttpResult<T>.onSuccess(action: (T) -> HttpResult<R>): HttpRes
     }
 }
 
-inline fun <T> HttpResult<T>.onError(action: (ApiError) -> HttpResult<T>): HttpResult<T> {
+inline fun <T> HttpResult<T>.onFailure(action: (ApiError) -> HttpResult<T>): HttpResult<T> {
     return when (this) {
         is HttpResult.Success -> this
         is HttpResult.Failure -> action(error)

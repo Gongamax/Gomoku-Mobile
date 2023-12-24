@@ -16,7 +16,7 @@ import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchingMatchInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchingPlayerInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.LobbyScreenState
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
 import java.lang.IllegalStateException
 
 class LobbyScreenViewModel(
@@ -49,7 +49,7 @@ class LobbyScreenViewModel(
         }
     }
 
-    fun fetchMatchInfo(variant: Variant) {
+    fun fetchMatchInfo(variant: Variants) {
         val value =  _state.value
         if (value !is FetchedPlayerInfo)
             throw IllegalStateException("Cannot fetch match info while loading")

@@ -56,20 +56,28 @@ class MainActivity : ComponentActivity() {
                 onCreateGameRequested = { LobbyActivity.navigateTo(this) },
                 onInfoRequested = { AboutActivity.navigateTo(this) },
                 onRankingRequested = { RankingActivity.navigateTo(this) },
-                onLogoutRequested = { viewModel.logout(token) }
+                onLogoutRequested = { viewModel.logout(token) },
             )
 
             currentState.let {
-                if (it is MainScreenState.FailedToFetchRecipes || it is MainScreenState.FailedToLogout)
+                if (it is MainScreenState.FailedToFetchRecipes || it is MainScreenState.FailedToLogout) {
                     ErrorAlert(
                         title = "Main Screen Error",
-                        message = "Failed to fetch recipes",
+                        message = getErrorMessage(it),
                         buttonText = "Ok",
                         onDismiss = { viewModel.resetToIdle() }
                     )
+                }
             }
         }
     }
+
+//    override fun onResume() {
+//        super.onResume()
+//        lifecycleScope.launch {
+//            viewModel.fetchPlayerInfo()
+//        }
+//    }
 
     override fun onStart() {
         super.onStart()
@@ -84,6 +92,17 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.v(TAG, "onDestroy() called")
+    }
+
+    companion object {
+        private fun getErrorMessage(state: MainScreenState): String =
+            when (state) {
+                is MainScreenState.FailedToFetchRecipes -> state.error.message ?: UNKNOWN_ERROR
+                is MainScreenState.FailedToLogout -> state.error.message ?: UNKNOWN_ERROR
+                else -> UNKNOWN_ERROR
+            }
+
+        private const val UNKNOWN_ERROR = "Unknown error"
     }
 }
 

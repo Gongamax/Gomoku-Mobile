@@ -30,11 +30,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.isel.pdm.gomokuroyale.R
-import pt.isel.pdm.gomokuroyale.game.play.domain.Board
-import pt.isel.pdm.gomokuroyale.game.play.domain.BoardDim
-import pt.isel.pdm.gomokuroyale.game.play.domain.BoardRun
-import pt.isel.pdm.gomokuroyale.game.play.domain.Cell
-import pt.isel.pdm.gomokuroyale.game.play.domain.Piece
+import pt.isel.pdm.gomokuroyale.authentication.domain.Email
+import pt.isel.pdm.gomokuroyale.authentication.domain.Id
+import pt.isel.pdm.gomokuroyale.authentication.domain.User
+import pt.isel.pdm.gomokuroyale.game.play.domain.Game
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.BoardRun
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Cell
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Piece
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
@@ -43,6 +45,52 @@ import pt.isel.pdm.gomokuroyale.ui.theme.Violet
 
 const val GameScreenTestTag = "GameScreenTestTag"
 
+@Composable
+fun GameScreen(
+    state: GameScreenState,
+    onPlayRequested: (Cell) -> Unit = {},
+    onForfeitRequested: () -> Unit = {},
+    onHelpRequested: () -> Unit = {}
+) {
+    GomokuRoyaleTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Violet)
+                .testTag(GameScreenTestTag),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
+            IconComposable(
+                iconResourceId = R.drawable.gomokulog,
+                height = 50.dp,
+            )
+            RectangleComponent()
+            BoardView(
+                board = state.getGameBoard(),
+                boardDim = state.getGameVariant().boardDim,
+                onPlayEnabled = state is GameScreenState.MyTurn,
+            ) { at -> onPlayRequested(at) }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ButtonComponent(
+                    iconResourceId = R.drawable.ic_exit,
+                    text = "Exit",
+                    onSelectEnabled = state is GameScreenState.MyTurn,
+                    onClick = onForfeitRequested
+                )
+                ButtonComponent(
+                    iconResourceId = R.drawable.ic_robot,
+                    text = "Help",
+                    onClick = onHelpRequested
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun IconComposable(
@@ -62,9 +110,15 @@ fun IconComposable(
 }
 
 @Composable
-fun ButtonComponent(iconResourceId: Int, text: String, onClick: () -> Unit) {
+fun ButtonComponent(
+    iconResourceId: Int,
+    onSelectEnabled: Boolean = true,
+    text: String,
+    onClick: () -> Unit
+) {
     Button(
         onClick = onClick,
+        enabled = onSelectEnabled,
         colors = ButtonDefaults.buttonColors(DarkViolet)
     ) {
         IconComposable(iconResourceId = iconResourceId, height = 24.dp, padding = 4.dp)
@@ -146,54 +200,68 @@ fun RectangleComponent() {
 }
 
 
+@Preview(showBackground = true)
 @Composable
-fun GameScreen(
-    board: Board,
-    onPlayRequested: (Cell) -> Unit = {},
-    onForfeitRequested: () -> Unit = {},
-    onHelpRequested: () -> Unit = {}
-) {
-    GomokuRoyaleTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = Violet)
-                .testTag(GameScreenTestTag),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly
-        ) {
-            IconComposable(
-                iconResourceId = R.drawable.gomokulog,
-                height = 50.dp,
-            )
-            RectangleComponent()
-            BoardView(
-                board = board,
-                boardDim = BoardDim.MODIFIED.toInt(),
-            ) { at -> onPlayRequested(at) }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ButtonComponent(
-                    iconResourceId = R.drawable.ic_exit,
-                    text = "Exit",
-                    onClick = onForfeitRequested
-                )
-                ButtonComponent(
-                    iconResourceId = R.drawable.ic_robot,
-                    text = "Help",
-                    onClick = onHelpRequested
-                )
-            }
-        }
-    }
+private fun GamePlayScreenLoadingPreview() {
+    GameScreen(GameScreenState.Loading)
 }
-
 
 @Preview(showBackground = true)
 @Composable
-fun GameScreenPreview() {
-    GameScreen(BoardRun(emptyMap(), Piece.BLACK, Variant.STANDARD))
+private fun GamePlayScreenMyTurnPreview() {
+    GameScreen(
+        GameScreenState.Playing(
+            Game(
+                id = 1,
+                variant = variant,
+                board = BoardRun(
+                    moves = mapOf(
+                        Cell(0, 0) to Piece.BLACK,
+                        Cell(0, 1) to Piece.WHITE,
+                        Cell(0, 8) to Piece.BLACK,
+                        Cell(0, 9) to Piece.WHITE,
+                        Cell(1, 7) to Piece.WHITE,
+                        Cell(1, 8) to Piece.BLACK,
+                        Cell(1, 9) to Piece.WHITE,
+                        Cell(2, 0) to Piece.BLACK,
+                        Cell(2, 1) to Piece.WHITE,
+                        Cell(2, 2) to Piece.BLACK,
+                        Cell(2, 3) to Piece.WHITE,
+                        Cell(3, 2) to Piece.BLACK,
+                        Cell(3, 3) to Piece.WHITE,
+                        Cell(3, 4) to Piece.BLACK,
+                        Cell(3, 5) to Piece.WHITE,
+                        Cell(3, 6) to Piece.BLACK,
+                        Cell(3, 7) to Piece.WHITE
+                    ),
+                    turn = Piece.BLACK,
+                ),
+                userBlack = mockUser1,
+                userWhite = mockUser2,
+                state = "PLAYER_BLACK_TURN",
+            )
+        )
+    )
 }
+
+
+val mockUser1 = User(
+    id = Id(1),
+    username = "user1",
+    email = Email("mock1@example.com"),
+)
+
+val mockUser2 = User(
+    id = Id(2),
+    username = "user2",
+    email = Email("mock2@example.com"),
+)
+
+val variant = Variant(
+    name = "Standard",
+    boardDim = 15,
+    playRule = "Standard",
+    openingRule = "Standard",
+    points = 5
+)
+

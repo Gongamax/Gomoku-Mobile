@@ -10,7 +10,7 @@ import pt.isel.pdm.gomokuroyale.http.services.games.GameService
 import pt.isel.pdm.gomokuroyale.http.services.users.UserService
 import pt.isel.pdm.gomokuroyale.util.ApiError
 import pt.isel.pdm.gomokuroyale.util.HttpResult
-import pt.isel.pdm.gomokuroyale.util.onError
+import pt.isel.pdm.gomokuroyale.util.onFailure
 import pt.isel.pdm.gomokuroyale.util.onSuccess
 
 data class HomeOutputModel(val message: String)
@@ -31,7 +31,7 @@ class GomokuService(
         val response = get<HomeOutputModel>(HOME_PATH)
         return response.onSuccess {
             HttpResult.Success(it.recipeLinks)
-        }.onError {
+        }.onFailure {
             val message = it.message ?: "Unknown error"
             HttpResult.Failure(ApiError(message))
         }

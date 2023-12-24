@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.game.play.domain
+package pt.isel.pdm.gomokuroyale.game.play.domain.board
 
 /**
  * Class Row represents a row in the board.

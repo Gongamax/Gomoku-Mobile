@@ -39,7 +39,7 @@ class RegisterActivity : ComponentActivity() {
         lifecycleScope.launch {
             viewModel.state.collect {
                 if (it is Loaded && it.value.isSuccess) {
-                    finish()
+                    LoginActivity.navigateTo(this@RegisterActivity)
                     viewModel.resetToIdle()
                 }
             }

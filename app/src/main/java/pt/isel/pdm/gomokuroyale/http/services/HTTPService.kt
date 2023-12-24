@@ -13,6 +13,7 @@ import pt.isel.pdm.gomokuroyale.http.media.siren.SirenModel
 import pt.isel.pdm.gomokuroyale.http.utils.makeAPIRequest
 import pt.isel.pdm.gomokuroyale.util.ApiError
 import pt.isel.pdm.gomokuroyale.util.HttpResult
+import java.lang.reflect.Type
 
 abstract class HTTPService(
     val httpClient: OkHttpClient,
@@ -20,7 +21,6 @@ abstract class HTTPService(
     val apiEndpoint: String,
     val uriRepository: UriRepository
 ) {
-
     protected suspend inline fun <reified T> Request.getResponse(): HttpResult<SirenModel<T>> =
         try {
             val res = makeAPIRequest<T>(httpClient, SirenModel.getType<T>().type, jsonEncoder)
@@ -30,6 +30,8 @@ abstract class HTTPService(
         } catch (e: Exception) {
             HttpResult.Failure(ApiError(e.message ?: "Unknown error"))
         }
+
+    val gson = jsonEncoder
 
     protected suspend inline fun <reified T> get(path: String): HttpResult<SirenModel<T>> =
         Request.Builder()

@@ -4,12 +4,14 @@ import android.app.Application
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 import pt.isel.pdm.gomokuroyale.authentication.storage.UserInfoDataStore
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Board
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
+import pt.isel.pdm.gomokuroyale.util.BoardDeserializer
 import pt.isel.pdm.gomokuroyale.http.storage.UriDataStore
 import java.util.concurrent.TimeUnit
 
@@ -21,7 +23,8 @@ const val TAG = "GOMOKU_ROYALE_TAG"
 
 class GomokuRoyaleApplication : Application(), DependenciesContainer {
 
-    override val gson = Gson()
+    override val gson = GsonBuilder().registerTypeAdapter(Board::class.java, BoardDeserializer())
+        .create()
 
     override val client =
         OkHttpClient.Builder()
@@ -41,7 +44,7 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
 
     companion object {
         private const val API_ENDPOINT =
-            "https://1cca-2001-8a0-f978-ae00-4851-cf37-4e53-dff2.ngrok-free.app" // API NGROK URL
+            "https://d829-2001-8a0-f978-ae00-8aea-b9b5-e74a-e9c6.ngrok-free.app" // API NGROK URL
         private const val GOMOKU_DATA_STORE = "gomoku_data_store"
     }
 }
