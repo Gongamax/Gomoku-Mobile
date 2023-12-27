@@ -34,12 +34,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import pt.isel.pdm.gomokuroyale.R
-import pt.isel.pdm.gomokuroyale.game.play.domain.Board
-import pt.isel.pdm.gomokuroyale.game.play.domain.BoardDim
-import pt.isel.pdm.gomokuroyale.game.play.domain.BoardRun
-import pt.isel.pdm.gomokuroyale.game.play.domain.Cell
-import pt.isel.pdm.gomokuroyale.game.play.domain.Piece
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Board
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.BoardDim
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.BoardRun
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Cell
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Piece
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
 import pt.isel.pdm.gomokuroyale.ui.theme.AlabasterWhite
 import pt.isel.pdm.gomokuroyale.ui.theme.Brown
 
@@ -52,6 +52,7 @@ const val BOARD_TEST_TAG = "BOARD"
 fun BoardView(
     board: Board?,
     boardDim: Int,
+    onPlayEnabled: Boolean = true,
     onClick: (Cell) -> Unit,
 ) {
     val maxWidth = LocalConfiguration.current.screenWidthDp.dp - boarderSize * 2
@@ -66,7 +67,8 @@ fun BoardView(
                 board = board,
                 boardDim = boarDimWithBorder(size = boardDim),
                 onClick = onClick,
-                maxWidth = maxWidth
+                maxWidth = maxWidth,
+                onPlayEnabled = onPlayEnabled
             )
         }
     }
@@ -77,7 +79,8 @@ private fun BorderConstructor(
     board: Board?,
     boardDim: Int,
     onClick: (Cell) -> Unit,
-    maxWidth: Dp
+    maxWidth: Dp,
+    onPlayEnabled: Boolean
 ) {
     val roundedWidth = roundToNearestMultipleOf4(maxWidth.value.toInt())
     val cellSize: Dp = (roundedWidth / boardDim).dp
@@ -94,13 +97,13 @@ private fun BorderConstructor(
                     Border(resourceId, cellSize)
                 } else {
                     val pos = Cell(row, col)
-                    if (board == null) CellView(null, cellSize)
+                    if (board == null) CellView(null, cellSize, onPlayEnabled)
                     else CellView(
                         board.moves[pos],
-                        cellSize
+                        cellSize,
+                        onPlayEnabled,
                     ) {
                         onClick(pos)
-                        Log.v("Piece", "(${pos.row.index}, ${pos.col.index})")
                     }
                 }
             }
@@ -108,11 +111,11 @@ private fun BorderConstructor(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CellView(
     player: Piece?,
     cellSize: Dp,
+    onPlayEnabled: Boolean = true,
     modifier: Modifier = Modifier
         .size(cellSize)
         .background(Brown)
@@ -122,38 +125,39 @@ fun CellView(
     if (player == null)
         Box(modifier = modifier
             .clip(CircleShape)
-            .clickable { onClick() }) {
+            .clickable(enabled = onPlayEnabled) { onClick() }
+        ) {
             Image(painter = painterResource(id = R.drawable.cross), contentDescription = "Cross")
         }
     else
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
-            var fill by remember(player) { mutableStateOf(0.1f) }
+//            var fill by remember(player) { mutableStateOf(0.1f) }
             val image = when (player) {
                 Piece.WHITE -> R.drawable.checkers_white
                 Piece.BLACK -> R.drawable.checkers_black
             }
-            Image(
-                painter = painterResource(image),
-                modifier = Modifier.fillMaxSize(fill),
-                contentDescription = "piece"
-            )
-            LaunchedEffect(player) {
-                while (fill < 1f) {
-                    delay(50)
-                    fill *= 2
-                }
-                fill = 1f
-            }
-//            AnimatedVisibility(
-//                visible = true,
-//                enter = scaleIn(initialScale = 0.1f) + expandVertically(expandFrom = Alignment.CenterVertically),
-//            ) {
-//                Image(
-//                    painter = painterResource(image),
-//                    modifier = Modifier.fillMaxSize(),
-//                    contentDescription = "piece"
-//                )
+//            Image(
+//                painter = painterResource(image),
+//                modifier = Modifier.fillMaxSize(fill),
+//                contentDescription = "piece"
+//            )
+//            LaunchedEffect(player) {
+//                while (fill < 1f) {
+//                    delay(50)
+//                    fill *= 2
+//                }
+//                fill = 1f
 //            }
+            AnimatedVisibility(
+                visible = true,
+                enter = scaleIn(initialScale = 0.1f) + expandVertically(expandFrom = Alignment.CenterVertically),
+            ) {
+                Image(
+                    painter = painterResource(image),
+                    modifier = Modifier.fillMaxSize(),
+                    contentDescription = "piece"
+                )
+            }
         }
 }
 
@@ -201,7 +205,7 @@ private fun boarDimWithBorder(size: Int) = size + 1
 @Preview
 fun BoardViewPreview() {
     BoardView(
-        BoardRun(emptyMap(), Piece.BLACK, Variant.STANDARD),
+        BoardRun(emptyMap(), Piece.BLACK),
         BoardDim.STANDARD.toInt(),
         onClick = {})
 }

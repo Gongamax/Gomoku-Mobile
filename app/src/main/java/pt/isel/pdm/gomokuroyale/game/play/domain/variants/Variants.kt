@@ -1,92 +1,54 @@
 package pt.isel.pdm.gomokuroyale.game.play.domain.variants
 
-import pt.isel.pdm.gomokuroyale.game.play.domain.Board
-import pt.isel.pdm.gomokuroyale.game.play.domain.BoardDraw
-import pt.isel.pdm.gomokuroyale.game.play.domain.BoardOpen
-import pt.isel.pdm.gomokuroyale.game.play.domain.BoardRun
-import pt.isel.pdm.gomokuroyale.game.play.domain.BoardWin
-import pt.isel.pdm.gomokuroyale.game.play.domain.Cell
-import pt.isel.pdm.gomokuroyale.game.play.domain.Direction
-import pt.isel.pdm.gomokuroyale.game.play.domain.Piece
-import pt.isel.pdm.gomokuroyale.game.play.domain.cellsInDirection
-import pt.isel.pdm.gomokuroyale.game.play.domain.isDraw
-import pt.isel.pdm.gomokuroyale.game.play.domain.isWin
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.BoardDim
 
-interface Variants {
-    private val WIN_LENGTH: Int
-        get() = 5
+enum class Variants(
+    val boardDim: BoardDim,
+    val openingRule: OpeningRule,
+    val playingRule: PlayingRule,
+    val tip: String = ""
+) : VariantLogic {
 
-    private val directions: List<Pair<Direction, Direction>>
-        get() = listOf(
-            Pair(Direction.DOWN_LEFT, Direction.UP_RIGHT),
-            Pair(Direction.DOWN_RIGHT, Direction.UP_LEFT),
-            Pair(Direction.UP, Direction.DOWN),
-            Pair(Direction.LEFT, Direction.RIGHT)
-        )
-
-    fun play(board: Board, cell: Cell, nextPiece: Piece): Board {
-        return when (board) {
-            is BoardOpen -> playOpening(board, cell, nextPiece)
-            is BoardRun -> {
-                require(board.moves[cell] == null) { "Position $cell used" }
-                val moves = board.moves + (cell to board.turn)
-                when {
-                    board.isWin(cell) -> return BoardWin(moves, winner = board.turn)
-                    board.isDraw() ->  return BoardDraw(moves)
-                    else -> return BoardRun(moves, nextPiece, board.variant)
-                }
-            }
-            is BoardWin, is BoardDraw -> error("Game over")
-        }
-    }
-    fun playOpening(board: BoardOpen, cell: Cell, nextPiece: Piece): Board =
-        when (board.variant.openingRule) {
-            OpeningRule.STANDARD -> BoardRun(board.moves + (cell to board.turn), nextPiece, board.variant)
-            OpeningRule.SWAP -> BoardOpen(board.moves + (cell to board.turn), nextPiece, board.variant)
-        }
-    fun validPlay(board: Board, cell: Cell): Boolean =
-        when (board.variant.playingRule) {
-            PlayingRule.STANDARD -> cell !in board.moves
-            PlayingRule.THREE_AND_THREE -> isValidOnThreeAndThreeRule(board, cell)
-        }
-
-
-
-    fun isWin(board: BoardRun, cell: Cell): Boolean =
-        board.moves.size >= WIN_LENGTH * 2 - 2 &&
-                (board.moves.filter { it.value == board.turn }.keys + cell).run {
-                    any { winningCell ->
-                        directions.any { (forwardDir, backwardDir) ->
-                            val forwardCells = cellsInDirection(winningCell, forwardDir, size)
-                                .takeWhile { it in this }
-                            val backwardCells = cellsInDirection(winningCell, backwardDir, size)
-                                .takeWhile { it in this }
-
-                            val consecutiveCells = (backwardCells + listOf(winningCell) + forwardCells)
-
-                            consecutiveCells.size >= WIN_LENGTH
-                        }
-                    }
-                }
-
-    /*
-    * in this function is not possible to play if
-    * theres a move that simultaneously forms two open rows of three stones
-    * (rows not blocked by an opponent's stone at either end
-    * */
-    fun isValidOnThreeAndThreeRule(board: Board, cell: Cell): Boolean =
-        board is BoardRun && (board.moves.filter { it.value == board.turn }.keys + cell).run {
-            any {
-                directions.any { (forwardDir, backwardDir) ->
-                    val forwardCells = cellsInDirection(it, forwardDir, size)
-                        .takeWhile { it in this }
-                    val backwardCells = cellsInDirection(it, backwardDir, size)
-                        .takeWhile { it in this }
-                    val consecutiveCells = (backwardCells + listOf(it) + forwardCells)
-
-                    (board.moves[forwardCells.last()] != board.turn || board.moves[backwardCells.last()] != board.turn)
-                            && consecutiveCells.size <= 3
-                }
-            }
-        }
+    STANDARD(
+        boardDim = BoardDim.STANDARD,
+        openingRule = OpeningRule.STANDARD,
+        playingRule = PlayingRule.STANDARD,
+        tip = "Standard variant is a variant where the first player can place a stone anywhere on the board."
+    ),
+    SWAP(
+        boardDim = BoardDim.STANDARD,
+        openingRule = OpeningRule.SWAP,
+        playingRule = PlayingRule.STANDARD,
+        tip = "Swap variant is a variant where the second player can choose to swap the first player's first move with his own first move."
+    ),
+    RENJU(
+        boardDim = BoardDim.STANDARD,
+        openingRule = OpeningRule.STANDARD,
+        playingRule = PlayingRule.THREE_AND_THREE,
+        tip = "Renju variant is a variant where the first player cannot place a stone in a position that would create a three-in-a-row."
+    ),
+    CARO(
+        boardDim = BoardDim.STANDARD,
+        openingRule = OpeningRule.STANDARD,
+        playingRule = PlayingRule.STANDARD,
+        tip = "Caro variant is a variant where the first player cannot place a stone in a position that would create a three-in-a-row."
+    ),
+    PENTE(
+        boardDim = BoardDim.MODIFIED,
+        openingRule = OpeningRule.STANDARD,
+        playingRule = PlayingRule.STANDARD,
+        tip = "Pente variant is a variant where the first player cannot place a stone in a position that would create a three-in-a-row."
+    ),
+    OMOK(
+        boardDim = BoardDim.MODIFIED,
+        openingRule = OpeningRule.STANDARD,
+        playingRule = PlayingRule.THREE_AND_THREE,
+        tip = "Omok variant is a variant where the first player cannot place a stone in a position that would create a three-in-a-row."
+    ),
+    NINUKI_RENJU(
+        boardDim = BoardDim.STANDARD,
+        openingRule = OpeningRule.STANDARD,
+        playingRule = PlayingRule.THREE_AND_THREE,
+        tip = "Ninuki Renju variant is a variant where the first player cannot place a stone in a position that would create a three-in-a-row."
+    );
 }

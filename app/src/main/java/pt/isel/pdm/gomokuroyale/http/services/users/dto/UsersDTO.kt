@@ -1,39 +1,43 @@
 package pt.isel.pdm.gomokuroyale.http.services.users.dto
 
-import pt.isel.pdm.gomokuroyale.http.dto.DTO
-import pt.isel.pdm.gomokuroyale.http.dto.util.RankingEntry
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonParseException
+import pt.isel.pdm.gomokuroyale.http.domain.RankingEntry
+import java.lang.reflect.Type
+
+// region Input Models
 
 data class UserCreateInputModel(
     val username: String,
     val email: String,
     val password: String
-) : DTO {
-    override fun getType(): Class<out DTO> {
-        return this::class.java
-    }
-}
+)
 
 data class UserCreateTokenInputModel(
     val username: String,
     val password: String
-) : DTO {
-    override fun getType(): Class<out DTO> {
-        return this::class.java
-    }
-}
+)
 
-class UserGetByIdOutputModel(
+// endregion
+
+// region Output Models
+
+data class UserCreateOutputModel(
+    val uid: Int
+)
+
+data class UserGetByIdOutputModel(
     val id: Int,
     val username: String,
     val email: String
-) : DTO {
-    override fun getType(): Class<out DTO> {
-        return this::class.java
-    }
-}
+)
 
-class UserStatsOutputModel(
-    val id: Int,
+data class UserStatsOutputModel(
+    val uid: Int,
     val username: String,
     val gamesPlayed: Int,
     val wins: Int,
@@ -41,65 +45,49 @@ class UserStatsOutputModel(
     val draws: Int,
     val rank: Int,
     val points: Int
-) : DTO {
-    override fun getType(): Class<out DTO> {
-        return this::class.java
+) {
+    private class UserStatsDeserializer : JsonDeserializer<UserStatsOutputModel> {
+        override fun deserialize(
+            json: JsonElement?,
+            typeOfT: Type?,
+            context: JsonDeserializationContext?
+        ): UserStatsOutputModel {
+            val jsonObject = json?.asJsonObject ?: throw JsonParseException("Invalid JSON")
+            val uid = jsonObject["uid"].asInt
+            val username = jsonObject["username"].asString
+            val gamesPlayed = jsonObject["gamesPlayed"].asInt
+            val wins = jsonObject["wins"].asInt
+            val losses = jsonObject["losses"].asInt
+            val rank = jsonObject["rank"].asInt
+            val points = jsonObject["points"].asInt
+            return UserStatsOutputModel(uid, username, gamesPlayed, wins, losses, rank, points)
+        }
+    }
+
+    companion object {
+        fun getCustomGson(): Gson {
+            return GsonBuilder()
+                .registerTypeAdapter(UserStatsOutputModel::class.java, UserStatsDeserializer())
+                .create()
+        }
     }
 }
 
-class UserHomeOutputModel(
+data class UserHomeOutputModel(
     val id: Int,
     val username: String
-) : DTO {
-    override fun getType(): Class<out DTO> {
-        return this::class.java
-    }
-}
+)
 
 data class UserTokenCreateOutputModel(
     val token: String
-) : DTO {
-    override fun getType(): Class<out DTO> {
-        return this::class.java
-    }
-}
+)
 
 data class RankingInfoOutputModel(
     val rankingTable: List<RankingEntry>
-) : DTO {
-    override fun getType(): Class<out DTO> {
-        return this::class.java
-    }
-}
-
+)
 
 data class UserTokenRemoveOutputModel(
     val message: String
-) : DTO {
-    override fun getType(): Class<out DTO> {
-        return this::class.java
-    }
-}
-
-//TODO: remove this class, it's only here to make the compiler happy TEMPORARILY
-data class UserEmptyOutputModel(
-    val classList: List<String>,
-    val properties: Properties,
-    val links: List<Link>,
-    val entities: List<Any>,
-    val actions: List<Any>,
-    val requireAuth: List<Boolean>
-) : DTO {
-    override fun getType(): Class<out DTO> {
-        return this::class.java
-    }
-}
-
-data class Properties(
-    val uid: Int
 )
 
-data class Link(
-    val rel: List<String>,
-    val href: String
-)
+// endregion

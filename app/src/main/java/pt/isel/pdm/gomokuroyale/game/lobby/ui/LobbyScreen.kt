@@ -39,7 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.PlayerInfo
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
@@ -57,7 +57,7 @@ const val LobbyScreenTestTag = "LOBBY_SCREEN_TEST_TAG"
 fun LobbyScreen(
     modifier: Modifier = Modifier,
     onPlayEnabled: Boolean = true,
-    onFindGame: (Variant) -> Unit = {},
+    onFindGame: (Variants) -> Unit = {},
     playerInfo: PlayerInfo? = null,
     onNavigationBackRequested: () -> Unit = {}
 ) {
@@ -87,7 +87,7 @@ fun LobbyScreen(
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    var selectedVariant by remember { mutableStateOf(Variant.STANDARD) }
+                    var selectedVariant by remember { mutableStateOf(Variants.STANDARD) }
                     Row(
                         horizontalArrangement = Arrangement.Center
                     ) {
@@ -210,9 +210,9 @@ private fun ListRadioButtons(
 }
 
 private val listOfVariants: List<ToggleableInfo> =
-    Variant.entries.map {
+    Variants.entries.map {
         ToggleableInfo(
-            isChecked = it == Variant.STANDARD,
+            isChecked = it == Variants.STANDARD,
             variant = it,
             text = it.name
         )
@@ -220,7 +220,7 @@ private val listOfVariants: List<ToggleableInfo> =
 
 private data class ToggleableInfo(
     val isChecked: Boolean,
-    val variant: Variant,
+    val variant: Variants,
     val text: String
 )
 

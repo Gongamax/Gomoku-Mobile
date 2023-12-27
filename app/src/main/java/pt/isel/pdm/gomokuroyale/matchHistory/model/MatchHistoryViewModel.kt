@@ -3,7 +3,7 @@ package pt.isel.pdm.gomokuroyale.matchHistory.model
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.viewModelFactory
-import pt.isel.pdm.gomokuroyale.game.play.domain.Piece
+import pt.isel.pdm.gomokuroyale.game.play.domain.board.Piece
 import pt.isel.pdm.gomokuroyale.http.services.games.GameService
 import pt.isel.pdm.gomokuroyale.util.IOState
 import pt.isel.pdm.gomokuroyale.util.Idle

@@ -16,8 +16,7 @@ class UserInfoDataStore(
     private val accessToken = stringPreferencesKey(ACCESS_TOKEN)
     private val points = stringPreferencesKey(POINTS)
 
-    override val isLoggedIn: Boolean    //TODO: IMPROVE THIS CONDITION
-        get() = store.data.toString().isNotEmpty()
+    override suspend fun isLoggedIn() : Boolean = store.data.first()[usernameKey] != null
 
     override suspend fun login(userInfo: UserInfo) {
         store.edit { preferences ->

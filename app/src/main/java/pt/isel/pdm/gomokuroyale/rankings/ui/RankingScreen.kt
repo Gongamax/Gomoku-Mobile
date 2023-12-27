@@ -39,8 +39,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collectLatest
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.about.ui.AboutScreenTestTag
-import pt.isel.pdm.gomokuroyale.http.dto.util.RankingEntry
-import pt.isel.pdm.gomokuroyale.http.dto.util.unitsConverter
+import pt.isel.pdm.gomokuroyale.http.domain.unitsConverter
+import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
 import pt.isel.pdm.gomokuroyale.rankings.domain.FetchedPlayerInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.FetchedRankingInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.FetchingRankingInfo
@@ -54,23 +54,25 @@ import pt.isel.pdm.gomokuroyale.ui.components.UserInfoPopUp
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
-const val SearchBarTestTag = "SearchBar"
+const val SearchBarTestTag = "SEARCH_BAR_TEST_TAG"
+
 @Composable
 fun RankingScreen(
     vmState: RankingScreenState,
     modifier: Modifier = Modifier,
     onBackRequested: () -> Unit = { },
+    players: List<UserRanking> = listOf(),
     onPagedRequested: (Int) -> Unit = { },
     onMatchHistoryRequested: (Int, String) -> Unit = { _, _ -> },
     onSearchRequested: (String) -> Unit = { },
     onPlayerSelected: (Int) -> Unit = { },
     onPlayerDismissed: () -> Unit = { },
-){
+) {
     GomokuRoyaleTheme {
         var query by remember { mutableStateOf("") }
         val listState = rememberLazyListState()
         var page by remember { mutableIntStateOf(0) }
-        val rank by remember { mutableStateOf((vmState as FetchedRankingInfo).rankingInfo.rank) }
+        //val players by remember { mutableStateOf((vmState as FetchedRankingInfo).rankingInfo.rank) }
         Scaffold(
             modifier = modifier
                 .fillMaxSize()
@@ -78,47 +80,46 @@ fun RankingScreen(
             topBar = {
                 TopBar(
                     title = {
-                            Spacer(modifier = Modifier.padding(5.dp))
-                            Text(
-                                text = stringResource(id = R.string.ranking_title),
-                                textAlign = TextAlign.Center
-                            )
+                        Spacer(modifier = Modifier.padding(5.dp))
+                        Text(
+                            text = stringResource(id = R.string.ranking_title),
+                            textAlign = TextAlign.Center
+                        )
                     },
-                    navigation = NavigationHandlers(onBackRequested = onBackRequested)) },
-        ) { innerPadding ->
-            run {
-                RankingLazyColumn(
-                    query = query,
-                    listState = listState,
-                    rank = rank,
-                    state = vmState,
-                    modifier = modifier.padding(innerPadding),
-                    onMatchHistoryRequested = onMatchHistoryRequested,
-                    onSearchRequested = { onSearchRequested(it) },
-                    onQueryChanged = { query = it },
-                    onClearSearch = { query = "" },
-                    onPlayerSelected = { onPlayerSelected(it) },
-                    onPlayerDismissed = onPlayerDismissed
+                    navigation = NavigationHandlers(onBackRequested = onBackRequested)
                 )
-                LaunchedEffect(key1 = page){
-                    if(page == 0){
-                        listState.scrollToItem(0)
-                    } else {
-                        onPagedRequested(page)
-                    }
-                }
-                LaunchedEffect(key1 = listState){
-                    snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-                        .collectLatest { itemIndex ->
-                            if(vmState is FetchingRankingInfo && itemIndex != null && itemIndex >= rank.size - 1)
-                                page++
-                        }
-                }
-            }
+            },
+        ) { innerPadding ->
+            RankingLazyColumn(
+                query = query,
+                listState = listState,
+                rank = players,
+                state = vmState,
+                modifier = modifier.padding(innerPadding),
+                onMatchHistoryRequested = onMatchHistoryRequested,
+                onSearchRequested = { onSearchRequested(it) },
+                onQueryChanged = { query = it },
+                onClearSearch = { query = "" },
+                onPlayerSelected = { onPlayerSelected(it) },
+                onPlayerDismissed = onPlayerDismissed
+            )
         }
     }
 }
-
+//            LaunchedEffect(key1 = page) {
+//                if (page == 0) {
+//                    listState.scrollToItem(0)
+//                } else {
+//                    onPagedRequested(page)
+//                }
+//            }
+//            LaunchedEffect(key1 = listState) {
+//                snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+//                    .collectLatest { itemIndex ->
+//                        if (vmState is FetchingRankingInfo && itemIndex != null && itemIndex >= players.size - 1)
+//                            page++
+//                    }
+//            }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -126,7 +127,7 @@ fun RankingLazyColumn(
     query: String,
     listState: LazyListState,
     state: RankingScreenState,
-    rank: List<RankingEntry>,
+    rank: List<UserRanking>,
     modifier: Modifier = Modifier,
     onMatchHistoryRequested: (Int, String) -> Unit = { _, _ -> },
     onSearchRequested: (String) -> Unit = { },
@@ -134,7 +135,7 @@ fun RankingLazyColumn(
     onClearSearch: () -> Unit = { },
     onPlayerSelected: (Int) -> Unit = { },
     onPlayerDismissed: () -> Unit = { },
-){
+) {
     LazyColumn(
         userScrollEnabled = true,
         state = listState,
@@ -146,13 +147,13 @@ fun RankingLazyColumn(
             MySearchBar(query, onSearchRequested, onQueryChanged, onClearSearch)
             Spacer(modifier = Modifier.padding(5.dp))
         }
-        rank.forEach{ player ->
+        rank.forEach { player ->
             item {
                 PlayerView(player, onPlayerSelected)
                 Spacer(modifier = Modifier.padding(1.dp))
             }
         }
-        if(state is FetchingRankingInfo){
+        if (state is FetchingRankingInfo) {
             item {
                 LoadingView()
             }
@@ -171,9 +172,9 @@ fun RankingLazyColumn(
 
 @Composable
 fun PlayerView(
-    playerInfo: RankingEntry,
+    playerInfo: UserRanking,
     onPlayerSelected: (Int) -> Unit = { },
-){
+) {
     Card(
         shape = RectangleShape,
         modifier = Modifier
@@ -218,17 +219,17 @@ fun PlayerView(
     }
 }
 
-    @Preview(showBackground = true)
-    @Composable
-    private fun LeaderboardPreview() {
-        RankingScreen(
-            vmState = FetchingRankingInfo,
-            onBackRequested = {},
-            onMatchHistoryRequested = { _, _ -> },
-        )
-    }
+@Preview(showBackground = true)
+@Composable
+private fun LeaderboardPreview() {
+    RankingScreen(
+        vmState = FetchingRankingInfo,
+        onBackRequested = {},
+        onMatchHistoryRequested = { _, _ -> },
+    )
+}
 
-private val top3 = hashMapOf<Int, @Composable () -> Unit>(
+private val top3 = mapOf<Int, @Composable () -> Unit>(
     1 to { MyIcon(resultId = R.drawable.first_place) },
     2 to { MyIcon(resultId = R.drawable.second_place) },
     3 to { MyIcon(resultId = R.drawable.third_place) }

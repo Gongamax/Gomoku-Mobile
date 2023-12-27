@@ -14,36 +14,39 @@ import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
 import pt.isel.pdm.gomokuroyale.matchHistory.ui.MatchHistoryActivity
+import pt.isel.pdm.gomokuroyale.rankings.domain.FailedToFetchPlayerInfo
+import pt.isel.pdm.gomokuroyale.rankings.domain.FailedToFetchPlayersBySearch
+import pt.isel.pdm.gomokuroyale.rankings.domain.FailedToFetchRankingInfo
+import pt.isel.pdm.gomokuroyale.rankings.domain.FetchedRankingInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.FetchingRankingInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.WantsToGoToMatchHistory
+import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
 
-class RankingActivity: ComponentActivity() {
+class RankingActivity : ComponentActivity() {
 
-    private val repo by lazy { (application as DependenciesContainer).gomokuService.userService }
+    private val dependencies by lazy { application as DependenciesContainer }
 
     companion object {
-        fun navigateTo(origin : Activity){
+        fun navigateTo(origin: Activity) {
             val intent = Intent(origin, RankingActivity::class.java)
             origin.startActivity(intent)
         }
     }
 
-    /**
-     * The application's dependency provider.
-     */
-    private val viewModel by viewModels<RankingViewModel> (
-        factoryProducer = {
-            RankingViewModel.factory(repo)
-        }
-    )
+    private val viewModel by viewModels<RankingScreenViewModel> {
+        RankingScreenViewModel.factory(
+            dependencies.gomokuService.userService,
+            dependencies.userInfoRepository
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        lifecycleScope.launch{
+        lifecycleScope.launch {
             viewModel.state.collect {
-                if(it is FetchingRankingInfo)
-                    viewModel.getPage()
+                if (it is FetchingRankingInfo)
+                    viewModel.getPlayers()
                 if (it is WantsToGoToMatchHistory) {
                     MatchHistoryActivity.navigateTo(this@RankingActivity, it.id, it.username)
                     viewModel.resetToFetchingRankingInfo()
@@ -53,15 +56,39 @@ class RankingActivity: ComponentActivity() {
 
         setContent {
             val state by viewModel.state.collectAsState(initial = FetchingRankingInfo)
+            val players =
+                if (state is FetchedRankingInfo)
+                    (state as FetchedRankingInfo).rankingInfo.rank
+                else
+                    listOf()
             RankingScreen(
-                vmState = state ,
+                vmState = state,
                 modifier = if (state is FetchingRankingInfo) Modifier.shimmer() else Modifier,
                 onBackRequested = { finish() },
-                onMatchHistoryRequested = { id, username -> viewModel.goToMatchHistory(id, username) },
+                players = players,
+                onPagedRequested = { page -> viewModel.getPlayers(page) },
+                onMatchHistoryRequested = { id, username ->
+                    viewModel.goToMatchHistory(
+                        id,
+                        username
+                    )
+                },
                 onSearchRequested = { username -> viewModel.search(username) },
                 onPlayerSelected = { userId -> viewModel.getUserInfo(userId) },
                 onPlayerDismissed = { viewModel.resetToFetchingRankingInfo() }
             )
+
+            state.let {
+                if (it is FailedToFetchRankingInfo || it is FailedToFetchPlayerInfo ||
+                    it is FailedToFetchPlayersBySearch
+                )
+                    ErrorAlert(
+                        title = "Error",
+                        message = "Failed to fetch ranking info",
+                        buttonText = "Ok",
+                        onDismiss = { viewModel.resetToFetchingRankingInfo() }
+                    )
+            }
         }
     }
 }
