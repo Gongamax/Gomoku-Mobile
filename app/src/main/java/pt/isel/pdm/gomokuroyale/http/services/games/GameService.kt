@@ -3,6 +3,7 @@ package pt.isel.pdm.gomokuroyale.http.services.games
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import pt.isel.pdm.gomokuroyale.game.play.domain.Game
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
 import pt.isel.pdm.gomokuroyale.http.domain.games.MatchmakerStatus
 import pt.isel.pdm.gomokuroyale.http.domain.games.QueueEntry
@@ -15,6 +16,7 @@ import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingOutputMod
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingStatusOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GamePlayInputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameRoundOutputModel
+import pt.isel.pdm.gomokuroyale.http.services.games.dto.GetVariantsOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.SurrenderGameOutputModel
 import pt.isel.pdm.gomokuroyale.http.utils.Rels
 import pt.isel.pdm.gomokuroyale.util.ApiError
@@ -89,7 +91,7 @@ class GameService(
         val path = uriRepository.getRecipeLink(Rels.LEAVE) ?: return HttpResult.Failure(
             ApiError("Game link not found")
         )
-        val response = delete<SurrenderGameOutputModel>(
+        val response = put<SurrenderGameOutputModel>(
             path = path.href.replace("{gid}", gameId.toString()),
             token = token,
         )
@@ -128,6 +130,27 @@ class GameService(
             HttpResult.Failure(ApiError(message))
         }
     }
+
+
+    suspend fun getVariants() : HttpResult<List<Variant>>{
+
+        val path = uriRepository.getRecipeLink(Rels.GET_ALL_VARIANTS) ?: return HttpResult.Failure(
+            ApiError("Variants link not found")
+        )
+        val response = get<GetVariantsOutputModel>(
+            path = path.href,
+        )
+        return response.onSuccess {
+            HttpResult.Success(
+                it.properties.variants
+            )
+        }.onFailure {
+            val message = it.message.errorMessage
+            HttpResult.Failure(ApiError(message))
+        }
+    }
+
+
 
     suspend fun matchmaking(
         token: String,

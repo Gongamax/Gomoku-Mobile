@@ -26,7 +26,8 @@ class MainActivity : ComponentActivity() {
         MainScreenViewModel.factory(
             app.userInfoRepository,
             app.gomokuService,
-            app.uriRepository
+            app.uriRepository,
+            app.variantRepository
         )
     }
 
@@ -40,6 +41,9 @@ class MainActivity : ComponentActivity() {
                 }
                 if (it is MainScreenState.FetchedRecipes) {
                     viewModel.fetchPlayerInfo()
+                }
+                if (it is MainScreenState.FetchedPlayerInfo) {
+                    viewModel.updateVariants()
                 }
             }
         }
@@ -60,7 +64,9 @@ class MainActivity : ComponentActivity() {
             )
 
             currentState.let {
-                if (it is MainScreenState.FailedToFetchRecipes || it is MainScreenState.FailedToLogout) {
+                if (it is MainScreenState.FailedToFetchRecipes || it is MainScreenState.FailedToLogout ||
+                    it is MainScreenState.FailedToFetchVariants
+                ) {
                     ErrorAlert(
                         title = "Main Screen Error",
                         message = getErrorMessage(it),
@@ -99,6 +105,7 @@ class MainActivity : ComponentActivity() {
             when (state) {
                 is MainScreenState.FailedToFetchRecipes -> state.error.message ?: UNKNOWN_ERROR
                 is MainScreenState.FailedToLogout -> state.error.message ?: UNKNOWN_ERROR
+                is MainScreenState.FailedToFetchVariants -> state.error.message ?: UNKNOWN_ERROR
                 else -> UNKNOWN_ERROR
             }
 

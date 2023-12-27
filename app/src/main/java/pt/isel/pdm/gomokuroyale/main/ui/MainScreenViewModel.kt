@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.VariantRepository
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.Recipe
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
@@ -28,7 +30,8 @@ import pt.isel.pdm.gomokuroyale.util.onSuccessResult
 class MainScreenViewModel(
     private val repository: UserInfoRepository,
     private val uriRepository: UriRepository,
-    private val gomokuService: GomokuService
+    private val gomokuService: GomokuService,
+    private val variantRepository: VariantRepository
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<MainScreenState> = MutableStateFlow(Idle)
@@ -50,6 +53,33 @@ class MainScreenViewModel(
             }
         }
     }
+
+    fun updateVariants() {
+        check(_state.value is FetchedPlayerInfo) {
+            "The view model is not in the fetched player info state."
+        }
+        _state.value = MainScreenState.FetchVariant(false)
+        viewModelScope.launch {
+            val response = gomokuService.gameService.getVariants()
+            response.onSuccessResult {
+                val variants = it.map { variant ->
+                    Variant(
+                        variant.name,
+                        variant.boardDim,
+                        variant.playRule,
+                        variant.openingRule,
+                        variant.points
+                    )
+                }
+                val result =
+                    kotlin.runCatching { variantRepository.storeVariants(variants); variants }
+                _state.value = MainScreenState.FetchVariant(true, result)
+            }.onFailureResult {
+                _state.value = MainScreenState.FailedToFetchVariants(it)
+            }
+        }
+    }
+
 
     fun fetchPlayerInfo() {
         if (_state.value !is FetchedRecipes)
@@ -90,9 +120,17 @@ class MainScreenViewModel(
         fun factory(
             userInfoRepository: UserInfoRepository,
             gomokuService: GomokuService,
-            uriRepository: UriRepository
+            uriRepository: UriRepository,
+            variantRepository: VariantRepository
         ) = viewModelFactory {
-            initializer { MainScreenViewModel(userInfoRepository, uriRepository, gomokuService) }
+            initializer {
+                MainScreenViewModel(
+                    userInfoRepository,
+                    uriRepository,
+                    gomokuService,
+                    variantRepository
+                )
+            }
         }
 
         private const val DELIMITER = "/"

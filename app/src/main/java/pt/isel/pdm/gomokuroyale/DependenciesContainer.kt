@@ -3,6 +3,7 @@ package pt.isel.pdm.gomokuroyale
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.VariantRepository
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
 
@@ -34,4 +35,9 @@ interface DependenciesContainer {
      * The repository used to access API URI's templates
      */
     val uriRepository: UriRepository
+
+    /**
+     * The repository used to access the game variants
+     */
+    val variantRepository: VariantRepository
 }

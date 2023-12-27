@@ -13,12 +13,14 @@ import androidx.lifecycle.lifecycleScope
 import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
+import pt.isel.pdm.gomokuroyale.TAG
 import pt.isel.pdm.gomokuroyale.authentication.ui.login.LoginActivity
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FailedToFetch
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchedMatchInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchedPlayerInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchingMatchInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchingPlayerInfo
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.FetchVariants
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.PlayerInfo
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakerActivity
 import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
@@ -26,9 +28,10 @@ import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
 class LobbyActivity : ComponentActivity() {
 
     private val repo by lazy { (application as DependenciesContainer).userInfoRepository }
+    private val variantRepo by lazy { (application as DependenciesContainer).variantRepository }
 
     private val viewModel by viewModels<LobbyScreenViewModel> {
-        LobbyScreenViewModel.factory(repo)
+        LobbyScreenViewModel.factory(repo, variantRepo)
     }
 
     companion object {
@@ -52,19 +55,31 @@ class LobbyActivity : ComponentActivity() {
                     MatchmakerActivity.navigateTo(this@LobbyActivity, it.matchInfo)
                     viewModel.resetToFetchingPlayerInfo()
                 }
+                if (it is FetchedPlayerInfo) {
+                    viewModel.fetchVariants()
+                }
+                if (it is FetchVariants) {
+                    Log.v(TAG, "Variants fetched")
+                    Log.v(TAG, "Variants: ${it.variants}")
+                }
             }
         }
 
         setContent {
             val state by viewModel.state.collectAsState(initial = FetchingPlayerInfo)
             val userInfo =
-                if (state !is FetchingPlayerInfo && state !is FailedToFetch)
-                    (state as FetchedPlayerInfo).userInfo
-                else
-                    null
+                /* if (state !is FetchingPlayerInfo && state !is FailedToFetch)
+                     (state as FetchedPlayerInfo).userInfo
+                 else
+                     null*/
+                when (state) {
+                    is FetchingPlayerInfo -> null
+                    is FetchedPlayerInfo -> (state as FetchedPlayerInfo).userInfo
+                    else -> null
+                }
             LobbyScreen(
                 modifier = if (state is FetchingPlayerInfo) Modifier.shimmer() else Modifier,
-                onPlayEnabled =  state !is FetchingMatchInfo && state !is FetchedMatchInfo,
+                onPlayEnabled = state !is FetchingMatchInfo && state !is FetchedMatchInfo,
                 onFindGame = { variant -> viewModel.fetchMatchInfo(variant) },
                 playerInfo = if (userInfo != null) PlayerInfo(userInfo.username, 0) else null,
                 onNavigationBackRequested = { finish() }
