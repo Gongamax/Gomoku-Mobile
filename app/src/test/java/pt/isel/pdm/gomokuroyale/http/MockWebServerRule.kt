@@ -1,21 +1,10 @@
 package pt.isel.pdm.gomokuroyale.http
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
-import pt.isel.pdm.gomokuroyale.http.storage.UriDataStore
 
 const val CALL_TIMEOUT_IN_SECS = 10L
 

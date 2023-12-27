@@ -8,6 +8,8 @@ import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 import pt.isel.pdm.gomokuroyale.authentication.storage.UserInfoDataStore
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.VariantRepository
+import pt.isel.pdm.gomokuroyale.game.lobby.storage.VariantDataStore
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Board
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
@@ -42,9 +44,12 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
     override val gomokuService: GomokuService
         get() = lazy { GomokuService(client, gson, API_ENDPOINT, uriRepository) }.value
 
+    override val variantRepository: VariantRepository
+        get() = VariantDataStore(dataStore)
+
     companion object {
         private const val API_ENDPOINT =
-            "https://d829-2001-8a0-f978-ae00-8aea-b9b5-e74a-e9c6.ngrok-free.app" // API NGROK URL
+            "https://81ab-2001-8a0-f978-ae00-69e7-360-99a5-5db7.ngrok-free.app" // API NGROK URL
         private const val GOMOKU_DATA_STORE = "gomoku_data_store"
     }
 }

@@ -192,18 +192,7 @@ fun RegisterScreen(
 
 
                     DivideComponent()
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        IconButtonWithBorder(
-                            iconResourceId = R.drawable.google,
-                            onClick = {})
-                        IconButtonWithBorder(
-                            iconResourceId = R.drawable.facebook,
-                            onClick = {})
-                    }
+
 
                     VerificationComponent(
                         text = HAVE_ACCOUNT,
