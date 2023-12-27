@@ -28,14 +28,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import pt.isel.pdm.gomokuroyale.R
-import pt.isel.pdm.gomokuroyale.http.dto.util.RankingEntry
+import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
 import pt.isel.pdm.gomokuroyale.matchHistory.model.InfoParam
 
 @Composable
 fun UserInfoPopUp(
     onDismissRequest: () -> Unit,
     onMatchHistoryRequested: (Int, String)-> Unit,
-    playerInfo: RankingEntry
+    playerInfo: UserRanking
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
         Card (
@@ -128,7 +128,7 @@ fun UserInfoPopUpPreview() {
     UserInfoPopUp(
         onDismissRequest = {},
         onMatchHistoryRequested = { _, _ -> },
-        playerInfo = RankingEntry(
+        playerInfo = UserRanking(
             id = 1,
             username = "username",
             points = 1000,

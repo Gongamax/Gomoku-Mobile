@@ -13,8 +13,8 @@ import pt.isel.pdm.gomokuroyale.game.lobby.storage.VariantDataStore
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Board
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
-import pt.isel.pdm.gomokuroyale.util.BoardDeserializer
 import pt.isel.pdm.gomokuroyale.http.storage.UriDataStore
+import pt.isel.pdm.gomokuroyale.util.BoardDeserializer
 import java.util.concurrent.TimeUnit
 
 /**
@@ -45,7 +45,7 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
         get() = lazy { GomokuService(client, gson, API_ENDPOINT, uriRepository) }.value
 
     override val variantRepository: VariantRepository
-        get() = VariantDataStore(dataStore)
+        get() = VariantDataStore(dataStore, gson)
 
     companion object {
         private const val API_ENDPOINT =

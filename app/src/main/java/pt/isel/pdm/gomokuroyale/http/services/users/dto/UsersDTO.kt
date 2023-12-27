@@ -6,7 +6,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
-import pt.isel.pdm.gomokuroyale.http.domain.RankingEntry
+import pt.isel.pdm.gomokuroyale.http.dto.util.RankingEntry
 import java.lang.reflect.Type
 
 // region Input Models
@@ -58,9 +58,10 @@ data class UserStatsOutputModel(
             val gamesPlayed = jsonObject["gamesPlayed"].asInt
             val wins = jsonObject["wins"].asInt
             val losses = jsonObject["losses"].asInt
+            val draws = jsonObject["draws"].asInt
             val rank = jsonObject["rank"].asInt
             val points = jsonObject["points"].asInt
-            return UserStatsOutputModel(uid, username, gamesPlayed, wins, losses, rank, points)
+            return UserStatsOutputModel(uid, username, gamesPlayed, wins, losses, draws, rank, points)
         }
     }
 

@@ -143,6 +143,7 @@ class UserService(
                     gamesPlayed = it.properties.gamesPlayed,
                     wins = it.properties.wins,
                     losses = it.properties.losses,
+                    draws = it.properties.draws,
                     rank = it.properties.rank,
                     points = it.properties.points
                 )
@@ -177,6 +178,7 @@ class UserService(
                         gamesPlayed = property.gamesPlayed,
                         wins = property.wins,
                         losses = property.losses,
+                        draws = property.draws,
                         rank = property.rank,
                         points = property.points
                     )
