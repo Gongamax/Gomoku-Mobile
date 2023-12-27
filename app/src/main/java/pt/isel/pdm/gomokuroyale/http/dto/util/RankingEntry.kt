@@ -6,6 +6,7 @@ data class RankingEntry (
     val gamesPlayed: Int,
     val wins: Int,
     val losses: Int,
+    val draws: Int,
     val points: Int,
     val rank: Int
 )

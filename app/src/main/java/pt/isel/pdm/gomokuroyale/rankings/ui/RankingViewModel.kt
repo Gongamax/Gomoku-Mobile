@@ -71,6 +71,7 @@ class RankingViewModel (private val service: UserService) : ViewModel() {
                     userInfo.properties.gamesPlayed,
                     userInfo.properties.wins,
                     userInfo.properties.losses,
+                    userInfo.properties.draws,
                     userInfo.properties.points,
                     userInfo.properties.rank
                 ),
