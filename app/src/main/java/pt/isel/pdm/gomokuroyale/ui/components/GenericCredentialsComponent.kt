@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +42,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -70,7 +70,6 @@ fun TextComponent(value: Int, fontSize: TextUnit = 35.sp, height: Dp = 40.dp) {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InformationBox(
     value: String,
@@ -101,7 +100,7 @@ fun InformationBox(
         },
         visualTransformation = when (fieldType) {
             FieldType.PASSWORD -> if (!passwordVisibility) PasswordVisualTransformation() else VisualTransformation.None
-            FieldType.EMAIL_USER  -> VisualTransformation.None
+            FieldType.EMAIL_OR_USER  -> VisualTransformation.None
         },
         isError = isError,
         supportingText = {
@@ -125,7 +124,7 @@ fun InformationBox(
                     }
                 }
 
-                FieldType.EMAIL_USER -> {
+                FieldType.EMAIL_OR_USER -> {
                     if (validateField) {
                         IconSpecial(painterId = R.drawable.icon_correct)
                     } else {
@@ -135,6 +134,21 @@ fun InformationBox(
             }
         }
 
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InformationBoxPreview() {
+    InformationBox(
+        value = "test",
+        label = "Username",
+        onValueChange = {},
+        resourceId = R.drawable.ic_user,
+        fieldType = FieldType.EMAIL_OR_USER,
+        validateField = false,
+        isError = true,
+        supportText = "Help"
     )
 }
 
@@ -153,7 +167,7 @@ fun IconSpecial(painterId: Int, color: Color = Color.Unspecified) {
 
 
 enum class FieldType {
-    EMAIL_USER,
+    EMAIL_OR_USER,
     PASSWORD
 }
 

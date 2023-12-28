@@ -19,13 +19,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,14 +34,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.collectLatest
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.about.ui.AboutScreenTestTag
 import pt.isel.pdm.gomokuroyale.http.domain.unitsConverter
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
-import pt.isel.pdm.gomokuroyale.rankings.domain.FetchedPlayerInfo
-import pt.isel.pdm.gomokuroyale.rankings.domain.FetchedRankingInfo
-import pt.isel.pdm.gomokuroyale.rankings.domain.FetchingRankingInfo
+import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchedPlayerInfo
+import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchingRankingInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
@@ -58,8 +54,9 @@ const val SearchBarTestTag = "SEARCH_BAR_TEST_TAG"
 
 @Composable
 fun RankingScreen(
-    vmState: RankingScreenState,
     modifier: Modifier = Modifier,
+    vmState: RankingScreenState,
+    isRequestInProgress: Boolean = false,
     onBackRequested: () -> Unit = { },
     players: List<UserRanking> = listOf(),
     onPagedRequested: (Int) -> Unit = { },
@@ -67,12 +64,13 @@ fun RankingScreen(
     onSearchRequested: (String) -> Unit = { },
     onPlayerSelected: (Int) -> Unit = { },
     onPlayerDismissed: () -> Unit = { },
+    currentPage: Int = 1
 ) {
     GomokuRoyaleTheme {
-        var query by remember { mutableStateOf("") }
+        var query by rememberSaveable { mutableStateOf("") }
         val listState = rememberLazyListState()
-        var page by remember { mutableIntStateOf(0) }
-        //val players by remember { mutableStateOf((vmState as FetchedRankingInfo).rankingInfo.rank) }
+        var currPage by rememberSaveable { mutableIntStateOf(currentPage) }
+        var currPlayers by rememberSaveable { mutableStateOf(emptyList<UserRanking>()) }
         Scaffold(
             modifier = modifier
                 .fillMaxSize()
@@ -90,51 +88,49 @@ fun RankingScreen(
                 )
             },
         ) { innerPadding ->
+            //currPlayers = players
             RankingLazyColumn(
                 query = query,
+                isRequestInProgress = isRequestInProgress,
                 listState = listState,
-                rank = players,
+                rank = currPlayers,
                 state = vmState,
                 modifier = modifier.padding(innerPadding),
                 onMatchHistoryRequested = onMatchHistoryRequested,
                 onSearchRequested = { onSearchRequested(it) },
                 onQueryChanged = { query = it },
                 onClearSearch = { query = "" },
-                onPlayerSelected = { onPlayerSelected(it) },
-                onPlayerDismissed = onPlayerDismissed
+                onPlayerSelected = { playerId -> onPlayerSelected(playerId) },
+                onPlayerDismissed = onPlayerDismissed,
+                onPagedRequested = { nextPage ->
+                    if (nextPage == currPage) return@RankingLazyColumn
+                    onPagedRequested(nextPage)
+                    currPage = nextPage
+                    currPlayers = currPlayers + players
+               },
+                currentPage = currPage
             )
         }
     }
 }
-//            LaunchedEffect(key1 = page) {
-//                if (page == 0) {
-//                    listState.scrollToItem(0)
-//                } else {
-//                    onPagedRequested(page)
-//                }
-//            }
-//            LaunchedEffect(key1 = listState) {
-//                snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-//                    .collectLatest { itemIndex ->
-//                        if (vmState is FetchingRankingInfo && itemIndex != null && itemIndex >= players.size - 1)
-//                            page++
-//                    }
-//            }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RankingLazyColumn(
+    modifier: Modifier = Modifier,
     query: String,
+    isRequestInProgress: Boolean = false,
     listState: LazyListState,
     state: RankingScreenState,
     rank: List<UserRanking>,
-    modifier: Modifier = Modifier,
     onMatchHistoryRequested: (Int, String) -> Unit = { _, _ -> },
     onSearchRequested: (String) -> Unit = { },
     onQueryChanged: (String) -> Unit = { },
     onClearSearch: () -> Unit = { },
     onPlayerSelected: (Int) -> Unit = { },
     onPlayerDismissed: () -> Unit = { },
+    onPagedRequested: (Int) -> Unit = { },
+    currentPage: Int = 1
 ) {
     LazyColumn(
         userScrollEnabled = true,
@@ -155,7 +151,7 @@ fun RankingLazyColumn(
         }
         if (state is FetchingRankingInfo) {
             item {
-                LoadingView()
+                LoadingView()   //onLoadingView
             }
         }
         if (state is FetchedPlayerInfo) {
@@ -166,6 +162,10 @@ fun RankingLazyColumn(
                     playerInfo = state.playerInfo,
                 )
             }
+        }
+        val lastIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+        if (lastIndex != null && lastIndex >= rank.size && !isRequestInProgress) {
+            onPagedRequested(currentPage + 1)
         }
     }
 }

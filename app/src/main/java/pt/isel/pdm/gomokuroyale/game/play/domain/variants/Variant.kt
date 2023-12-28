@@ -1,6 +1,5 @@
 package pt.isel.pdm.gomokuroyale.game.play.domain.variants
 
-//TODO: Might need some tweaking
 data class Variant(
     val name : String,
     val boardDim : Int,

@@ -86,7 +86,6 @@ class GameService(
         }
     }
 
-
     suspend fun surrender(gameId: Int, token: String): HttpResult<Unit> {
         val path = uriRepository.getRecipeLink(Rels.LEAVE) ?: return HttpResult.Failure(
             ApiError("Game link not found")

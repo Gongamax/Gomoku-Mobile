@@ -107,7 +107,7 @@ fun RegisterScreen(
                             username = it
                         },
                         resourceId = R.drawable.ic_user,
-                        fieldType = FieldType.EMAIL_USER,
+                        fieldType = FieldType.EMAIL_OR_USER,
                         validateField = validateUsername(username),
                         isError = !isUsernameValid && isButtonClicked,
                         supportText = if (!isUsernameValid && isButtonClicked) INVALID_USERNAME else HELP_USERNAME
@@ -118,7 +118,7 @@ fun RegisterScreen(
                             email = it
                         },
                         resourceId = R.drawable.email,
-                        fieldType = FieldType.EMAIL_USER,
+                        fieldType = FieldType.EMAIL_OR_USER,
                         validateField = validateEmail(email),
                         isError = !isEmailValid && isButtonClicked,
                         supportText = if (!isEmailValid && isButtonClicked) INVALID_EMAIL else HELP_EMAIL

@@ -39,7 +39,8 @@
             android:noHistory="true" />
         <activity
             android:name=".game.play.ui.GameActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:noHistory="true" />
         <activity
             android:name=".rankings.ui.RankingActivity"
             android:exported="false" />

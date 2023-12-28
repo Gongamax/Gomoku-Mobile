@@ -13,27 +13,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
 const val ErrorAlertTestTag = "ErrorAlertTestTag"
 const val ErrorAlertDismissButtonTestTag = "ErrorAlertDismissButtonTestTag"
 
-//@Composable
-//fun ErrorAlert(
-//    @StringRes title: Int,
-//    @StringRes message: Int,
-//    @StringRes buttonText: Int,
-//    onDismiss: () -> Unit = { }
-//) {
-//    ErrorAlertImpl(
-//        title = stringResource(id = title),
-//        message = stringResource(id = message),
-//        buttonText = stringResource(id = buttonText),
-//        onDismiss = onDismiss
-//    )
-//}
+@Composable
+fun ErrorAlert(
+    @StringRes title: Int,
+    @StringRes message: Int,
+    @StringRes buttonText: Int = R.string.ok,
+    onDismiss: () -> Unit = { }
+) {
+    ErrorAlertImpl(
+        title = stringResource(id = title),
+        message = stringResource(id = message),
+        buttonText = stringResource(id = buttonText),
+        onDismiss = onDismiss
+    )
+}
 
 @Composable
 fun ErrorAlert(
@@ -54,7 +56,7 @@ fun ErrorAlert(
 private fun ErrorAlertImpl(
     title: String,
     message: String,
-    buttonText: String,
+    buttonText: String ,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -69,7 +71,7 @@ private fun ErrorAlertImpl(
             }
         },
         title = { Text(text = title) },
-        text = { Text(text = message) },
+        text = { Text(text = message, textAlign = TextAlign.Justify) },
         icon = {
             Icon(
                 imageVector = Icons.Outlined.ErrorOutline,

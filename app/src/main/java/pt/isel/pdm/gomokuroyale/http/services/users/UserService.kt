@@ -159,7 +159,7 @@ class UserService(
             ApiError("Ranking link not found")
         )
         val response = get<RankingInfoOutputModel>(
-            path = path.href.replace("{page}", page.toString())
+            path = path.href.replace("1", page.toString())
         )
         return response.onSuccess { players ->
             Log.v(UserServicesTag, "getRankingInfo: ${players.entities}")

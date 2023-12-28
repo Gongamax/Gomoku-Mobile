@@ -16,28 +16,32 @@ import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
  * - [FailedToFetchPlayersBySearch]
  * - [WantsToGoToMatchHistory]
  */
+sealed interface RankingScreenState {
+    data object Idle : RankingScreenState
+    data object FetchingRankingInfo : RankingScreenState
 
-sealed class RankingScreenState
+    data class FetchedRankingInfo(val rankingInfo: RankingState, val page : Int) : RankingScreenState
 
-data object FetchingRankingInfo : RankingScreenState()
+    data class FailedToFetchRankingInfo(val error: Throwable) : RankingScreenState
 
-data class FetchedRankingInfo(val rankingInfo : RankingState) : RankingScreenState()
+    data object FetchingPlayerInfo : RankingScreenState
 
-data class FailedToFetchRankingInfo(val error : Throwable) : RankingScreenState()
+    data class FetchedPlayerInfo(val playerInfo: UserRanking, val page: Int) : RankingScreenState
 
-data object FetchingPlayerInfo : RankingScreenState()
+    data class FailedToFetchPlayerInfo(val error: Throwable) : RankingScreenState
 
-data class FetchedPlayerInfo(val playerInfo : UserRanking) : RankingScreenState()
+    data object FetchingPlayersBySearch : RankingScreenState
 
-data class FailedToFetchPlayerInfo(val error : Throwable) : RankingScreenState()
+    data class FetchedPlayersBySearch(val players: RankingState, val page : Int) : RankingScreenState
 
-data object FetchingPlayersBySearch : RankingScreenState()
+    data class FailedToFetchPlayersBySearch(val error: Throwable) : RankingScreenState
 
-data class FetchedPlayersBySearch(val players : RankingState) : RankingScreenState()
+    data class WantsToGoToMatchHistory(val id: Int, val username: String, val page : Int) : RankingScreenState
+}
 
-data class FailedToFetchPlayersBySearch(val error : Throwable) : RankingScreenState()
 
-data class WantsToGoToMatchHistory(val id: Int, val username: String) : RankingScreenState()
+
+
 fun Int.unitsConverter(): String {
     val points = this
     return when {

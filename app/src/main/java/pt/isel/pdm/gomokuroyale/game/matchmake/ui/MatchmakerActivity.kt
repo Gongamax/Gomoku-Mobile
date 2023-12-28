@@ -15,8 +15,9 @@ import kotlinx.parcelize.Parcelize
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
+import pt.isel.pdm.gomokuroyale.game.lobby.ui.LobbyActivity
 import pt.isel.pdm.gomokuroyale.game.matchmake.domain.StartGameInfo
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import pt.isel.pdm.gomokuroyale.game.play.ui.GameActivity
 import pt.isel.pdm.gomokuroyale.http.domain.MatchmakingStatus
 import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
@@ -30,21 +31,22 @@ class MatchmakerActivity : ComponentActivity() {
 
     private val viewModel by viewModels<MatchmakerViewModel> {
         MatchmakerViewModel.factory(
-            dependencies.gomokuService,
+            dependencies.gomokuService.gameService,
             matchInfo
         )
     }
 
     companion object {
-        fun navigateTo(ctx: Context, info: MatchInfo? = null) {
+        fun navigateTo(ctx: Context, info: MatchInfo) {
             Log.v(MATCHMAKER_ACTIVITY_TAG, "Navigating to matchmaker activity.")
             Log.v(MATCHMAKER_ACTIVITY_TAG, "Match info: $info")
             ctx.startActivity(createIntent(ctx, info))
         }
 
-        private fun createIntent(ctx: Context, matchInfo: MatchInfo? = null): Intent {
+        //TODO: REVIEW THIS, CHECK NULL SAFETY
+        private fun createIntent(ctx: Context, matchInfo: MatchInfo): Intent {
             val intent = Intent(ctx, MatchmakerActivity::class.java)
-            matchInfo?.let { intent.putExtra(PLAYER_INFO_EXTRA, PlayerInfoExtra(it)) }
+            matchInfo.let { intent.putExtra(PLAYER_INFO_EXTRA, PlayerInfoExtra(it)) }
             return intent
         }
     }
@@ -79,7 +81,9 @@ class MatchmakerActivity : ComponentActivity() {
             MatchmakerScreen(
                 status = status,
                 onCancelingMatchmaking = viewModel::leaveQueue,
-                onCancelingEnabled = currentState !is MatchmakingScreenState.Matched,
+                onCancelingEnabled =
+                        currentState !is MatchmakingScreenState.Matched &&
+                        currentState !is MatchmakingScreenState.Queueing,
                 variant = matchInfo.variant
             )
 
@@ -89,7 +93,7 @@ class MatchmakerActivity : ComponentActivity() {
                         title = "Error",
                         message = it.error.message ?: "Unknown error",
                         buttonText = "Ok",
-                        onDismiss = {}
+                        onDismiss = { LobbyActivity.navigateTo(this) }
                     )
                 }
             }
@@ -104,27 +108,48 @@ class MatchmakerActivity : ComponentActivity() {
     @Suppress("DEPRECATION")
     private fun getPlayerInfoExtra(): PlayerInfoExtra? =
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU)
-            intent?.getParcelableExtra(PLAYER_INFO_EXTRA, PlayerInfoExtra::class.java)
+            intent.getParcelableExtra(PLAYER_INFO_EXTRA, PlayerInfoExtra::class.java)
         else
-            intent?.getParcelableExtra(PLAYER_INFO_EXTRA)
+            intent.getParcelableExtra(PLAYER_INFO_EXTRA)
 
     @Parcelize
     data class PlayerInfoExtra(
         val username: String,
         val token: String,
         val points: Int,
-        val variant: Variants
+        val variant: ParcelableVariant
     ) : Parcelable {
         constructor(matchInfo: MatchInfo) : this(
             username = matchInfo.userInfo.username,
             token = matchInfo.userInfo.accessToken,
-            points = 0,
-            variant = matchInfo.variant
+            points = matchInfo.variant.points,
+            variant = ParcelableVariant(matchInfo.variant)
         )
     }
 
     private fun PlayerInfoExtra.toMatchInfo() = MatchInfo(
         userInfo = UserInfo(token, username),
-        variant = variant
+        variant = variant.toVariant()
     )
+
+    @Parcelize
+    data class ParcelableVariant(
+        val name: String,
+        val boardDim: Int,
+        val playRule: String,
+        val openingRule: String,
+        val points: Int
+    ) : Parcelable {
+        constructor(variant: Variant) : this(
+            name = variant.name,
+            boardDim = variant.boardDim,
+            playRule = variant.playRule,
+            openingRule = variant.openingRule,
+            points = variant.points
+        )
+
+        fun toVariant(): Variant {
+            return Variant(name, boardDim, playRule, openingRule, points)
+        }
+    }
 }

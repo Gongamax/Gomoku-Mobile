@@ -15,7 +15,7 @@ import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.Recipe
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
 import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FailedToFetchRecipes
+import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FailedToFetch
 import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FailedToLogout
 import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedPlayerInfo
 import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedRecipes
@@ -49,16 +49,16 @@ class MainScreenViewModel(
                     kotlin.runCatching { uriRepository.updateRecipeLinks(recipes); recipes }
                 _state.value = FetchedRecipes(result)
             }.onFailureResult {
-                _state.value = FailedToFetchRecipes(it)
+                _state.value = FailedToFetch(it)
             }
         }
     }
 
     fun updateVariants() {
-        check(_state.value is FetchedPlayerInfo) {
-            "The view model is not in the fetched player info state."
+        check(_state.value is FetchedRecipes) {
+            "The view model is not in the fetched recipes state."
         }
-        _state.value = MainScreenState.FetchVariant(false)
+        _state.value = MainScreenState.FetchingVariants
         viewModelScope.launch {
             val response = gomokuService.gameService.getVariants()
             response.onSuccessResult {
@@ -73,17 +73,17 @@ class MainScreenViewModel(
                 }
                 val result =
                     kotlin.runCatching { variantRepository.storeVariants(variants); variants }
-                _state.value = MainScreenState.FetchVariant(true, result)
+                _state.value = MainScreenState.FetchedVariants(result)
             }.onFailureResult {
-                _state.value = MainScreenState.FailedToFetchVariants(it)
+                _state.value = FailedToFetch(it)
             }
         }
     }
 
 
     fun fetchPlayerInfo() {
-        if (_state.value !is FetchedRecipes)
-            throw IllegalStateException("The view model is not in the loading state.")
+        if (_state.value !is MainScreenState.FetchedVariants && _state.value !is FetchedPlayerInfo)
+            throw IllegalStateException("The view model cant fetch player info on ${_state.value} state.")
         _state.value = FetchingPlayerInfo
         viewModelScope.launch {
             val result = runCatching { repository.getUserInfo() }
@@ -109,8 +109,8 @@ class MainScreenViewModel(
     }
 
     fun resetToIdle() {
-//        if (_state.value !is FetchedRecipes || _state.value !is FetchedPlayerInfo || _state.value !is LoggedOut)
-//            throw IllegalStateException("The view model is not in fetched state.")
+        if (_state.value !is FailedToFetch && _state.value !is FailedToLogout)
+            throw IllegalStateException("The view model is not in fetched state.")
         _state.value = Idle
     }
 

@@ -1,5 +1,6 @@
 package pt.isel.pdm.gomokuroyale.game.lobby.ui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,16 +16,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -38,8 +40,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pt.isel.pdm.gomokuroyale.R
+import pt.isel.pdm.gomokuroyale.TAG
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.PlayerInfo
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
+import pt.isel.pdm.gomokuroyale.game.lobby.domain.Variants
+import pt.isel.pdm.gomokuroyale.game.matchmake.ui.stdVariant
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
@@ -52,12 +57,12 @@ import pt.isel.pdm.gomokuroyale.ui.theme.Violet
 
 const val LobbyScreenTestTag = "LOBBY_SCREEN_TEST_TAG"
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LobbyScreen(
     modifier: Modifier = Modifier,
+    variants: List<Variant>,
     onPlayEnabled: Boolean = true,
-    onFindGame: (Variants) -> Unit = {},
+    onFindGame: (String) -> Unit = {},
     playerInfo: PlayerInfo? = null,
     onNavigationBackRequested: () -> Unit = {}
 ) {
@@ -66,7 +71,11 @@ fun LobbyScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .testTag(LobbyScreenTestTag),
-            topBar = { TopBar(title = {}, NavigationHandlers(onBackRequested = onNavigationBackRequested)) },
+            topBar = {
+                TopBar(
+                    navigation = NavigationHandlers(onBackRequested = onNavigationBackRequested)
+                )
+            },
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -87,7 +96,17 @@ fun LobbyScreen(
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    var selectedVariant by remember { mutableStateOf(Variants.STANDARD) }
+                    var selectedVariant by remember { mutableStateOf(Variants.Standard.value) }
+                    val listOfVariants = variants.map {
+                        ToggleableInfo(
+                            isChecked = it.name == Variants.Standard.value,
+                            variant = it,
+                            text = it.name
+                        )
+                    }
+                    val radioButtons = remember {
+                        mutableStateListOf(*listOfVariants.toTypedArray())
+                    }
                     Row(
                         horizontalArrangement = Arrangement.Center
                     ) {
@@ -101,17 +120,18 @@ fun LobbyScreen(
                         verticalAlignment = Alignment.Top,
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        val radioButtons = remember {
-                            mutableStateListOf(*listOfVariants.toTypedArray())
+                        if (radioButtons.isEmpty())
+                            radioButtons.addAll(listOfVariants)
+                        else {
+                            val listSplitter = splitList(radioButtons)
+                            Column(horizontalAlignment = Alignment.Start) {
+                                ListRadioButtons(listSplitter.first, radioButtons)
+                            }
+                            Column(horizontalAlignment = Alignment.Start) {
+                                ListRadioButtons(listSplitter.second, radioButtons)
+                            }
+                            selectedVariant = radioButtons.first { it.isChecked }.variant.name
                         }
-                        val listSplitter = splitList(radioButtons)
-                        Column(horizontalAlignment = Alignment.Start) {
-                            ListRadioButtons(listSplitter.first, radioButtons)
-                        }
-                        Column(horizontalAlignment = Alignment.Start) {
-                            ListRadioButtons(listSplitter.second, radioButtons)
-                        }
-                        selectedVariant = radioButtons.first { it.isChecked }.variant
                     }
                     Row(modifier = modifier, horizontalArrangement = Arrangement.Center) {
                         GradientButton(enabled = onPlayEnabled) { onFindGame(selectedVariant) }
@@ -123,7 +143,7 @@ fun LobbyScreen(
 }
 
 @Composable
-private fun GradientButton(enabled : Boolean = true, onClick: () -> Unit) {
+private fun GradientButton(enabled: Boolean = true, onClick: () -> Unit) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
@@ -178,7 +198,7 @@ private fun PlayerLobbyInfo(playerInfo: PlayerInfo?, modifier: Modifier) {
 
 @Composable
 private fun ListRadioButtons(
-    listSplit: MutableList<ToggleableInfo>,
+    listSplit: List<ToggleableInfo>,
     radioButtons: SnapshotStateList<ToggleableInfo>,
 ) {
     listSplit.forEachIndexed { _, info ->
@@ -209,18 +229,9 @@ private fun ListRadioButtons(
     }
 }
 
-private val listOfVariants: List<ToggleableInfo> =
-    Variants.entries.map {
-        ToggleableInfo(
-            isChecked = it == Variants.STANDARD,
-            variant = it,
-            text = it.name
-        )
-    }
-
 private data class ToggleableInfo(
     val isChecked: Boolean,
-    val variant: Variants,
+    val variant: Variant,
     val text: String
 )
 
@@ -235,5 +246,11 @@ fun <T> splitList(inputList: MutableList<T>): Pair<MutableList<T>, MutableList<T
 @Preview(showBackground = true)
 @Composable
 fun LobbyScreenPreview() {
-    LobbyScreen(playerInfo = PlayerInfo("Player Name", 1000))
+    LobbyScreen(
+        variants = listOf(
+            Variant("STANDARD", 15, "Standard", "Standard", 5),
+            Variant("Pente", 15, "Standard", "Standard", 5),
+            Variant("RENJU", 15, "Standard", "Standard", 5),
+        ), playerInfo = PlayerInfo("Player Name", 1000)
+    )
 }

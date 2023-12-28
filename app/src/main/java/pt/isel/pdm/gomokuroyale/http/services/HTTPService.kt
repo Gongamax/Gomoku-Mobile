@@ -1,6 +1,5 @@
 package pt.isel.pdm.gomokuroyale.http.services
 
-import android.util.Log
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -13,7 +12,6 @@ import pt.isel.pdm.gomokuroyale.http.media.siren.SirenModel
 import pt.isel.pdm.gomokuroyale.http.utils.makeAPIRequest
 import pt.isel.pdm.gomokuroyale.util.ApiError
 import pt.isel.pdm.gomokuroyale.util.HttpResult
-import java.lang.reflect.Type
 
 abstract class HTTPService(
     val httpClient: OkHttpClient,
@@ -30,8 +28,6 @@ abstract class HTTPService(
         } catch (e: Exception) {
             HttpResult.Failure(ApiError(e.message ?: "Unknown error"))
         }
-
-    val gson = jsonEncoder
 
     protected suspend inline fun <reified T> get(path: String): HttpResult<SirenModel<T>> =
         Request.Builder()

@@ -53,6 +53,7 @@ class LoginActivity : ComponentActivity() {
         setContent {
             val currentState = viewModel.state.collectAsState(initial = idle()).value
             LoginScreen(
+                isLoginButtonEnabled = currentState is Idle,
                 onBackRequested = { finish() },
                 onRegisterRequested = { RegisterActivity.navigateTo(this) },
                 onLoginRequested = { username, password ->

@@ -1,5 +1,6 @@
 package pt.isel.pdm.gomokuroyale.main.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -40,19 +41,21 @@ class MainActivity : ComponentActivity() {
                     viewModel.updateRecipes()
                 }
                 if (it is MainScreenState.FetchedRecipes) {
-                    viewModel.fetchPlayerInfo()
-                }
-                if (it is MainScreenState.FetchedPlayerInfo) {
                     viewModel.updateVariants()
+                }
+                if (it is MainScreenState.FetchedVariants) {
+                    viewModel.fetchPlayerInfo()
                 }
             }
         }
 
         setContent {
             val currentState = viewModel.state.collectAsState(initial = MainScreenState.Idle).value
-            val token = if (currentState is MainScreenState.FetchedPlayerInfo)
-                currentState.userInfo.getOrNull()?.accessToken
-            else null
+            val token =
+                if (currentState is MainScreenState.FetchedPlayerInfo)
+                    currentState.userInfo.getOrNull()?.accessToken
+                else
+                    null
             MainScreen(
                 isLoggedIn = token != null,
                 onLoginRequested = { LoginActivity.navigateTo(this) },
@@ -64,9 +67,7 @@ class MainActivity : ComponentActivity() {
             )
 
             currentState.let {
-                if (it is MainScreenState.FailedToFetchRecipes || it is MainScreenState.FailedToLogout ||
-                    it is MainScreenState.FailedToFetchVariants
-                ) {
+                if (it is MainScreenState.FailedToFetch || it is MainScreenState.FailedToLogout) {
                     ErrorAlert(
                         title = "Main Screen Error",
                         message = getErrorMessage(it),
@@ -77,13 +78,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-//    override fun onResume() {
-//        super.onResume()
-//        lifecycleScope.launch {
-//            viewModel.fetchPlayerInfo()
-//        }
-//    }
 
     override fun onStart() {
         super.onStart()
@@ -103,9 +97,8 @@ class MainActivity : ComponentActivity() {
     companion object {
         private fun getErrorMessage(state: MainScreenState): String =
             when (state) {
-                is MainScreenState.FailedToFetchRecipes -> state.error.message ?: UNKNOWN_ERROR
+                is MainScreenState.FailedToFetch -> state.error.message ?: UNKNOWN_ERROR
                 is MainScreenState.FailedToLogout -> state.error.message ?: UNKNOWN_ERROR
-                is MainScreenState.FailedToFetchVariants -> state.error.message ?: UNKNOWN_ERROR
                 else -> UNKNOWN_ERROR
             }
 

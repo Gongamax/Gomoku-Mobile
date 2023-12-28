@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
@@ -25,7 +26,8 @@ const val TAG = "GOMOKU_ROYALE_TAG"
 
 class GomokuRoyaleApplication : Application(), DependenciesContainer {
 
-    override val gson = GsonBuilder().registerTypeAdapter(Board::class.java, BoardDeserializer())
+    override val gson: Gson = GsonBuilder()
+        .registerTypeAdapter(Board::class.java, BoardDeserializer())
         .create()
 
     override val client =
@@ -45,11 +47,11 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
         get() = lazy { GomokuService(client, gson, API_ENDPOINT, uriRepository) }.value
 
     override val variantRepository: VariantRepository
-        get() = VariantDataStore(dataStore)
+        get() = VariantDataStore(dataStore, gson)
 
     companion object {
         private const val API_ENDPOINT =
-            "https://81ab-2001-8a0-f978-ae00-69e7-360-99a5-5db7.ngrok-free.app" // API NGROK URL
+            "https://6f5d-2001-8a0-f978-ae00-c450-8ff3-c907-851a.ngrok-free.app" // API NGROK URL
         private const val GOMOKU_DATA_STORE = "gomoku_data_store"
     }
 }

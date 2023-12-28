@@ -17,15 +17,15 @@ import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Looking
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Matched
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Queueing
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.LeftQueue
-import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.MatchmakingStatus
+import pt.isel.pdm.gomokuroyale.http.services.games.GameService
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingInputModel
 import pt.isel.pdm.gomokuroyale.util.onFailureResult
 import pt.isel.pdm.gomokuroyale.util.onSuccessResult
 
 //TODO: MOVE POLLING TO SERVICE
 class MatchmakerViewModel(
-    private val service: GomokuService,
+    private val service: GameService,
     private val matchInfo: MatchInfo
 ) : ViewModel() {
 
@@ -33,8 +33,6 @@ class MatchmakerViewModel(
         MutableStateFlow(Idle)
 
     val screenState: StateFlow<MatchmakingScreenState> get() = _screenStateFlow.asStateFlow()
-
-    private val gameService = service.gameService
 
     fun findGame() {
         check(_screenStateFlow.value is Idle)
@@ -45,16 +43,16 @@ class MatchmakerViewModel(
 
         viewModelScope.launch {
             _screenStateFlow.value = Queueing
-            gameService.matchmaking(
+            service.matchmaking(
                 matchInfo.userInfo.accessToken,
-                GameMatchmakingInputModel(matchInfo.variant.toString())
+                GameMatchmakingInputModel(matchInfo.variant.name)
             ).onSuccessResult { queueEntry ->
                 if (queueEntry.idType == GAME_TYPE_ID) {
                     _screenStateFlow.value = Matched(queueEntry.id)
                 } else {
                     _screenStateFlow.value = LookingForMatch(queueEntry.id)
                     while (true) {
-                        val status = gameService.getMatchmakingStatus(
+                        val status = service.getMatchmakingStatus(
                             matchInfo.userInfo.accessToken,
                             queueEntry.id
                         )
@@ -81,7 +79,7 @@ class MatchmakerViewModel(
         check(_screenStateFlow.value is LookingForMatch)
         { "Cannot leave queue while in state ${_screenStateFlow.value}" }
         viewModelScope.launch {
-            gameService.cancelMatchmaking(
+            service.cancelMatchmaking(
                 matchInfo.userInfo.accessToken,
                 (_screenStateFlow.value as LookingForMatch).matchId
             ).onSuccessResult {
@@ -97,7 +95,7 @@ class MatchmakerViewModel(
         private const val GAME_TYPE_ID = "gid"
         private const val MATCH_TYPE_ID = "mid"
 
-        fun factory(service: GomokuService, matchInfo: MatchInfo) =
+        fun factory(service: GameService, matchInfo: MatchInfo) =
             viewModelFactory {
                 initializer { MatchmakerViewModel(service, matchInfo) }
             }
