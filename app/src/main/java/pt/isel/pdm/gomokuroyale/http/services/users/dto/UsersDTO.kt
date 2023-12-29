@@ -6,7 +6,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
-import pt.isel.pdm.gomokuroyale.http.domain.RankingEntry
+import pt.isel.pdm.gomokuroyale.http.domain.users.RankingEntry
 import java.lang.reflect.Type
 
 // region Input Models

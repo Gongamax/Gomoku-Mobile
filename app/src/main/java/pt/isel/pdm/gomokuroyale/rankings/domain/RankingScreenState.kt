@@ -1,5 +1,6 @@
 package pt.isel.pdm.gomokuroyale.rankings.domain
 
+import pt.isel.pdm.gomokuroyale.http.domain.users.RankingList
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
 
 /**
@@ -20,7 +21,7 @@ sealed interface RankingScreenState {
     data object Idle : RankingScreenState
     data object FetchingRankingInfo : RankingScreenState
 
-    data class FetchedRankingInfo(val rankingInfo: RankingState, val page : Int) : RankingScreenState
+    data class FetchedRankingInfo(val rankingInfo: RankingList, val page : Int) : RankingScreenState
 
     data class FailedToFetchRankingInfo(val error: Throwable) : RankingScreenState
 
@@ -32,15 +33,12 @@ sealed interface RankingScreenState {
 
     data object FetchingPlayersBySearch : RankingScreenState
 
-    data class FetchedPlayersBySearch(val players: RankingState, val page : Int) : RankingScreenState
+    data class FetchedPlayersBySearch(val players: RankingList, val page : Int) : RankingScreenState
 
     data class FailedToFetchPlayersBySearch(val error: Throwable) : RankingScreenState
 
     data class WantsToGoToMatchHistory(val id: Int, val username: String, val page : Int) : RankingScreenState
 }
-
-
-
 
 fun Int.unitsConverter(): String {
     val points = this
@@ -50,6 +48,3 @@ fun Int.unitsConverter(): String {
         else -> String.format("%.1fM", points / 1000000)
     }
 }
-data class RankingState(
-    val rank: List<UserRanking>
-)

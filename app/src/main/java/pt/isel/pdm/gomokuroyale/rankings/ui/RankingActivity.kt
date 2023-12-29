@@ -3,7 +3,6 @@ package pt.isel.pdm.gomokuroyale.rankings.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -14,6 +13,7 @@ import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
 import pt.isel.pdm.gomokuroyale.matchHistory.ui.MatchHistoryActivity
+import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FailedToFetchPlayerInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FailedToFetchPlayersBySearch
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FailedToFetchRankingInfo
@@ -28,13 +28,6 @@ const val RANKING_ACTIVITY_TAG = "RANKING_ACTIVITY_TAG"
 class RankingActivity : ComponentActivity() {
 
     private val dependencies by lazy { application as DependenciesContainer }
-
-    companion object {
-        fun navigateTo(origin: Activity) {
-            val intent = Intent(origin, RankingActivity::class.java)
-            origin.startActivity(intent)
-        }
-    }
 
     private val vm by viewModels<RankingScreenViewModel> {
         RankingScreenViewModel.factory(
@@ -52,42 +45,62 @@ class RankingActivity : ComponentActivity() {
                 }
                 if (it is WantsToGoToMatchHistory) {
                     MatchHistoryActivity.navigateTo(this@RankingActivity, it.id, it.username)
-                    vm.resetToFetchingRankingInfo()
+                    vm.resetToIdle()
                 }
             }
         }
 
         setContent {
-            val state = vm.state.collectAsState(initial = Idle).value
-            val players = if (state is FetchedRankingInfo) state.rankingInfo.rank else emptyList()
-            Log.v(RANKING_ACTIVITY_TAG, "state: $state")
-            val currentPage = (state as? FetchedRankingInfo)?.page ?: 1
-            Log.v(RANKING_ACTIVITY_TAG, "currentPage: $currentPage")
+            val currentState = vm.state.collectAsState(initial = Idle).value
+            val players =
+                if (currentState is FetchedRankingInfo)
+                    currentState.rankingInfo.rankingTable
+                else emptyList()
             RankingScreen(
-                vmState = state,
-                isRequestInProgress = state is FetchingRankingInfo || state is Idle,
-                modifier = if (state is FetchingRankingInfo) Modifier.shimmer() else Modifier,
+                vmState = currentState,
+                isRequestInProgress = currentState is FetchingRankingInfo || currentState is Idle,
+                modifier = if (currentState is FetchingRankingInfo) Modifier.shimmer() else Modifier,
                 onBackRequested = { finish() },
                 players = players,
                 onPagedRequested = { page -> vm.getPlayers(page) },
                 onMatchHistoryRequested = { id, username -> vm.goToMatchHistory(id, username) },
                 onSearchRequested = { username -> vm.search(username) },
                 onPlayerSelected = { userId -> vm.getUserInfo(userId) },
-                onPlayerDismissed = { vm.resetToFetchingRankingInfo() },
-                currentPage = currentPage
+                onPlayerDismissed = { vm.resetToIdle() },
+                isLastPage = currentState is FetchedRankingInfo
+                        && currentState.rankingInfo.paginationLinks.last == null
             )
-
-            state.let {
+            currentState.let {
                 if (it is FailedToFetchRankingInfo || it is FailedToFetchPlayerInfo ||
                     it is FailedToFetchPlayersBySearch
                 )
                     ErrorAlert(
                         title = "Error",
-                        message = "Failed to fetch ranking info",
+                        message = it.getErrorMessage(),
                         buttonText = "Ok",
-                        onDismiss = { vm.resetToFetchingRankingInfo() }
+                        onDismiss = { vm.resetToIdle() }
                     )
             }
+        }
+
+
+    }
+
+    private fun RankingScreenState.getErrorMessage(): String {
+        return when (this) {
+            is FailedToFetchRankingInfo -> error.message ?: UNKNOWN_ERROR
+            is FailedToFetchPlayerInfo -> error.message ?: UNKNOWN_ERROR
+            is FailedToFetchPlayersBySearch -> error.message ?: UNKNOWN_ERROR
+            else -> UNKNOWN_ERROR
+        }
+    }
+
+    companion object {
+        const val UNKNOWN_ERROR = "Unknown error"
+
+        fun navigateTo(origin: Activity) {
+            val intent = Intent(origin, RankingActivity::class.java)
+            origin.startActivity(intent)
         }
     }
 }

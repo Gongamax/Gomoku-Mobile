@@ -6,7 +6,9 @@ import okhttp3.OkHttpClient
 import pt.isel.pdm.gomokuroyale.authentication.domain.Email
 import pt.isel.pdm.gomokuroyale.authentication.domain.Id
 import pt.isel.pdm.gomokuroyale.authentication.domain.User
+import pt.isel.pdm.gomokuroyale.http.domain.PaginationLinks
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
+import pt.isel.pdm.gomokuroyale.http.domain.users.RankingList
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserHome
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserId
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
@@ -153,7 +155,7 @@ class UserService(
         }
     }
 
-    suspend fun getRankingInfo(page: Int): HttpResult<List<UserRanking>> {
+    suspend fun getRankingInfo(page: Int): HttpResult<RankingList> {
         val gson = UserStatsOutputModel.getCustomGson()
         val path = uriRepository.getRecipeLink(Rels.RANKING_INFO) ?: return HttpResult.Failure(
             ApiError("Ranking link not found")
@@ -162,25 +164,26 @@ class UserService(
             path = path.href.replace("1", page.toString())
         )
         return response.onSuccess { players ->
-            Log.v(UserServicesTag, "getRankingInfo: ${players.entities}")
+            val paginationLinks = players.links.associate { it.rel[0] to it.href }
             HttpResult.Success(
-                players.entities.map { entity ->
-                    Log.v(UserServicesTag, "getRankingInfo: ${entity.properties}")
-                    val property = gson.fromJson(
-                        entity.properties.toString(),
-                        UserStatsOutputModel::class.java
-                    )
-                    Log.v(UserServicesTag, "property: $property")
-                    UserRanking(
-                        id = property.uid,
-                        username = property.username,
-                        gamesPlayed = property.gamesPlayed,
-                        wins = property.wins,
-                        losses = property.losses,
-                        rank = property.rank,
-                        points = property.points
-                    )
-                }
+                RankingList(
+                    players.entities.map { entity ->
+                        val property = gson.fromJson(
+                            entity.properties.toString(),
+                            UserStatsOutputModel::class.java
+                        )
+                        UserRanking(
+                            id = property.uid,
+                            username = property.username,
+                            gamesPlayed = property.gamesPlayed,
+                            wins = property.wins,
+                            losses = property.losses,
+                            rank = property.rank,
+                            points = property.points
+                        )
+                    },
+                    PaginationLinks.from(paginationLinks)
+                )
             )
         }.onFailure {
             val message = it.message.errorMessage

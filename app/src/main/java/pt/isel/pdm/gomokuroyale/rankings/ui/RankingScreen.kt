@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.about.ui.AboutScreenTestTag
-import pt.isel.pdm.gomokuroyale.http.domain.unitsConverter
+import pt.isel.pdm.gomokuroyale.http.domain.users.unitsConverter
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchedPlayerInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchingRankingInfo
@@ -51,6 +51,7 @@ import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
 const val SearchBarTestTag = "SEARCH_BAR_TEST_TAG"
+const val FirstPage = 1
 
 @Composable
 fun RankingScreen(
@@ -64,12 +65,13 @@ fun RankingScreen(
     onSearchRequested: (String) -> Unit = { },
     onPlayerSelected: (Int) -> Unit = { },
     onPlayerDismissed: () -> Unit = { },
-    currentPage: Int = 1
+    initialPage: Int = FirstPage,
+    isLastPage : Boolean = false
 ) {
     GomokuRoyaleTheme {
         var query by rememberSaveable { mutableStateOf("") }
         val listState = rememberLazyListState()
-        var currPage by rememberSaveable { mutableIntStateOf(currentPage) }
+        var currPage by rememberSaveable { mutableIntStateOf(initialPage) }
         var currPlayers by rememberSaveable { mutableStateOf(emptyList<UserRanking>()) }
         Scaffold(
             modifier = modifier
@@ -88,7 +90,6 @@ fun RankingScreen(
                 )
             },
         ) { innerPadding ->
-            //currPlayers = players
             RankingLazyColumn(
                 query = query,
                 isRequestInProgress = isRequestInProgress,
@@ -108,7 +109,8 @@ fun RankingScreen(
                     currPage = nextPage
                     currPlayers = currPlayers + players
                },
-                currentPage = currPage
+                currentPage = currPage,
+                isLastPage = isLastPage
             )
         }
     }
@@ -130,7 +132,8 @@ fun RankingLazyColumn(
     onPlayerSelected: (Int) -> Unit = { },
     onPlayerDismissed: () -> Unit = { },
     onPagedRequested: (Int) -> Unit = { },
-    currentPage: Int = 1
+    currentPage: Int = 1,
+    isLastPage : Boolean = false
 ) {
     LazyColumn(
         userScrollEnabled = true,
@@ -164,7 +167,7 @@ fun RankingLazyColumn(
             }
         }
         val lastIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-        if (lastIndex != null && lastIndex >= rank.size && !isRequestInProgress) {
+        if (lastIndex != null && lastIndex >= rank.size && !isRequestInProgress && !isLastPage) {
             onPagedRequested(currentPage + 1)
         }
     }

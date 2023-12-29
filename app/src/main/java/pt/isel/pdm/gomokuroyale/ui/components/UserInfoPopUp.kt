@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import pt.isel.pdm.gomokuroyale.http.domain.RankingEntry
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
 
 @OptIn(ExperimentalMaterial3Api::class)
