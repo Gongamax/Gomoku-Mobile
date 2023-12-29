@@ -38,6 +38,7 @@ fun UserInfoPopUp(
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun UserInfoPopUpPreview() {
