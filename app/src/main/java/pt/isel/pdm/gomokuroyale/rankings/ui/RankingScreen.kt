@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.valentinilk.shimmer.shimmer
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.about.ui.AboutScreenTestTag
 import pt.isel.pdm.gomokuroyale.http.domain.users.unitsConverter
@@ -54,10 +55,11 @@ import pt.isel.pdm.gomokuroyale.util.toTermOrNull
 
 const val SearchBarTestTag = "SEARCH_BAR_TEST_TAG"
 const val FirstPage = 1
+const val MAX_USERNAME_LENGTH = 10
+const val MAX_USERNAME_LENGTH_SPACER = 13
 
 @Composable
 fun RankingScreen(
-    modifier: Modifier = Modifier,
     vmState: RankingScreenState,
     isRequestInProgress: Boolean = false,
     onBackRequested: () -> Unit = { },
@@ -68,7 +70,7 @@ fun RankingScreen(
     onPlayerSelected: (Int) -> Unit = { },
     onPlayerDismissed: () -> Unit = { },
     initialPage: Int = FirstPage,
-    isLastPage : Boolean = false
+    isLastPage: Boolean = false
 ) {
     GomokuRoyaleTheme {
         var query by rememberSaveable { mutableStateOf("") }
@@ -76,7 +78,7 @@ fun RankingScreen(
         var currPage by rememberSaveable { mutableIntStateOf(initialPage) }
         var currPlayers by rememberSaveable { mutableStateOf(emptyList<UserRanking>()) }
         Scaffold(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .testTag(AboutScreenTestTag),
             topBar = {
@@ -98,7 +100,7 @@ fun RankingScreen(
                 listState = listState,
                 rank = currPlayers,
                 state = vmState,
-                modifier = modifier.padding(innerPadding),
+                modifier = Modifier.padding(innerPadding),
                 onMatchHistoryRequested = onMatchHistoryRequested,
                 onSearchRequested = { query.toTermOrNull()?.let { onSearchRequested(it) } },
                 onQueryChanged = { query = it },
@@ -110,7 +112,7 @@ fun RankingScreen(
                     onPagedRequested(nextPage)
                     currPage = nextPage
                     currPlayers = currPlayers + players
-               },
+                },
                 currentPage = currPage,
                 isLastPage = isLastPage
             )
@@ -135,26 +137,28 @@ fun RankingLazyColumn(
     onPlayerDismissed: () -> Unit = { },
     onPagedRequested: (Int) -> Unit = { },
     currentPage: Int = 1,
-    isLastPage : Boolean = false
+    isLastPage: Boolean = false
 ) {
     LazyColumn(
         userScrollEnabled = true,
         state = listState,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize(),
     ) {
+        val mod = if (isRequestInProgress) Modifier.shimmer() else Modifier
         stickyHeader {
             MySearchBar(query, isRequestInProgress, onSearchRequested, onQueryChanged, onClearSearch)
             Spacer(modifier = Modifier.padding(5.dp))
         }
         rank.forEach { player ->
             item {
-                PlayerView(player, onPlayerSelected)
-                Spacer(modifier = Modifier.padding(1.dp))
+                PlayerView(mod, player, onPlayerSelected)
+               // Spacer(modifier = Modifier.padding(1.dp))
             }
         }
         if (state is FetchingRankingInfo) {
+
             item {
                 LoadingView()   //onLoadingView
             }
@@ -170,6 +174,7 @@ fun RankingLazyColumn(
         }
         val lastIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
         if (lastIndex != null && lastIndex >= rank.size && !isRequestInProgress && !isLastPage) {
+
             onPagedRequested(currentPage + 1)
         }
     }
@@ -177,13 +182,14 @@ fun RankingLazyColumn(
 
 @Composable
 fun PlayerView(
+    modifier: Modifier,
     playerInfo: UserRanking,
     onPlayerSelected: (Int) -> Unit = { },
 ) {
     Card(
         shape = RectangleShape,
-        modifier = Modifier
-            .fillMaxWidth(0.7f)
+        modifier = modifier
+            .fillMaxWidth(0.8f)
             .clip(RoundedCornerShape(10.dp))
             .clickable {
                 onPlayerSelected(playerInfo.id)
@@ -192,9 +198,9 @@ fun PlayerView(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Spacer(modifier = Modifier.padding(10.dp))
             when (val res = playerInfo.rank) {
                 in top3.keys -> top3[res]?.invoke()
                 else -> IconButton(onClick = { }, enabled = false) {
@@ -206,23 +212,33 @@ fun PlayerView(
                     )
                 }
             }
-            Spacer(modifier = Modifier.padding(10.dp))
             Text(
-                text = playerInfo.username,
+                text = if (playerInfo.username.isLimitUsername)
+                    playerInfo.username.limitUsername else playerInfo.username.accommodateUsername,
+
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
             )
-            Spacer(modifier = Modifier.padding(15.dp))
             Text(
                 text = playerInfo.points.unitsConverter(),
                 textAlign = TextAlign.Center,
                 maxLines = 1,
             )
-            MyIcon(resultId = R.drawable.ic_coins, size = 40.dp)
+            MyIcon(resultId = R.drawable.ic_coins, size = 45.dp)
         }
     }
 }
+
+
+private val String.isLimitUsername: Boolean
+    get() = this.length >= MAX_USERNAME_LENGTH
+
+private val String.limitUsername: String
+    get() = this.substring(0, MAX_USERNAME_LENGTH)+"..."
+
+private val String.accommodateUsername: String
+    get() = this + " ".repeat(MAX_USERNAME_LENGTH_SPACER - this.length)
 
 @Preview(showBackground = true)
 @Composable

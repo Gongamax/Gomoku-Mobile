@@ -10,6 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.valentinilk.shimmer.shimmer
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
 import pt.isel.pdm.gomokuroyale.matchHistory.ui.MatchHistoryActivity
@@ -58,7 +59,6 @@ class RankingActivity : ComponentActivity() {
             RankingScreen(
                 vmState = currentState,
                 isRequestInProgress = currentState is FetchingRankingInfo || currentState is Idle,
-                modifier = if (currentState is FetchingRankingInfo) Modifier.shimmer() else Modifier,
                 onBackRequested = { finish() },
                 players = players,
                 onPagedRequested = { page -> vm.getPlayers(page) },

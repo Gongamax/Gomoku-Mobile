@@ -17,7 +17,6 @@ import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchedPlayer
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchedRankingInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchingPlayerInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchingPlayersBySearch
-import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchedPlayersBySearch
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchingRankingInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.Idle
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.WantsToGoToMatchHistory
