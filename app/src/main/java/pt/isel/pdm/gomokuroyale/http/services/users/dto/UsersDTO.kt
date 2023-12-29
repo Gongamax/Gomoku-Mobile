@@ -42,6 +42,7 @@ data class UserStatsOutputModel(
     val gamesPlayed: Int,
     val wins: Int,
     val losses: Int,
+    val draws: Int,
     val rank: Int,
     val points: Int
 ) {
@@ -57,9 +58,10 @@ data class UserStatsOutputModel(
             val gamesPlayed = jsonObject["gamesPlayed"].asInt
             val wins = jsonObject["wins"].asInt
             val losses = jsonObject["losses"].asInt
+            val draws = jsonObject["draws"].asInt
             val rank = jsonObject["rank"].asInt
             val points = jsonObject["points"].asInt
-            return UserStatsOutputModel(uid, username, gamesPlayed, wins, losses, rank, points)
+            return UserStatsOutputModel(uid, username, gamesPlayed, wins, losses, draws, rank, points)
         }
     }
 

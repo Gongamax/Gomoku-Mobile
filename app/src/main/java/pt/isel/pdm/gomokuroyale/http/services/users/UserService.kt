@@ -1,6 +1,5 @@
 package pt.isel.pdm.gomokuroyale.http.services.users
 
-import android.util.Log
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import pt.isel.pdm.gomokuroyale.authentication.domain.Email
@@ -145,6 +144,7 @@ class UserService(
                     gamesPlayed = it.properties.gamesPlayed,
                     wins = it.properties.wins,
                     losses = it.properties.losses,
+                    draws = it.properties.draws,
                     rank = it.properties.rank,
                     points = it.properties.points
                 )
@@ -178,6 +178,7 @@ class UserService(
                             gamesPlayed = property.gamesPlayed,
                             wins = property.wins,
                             losses = property.losses,
+                            draws = property.draws,
                             rank = property.rank,
                             points = property.points
                         )
@@ -217,6 +218,7 @@ class UserService(
                             gamesPlayed = property.gamesPlayed,
                             wins = property.wins,
                             losses = property.losses,
+                            draws = property.draws,
                             rank = property.rank,
                             points = property.points
                         )
