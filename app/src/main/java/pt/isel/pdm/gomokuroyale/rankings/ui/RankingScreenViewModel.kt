@@ -17,6 +17,7 @@ import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchedPlayer
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchedRankingInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchingPlayerInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchingPlayersBySearch
+import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchedPlayersBySearch
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchingRankingInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.Idle
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.WantsToGoToMatchHistory
@@ -40,22 +41,25 @@ class RankingScreenViewModel(
         _state.value = FetchingRankingInfo
         viewModelScope.launch {
             service.getRankingInfo(page).onSuccessResult { rankingList ->
-                _state.value =
-                    FetchedRankingInfo(rankingInfo = rankingList, page)
+                _state.value = FetchedRankingInfo(rankingInfo = rankingList, page)
             }.onFailureResult {
                 _state.value = FailedToFetchRankingInfo(it)
             }
         }
     }
 
-    fun search(query: String) {
-        if (_state.value !is FetchingPlayersBySearch)
-            throw IllegalStateException("Cannot search while loading")
-        _state.value = FetchingPlayersBySearch
-        viewModelScope.launch {
-            val result = service.getRankingInfo(1)
-            val search = result
-//            _state.value = FetchedPlayersBySearch(RankingState(search.properties.rankingTable))
+    fun search(query: String, page : Int = 1) {
+        _state.value.let {initState ->
+            if (initState !is FetchedRankingInfo)
+                throw IllegalStateException("Cannot search while loading, is on state ${_state.value}")
+            _state.value = FetchingPlayersBySearch
+            viewModelScope.launch {
+                service.getRankingInfoByUsername(query, page).onSuccessResult { rankingList ->
+                    _state.value = FetchedRankingInfo(rankingList, initState.page)
+                }.onFailureResult {
+                    _state.value = FailedToFetchRankingInfo(it)
+                }
+            }
         }
     }
 

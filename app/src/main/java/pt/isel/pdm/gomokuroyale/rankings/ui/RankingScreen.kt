@@ -49,6 +49,8 @@ import pt.isel.pdm.gomokuroyale.ui.components.MySearchBar
 import pt.isel.pdm.gomokuroyale.ui.components.UserInfoPopUp
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
+import pt.isel.pdm.gomokuroyale.util.Term
+import pt.isel.pdm.gomokuroyale.util.toTermOrNull
 
 const val SearchBarTestTag = "SEARCH_BAR_TEST_TAG"
 const val FirstPage = 1
@@ -62,7 +64,7 @@ fun RankingScreen(
     players: List<UserRanking> = listOf(),
     onPagedRequested: (Int) -> Unit = { },
     onMatchHistoryRequested: (Int, String) -> Unit = { _, _ -> },
-    onSearchRequested: (String) -> Unit = { },
+    onSearchRequested: (Term) -> Unit = { },
     onPlayerSelected: (Int) -> Unit = { },
     onPlayerDismissed: () -> Unit = { },
     initialPage: Int = FirstPage,
@@ -98,7 +100,7 @@ fun RankingScreen(
                 state = vmState,
                 modifier = modifier.padding(innerPadding),
                 onMatchHistoryRequested = onMatchHistoryRequested,
-                onSearchRequested = { onSearchRequested(it) },
+                onSearchRequested = { query.toTermOrNull()?.let { onSearchRequested(it) } },
                 onQueryChanged = { query = it },
                 onClearSearch = { query = "" },
                 onPlayerSelected = { playerId -> onPlayerSelected(playerId) },
@@ -126,7 +128,7 @@ fun RankingLazyColumn(
     state: RankingScreenState,
     rank: List<UserRanking>,
     onMatchHistoryRequested: (Int, String) -> Unit = { _, _ -> },
-    onSearchRequested: (String) -> Unit = { },
+    onSearchRequested: (Term) -> Unit = { },
     onQueryChanged: (String) -> Unit = { },
     onClearSearch: () -> Unit = { },
     onPlayerSelected: (Int) -> Unit = { },
@@ -138,12 +140,12 @@ fun RankingLazyColumn(
     LazyColumn(
         userScrollEnabled = true,
         state = listState,
-        verticalArrangement = Arrangement.SpaceEvenly,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize(),
     ) {
         stickyHeader {
-            MySearchBar(query, onSearchRequested, onQueryChanged, onClearSearch)
+            MySearchBar(query, isRequestInProgress, onSearchRequested, onQueryChanged, onClearSearch)
             Spacer(modifier = Modifier.padding(5.dp))
         }
         rank.forEach { player ->

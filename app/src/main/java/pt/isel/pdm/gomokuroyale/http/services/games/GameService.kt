@@ -102,6 +102,7 @@ class GameService(
         }
     }
 
+    //TODO: ADD PAGINATION
     suspend fun getUserGames(token: String, userId: Int): HttpResult<List<Game>> {
         val path = uriRepository.getRecipeLink(Rels.GET_ALL_GAMES_BY_USER) ?: return HttpResult.Failure(
             ApiError("Game link not found")

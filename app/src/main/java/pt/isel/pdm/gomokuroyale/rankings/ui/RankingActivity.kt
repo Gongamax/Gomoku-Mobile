@@ -53,8 +53,7 @@ class RankingActivity : ComponentActivity() {
         setContent {
             val currentState = vm.state.collectAsState(initial = Idle).value
             val players =
-                if (currentState is FetchedRankingInfo)
-                    currentState.rankingInfo.rankingTable
+                if (currentState is FetchedRankingInfo) currentState.rankingInfo.rankingTable
                 else emptyList()
             RankingScreen(
                 vmState = currentState,
@@ -64,7 +63,7 @@ class RankingActivity : ComponentActivity() {
                 players = players,
                 onPagedRequested = { page -> vm.getPlayers(page) },
                 onMatchHistoryRequested = { id, username -> vm.goToMatchHistory(id, username) },
-                onSearchRequested = { username -> vm.search(username) },
+                onSearchRequested = { username -> vm.search(username.value) },
                 onPlayerSelected = { userId -> vm.getUserInfo(userId) },
                 onPlayerDismissed = { vm.resetToIdle() },
                 isLastPage = currentState is FetchedRankingInfo
@@ -73,13 +72,14 @@ class RankingActivity : ComponentActivity() {
             currentState.let {
                 if (it is FailedToFetchRankingInfo || it is FailedToFetchPlayerInfo ||
                     it is FailedToFetchPlayersBySearch
-                )
+                ) {
                     ErrorAlert(
                         title = "Error",
                         message = it.getErrorMessage(),
                         buttonText = "Ok",
                         onDismiss = { vm.resetToIdle() }
                     )
+                }
             }
         }
 

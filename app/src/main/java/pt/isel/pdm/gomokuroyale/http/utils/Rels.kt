@@ -9,6 +9,7 @@ object Rels {
     const val USER = "get-user-by-id"
     const val AUTH_HOME = "auth-home"
     const val RANKING_INFO = "ranking-info"
+    const val GET_STATS_BY_USERNAME_FOR_RANKING = "get-stats-by-username-for-ranking"
     const val USER_STATS = "get-user-stats"
     const val USER_STATS_BY_USERNAME = "get-user-stats-by-username"
     const val UPDATE_USER = "update-user"

@@ -191,6 +191,45 @@ class UserService(
         }
     }
 
+    suspend fun getRankingInfoByUsername(username: String, page: Int): HttpResult<RankingList> {
+        val gson = UserStatsOutputModel.getCustomGson()
+        val path = uriRepository.getRecipeLink(Rels.GET_STATS_BY_USERNAME_FOR_RANKING)
+            ?: return HttpResult.Failure(
+                ApiError("Ranking link not found")
+            )
+        val response = get<RankingInfoOutputModel>(
+            path = path.href
+                .replace("1", page.toString())
+                .replace("{name}", username)
+        )
+        return response.onSuccess { players ->
+            val paginationLinks = players.links.associate { it.rel[0] to it.href }
+            HttpResult.Success(
+                RankingList(
+                    players.entities.map { entity ->
+                        val property = gson.fromJson(
+                            entity.properties.toString(),
+                            UserStatsOutputModel::class.java
+                        )
+                        UserRanking(
+                            id = property.uid,
+                            username = property.username,
+                            gamesPlayed = property.gamesPlayed,
+                            wins = property.wins,
+                            losses = property.losses,
+                            rank = property.rank,
+                            points = property.points
+                        )
+                    },
+                    PaginationLinks.from(paginationLinks)
+                )
+            )
+        }.onFailure {
+            val message = it.message.errorMessage
+            HttpResult.Failure(ApiError(message))
+        }
+    }
+
     private val String?.errorMessage get() = this ?: unknownError
     private val unknownError get() = "Unknown error"
 }

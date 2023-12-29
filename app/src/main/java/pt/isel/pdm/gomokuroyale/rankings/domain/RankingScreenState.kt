@@ -19,6 +19,7 @@ import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
  */
 sealed interface RankingScreenState {
     data object Idle : RankingScreenState
+
     data object FetchingRankingInfo : RankingScreenState
 
     data class FetchedRankingInfo(val rankingInfo: RankingList, val page : Int) : RankingScreenState
