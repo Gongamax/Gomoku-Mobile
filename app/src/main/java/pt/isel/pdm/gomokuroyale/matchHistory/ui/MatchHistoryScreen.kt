@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -38,25 +39,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Piece
-import pt.isel.pdm.gomokuroyale.matchHistory.model.MatchInfo
-import pt.isel.pdm.gomokuroyale.matchHistory.model.Result
-import pt.isel.pdm.gomokuroyale.matchHistory.model.toColor
-import pt.isel.pdm.gomokuroyale.matchHistory.model.toOther
+import pt.isel.pdm.gomokuroyale.matchHistory.domain.MatchInfo
+import pt.isel.pdm.gomokuroyale.matchHistory.domain.Result
+import pt.isel.pdm.gomokuroyale.matchHistory.domain.toColor
+import pt.isel.pdm.gomokuroyale.matchHistory.domain.toOther
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
 import pt.isel.pdm.gomokuroyale.ui.components.MyIcon
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
+const val MatchHistoryScreenTestTag = "MatchHistoryScreen"
+const val MatchHistoryListTestTag = "MatchHistoryHeader"
+
 @Composable
-fun UserStatsScreen(
-    onBackRequested: () -> Unit,
-    username: String
+fun MatchHistoryScreen(
+    modifier: Modifier = Modifier,
+    onBackRequested: () -> Unit = {},
+    username: String,
+    matches: List<MatchInfo>
 ) {
     GomokuRoyaleTheme {
         Scaffold(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = modifier
+                .fillMaxSize().testTag(MatchHistoryScreenTestTag),
             topBar = {
                 TopBar(
                     title = {
@@ -71,14 +77,15 @@ fun UserStatsScreen(
         ) { innerPadding ->
             MatchHistoryContent(
                 modifier = Modifier.padding(innerPadding),
-                username = username
+                username = username,
+                matches = matches
             )
         }
     }
 }
 
 @Composable
-private fun MatchHistoryContent(modifier: Modifier, username: String) {
+private fun MatchHistoryContent(modifier: Modifier, username: String, matches: List<MatchInfo>) {
     Column (
         modifier = modifier
             .fillMaxSize()
@@ -86,16 +93,16 @@ private fun MatchHistoryContent(modifier: Modifier, username: String) {
         horizontalAlignment = Alignment.CenterHorizontally
         ){
         MatchHistoryHeader(username = username)
-        MatchHistoryBody()
+        MatchHistoryBody(matches)
     }
 }
 @Composable
-private fun MatchHistoryBody(matches: List<MatchInfo> = matchesList) {
+private fun MatchHistoryBody(matches: List<MatchInfo>) {
     LazyColumn(
         userScrollEnabled = true,
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(vertical = 35.dp)
+        modifier = Modifier.padding(vertical = 35.dp).testTag(MatchHistoryListTestTag)
     ) {
         items(matches.size){
             val color = matches[it].myPiece.toColor()
@@ -164,7 +171,7 @@ private fun UsersProfilePic() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.sherlock_holmes),
+            painter = painterResource(id = R.drawable.chapeleiro_louco),
             contentDescription = "Profile_picture",
         )
     }
@@ -223,9 +230,10 @@ private fun Match(resultId: Int, match: MatchInfo){
 @Preview
 @Composable
 fun MatchesPreview() {
-    UserStatsScreen(
+    MatchHistoryScreen(
         onBackRequested = {},
-        username = "Username"
+        username = "Username",
+        matches = matchesList
     )
 }
 
