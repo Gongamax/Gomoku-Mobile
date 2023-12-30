@@ -52,7 +52,7 @@ class RankingScreenViewModel(
             _state.value = FetchingPlayersBySearch
             viewModelScope.launch {
                 service.getRankingInfoByUsername(query, page).onSuccessResult { rankingList ->
-                    _state.value = FetchedRankingInfo(rankingList, initState.page)
+                    _state.value = RankingScreenState.FetchedPlayersBySearch(rankingList, initState.page)
                 }.onFailureResult {
                     _state.value = FailedToFetchRankingInfo(it)
                 }

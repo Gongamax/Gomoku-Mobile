@@ -103,7 +103,14 @@ fun RankingScreen(
                 state = vmState,
                 modifier = Modifier.padding(innerPadding),
                 onMatchHistoryRequested = onMatchHistoryRequested,
-                onSearchRequested = { query.toTermOrNull()?.let { onSearchRequested(it) } },
+                onSearchRequested = {
+                    query.toTermOrNull()?.let {
+                        if (!isRequestInProgress){
+                            onSearchRequested(it)
+                            currPlayers =players
+                        }
+                    }
+                },
                 onQueryChanged = { query = it },
                 onClearSearch = { query = "" },
                 onPlayerSelected = { playerId -> onPlayerSelected(playerId) },
@@ -145,17 +152,25 @@ fun RankingLazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize().testTag(RankingListTestTag),
+        modifier = modifier
+            .fillMaxSize()
+            .testTag(RankingListTestTag),
     ) {
         val mod = if (isRequestInProgress) Modifier.shimmer() else Modifier
         stickyHeader {
-            MySearchBar(query, isRequestInProgress, onSearchRequested, onQueryChanged, onClearSearch)
+            MySearchBar(
+                query,
+                isRequestInProgress,
+                onSearchRequested,
+                onQueryChanged,
+                onClearSearch
+            )
             Spacer(modifier = Modifier.padding(5.dp))
         }
         rank.forEach { player ->
             item {
                 PlayerView(mod, player, onPlayerSelected)
-               // Spacer(modifier = Modifier.padding(1.dp))
+                // Spacer(modifier = Modifier.padding(1.dp))
             }
         }
         if (state is FetchingRankingInfo) {
@@ -236,7 +251,7 @@ private val String.isLimitUsername: Boolean
     get() = this.length >= MAX_USERNAME_LENGTH
 
 private val String.limitUsername: String
-    get() = this.substring(0, MAX_USERNAME_LENGTH)+"..."
+    get() = this.substring(0, MAX_USERNAME_LENGTH) + "..."
 
 private val String.accommodateUsername: String
     get() = this + " ".repeat(MAX_USERNAME_LENGTH_SPACER - this.length)
@@ -250,6 +265,33 @@ private fun LeaderboardPreview() {
         onMatchHistoryRequested = { _, _ -> },
     )
 }
+
+//@Preview(showBackground = true)
+//@Composable
+//private fun LeaderboardPreviewWithPlayers() {
+//    RankingScreen(
+//        vmState = null,
+//        onBackRequested = {},
+//        players = players,
+//        onMatchHistoryRequested = { _, _ -> },
+//    )
+//}
+//
+//private val players = buildList<UserRanking> {
+//    repeat(30) {
+//        add(
+//            UserRanking(
+//                id = it,
+//                username = "Player $it",
+//                gamesPlayed = it * 7,
+//                wins = it * 5,
+//                losses = it * 2,
+//                points = it * 10,
+//                rank = it
+//            )
+//        )
+//    }
+//}
 
 private val top3 = mapOf<Int, @Composable () -> Unit>(
     1 to { MyIcon(resultId = R.drawable.first_place) },

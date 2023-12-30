@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale
+package pt.isel.pdm.gomokuroyale.domain
 
 import org.junit.*
 import org.junit.Test

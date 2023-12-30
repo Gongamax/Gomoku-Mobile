@@ -4,6 +4,7 @@ package pt.isel.pdm.gomokuroyale.util
  * Represents search terms. A term is a string with between 3 and 120 characters. White spaces
  * at the beginning and end of the term are ignored.
  * @property value The term's text.
+ * @see https://github.com/isel-leic-pdm/2324i/blob/fb422ab8a84b7f7e49bc0b0466fd782f398c4f2b/demos/Jokes/app/src/main/java/isel/pdm/jokes/domain/JokesService.kt
  */
 @JvmInline
 value class Term(val value: String) {

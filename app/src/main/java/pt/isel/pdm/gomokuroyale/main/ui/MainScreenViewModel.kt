@@ -55,7 +55,7 @@ class MainScreenViewModel(
     }
 
     fun updateVariants() {
-        check(_state.value !is FetchedRecipes) {
+        check(_state.value is FetchedRecipes) {
             "The view model is not in the fetched recipes state."
         }
         _state.value = MainScreenState.FetchingVariants

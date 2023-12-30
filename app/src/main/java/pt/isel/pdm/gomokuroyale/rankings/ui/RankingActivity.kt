@@ -7,10 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
-import com.valentinilk.shimmer.shimmer
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
 import pt.isel.pdm.gomokuroyale.matchHistory.ui.MatchHistoryActivity
@@ -18,10 +15,12 @@ import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FailedToFetchPlayerInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FailedToFetchPlayersBySearch
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FailedToFetchRankingInfo
+import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchedPlayersBySearch
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchedRankingInfo
+import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchingPlayersBySearch
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchingRankingInfo
-import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.WantsToGoToMatchHistory
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.Idle
+import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.WantsToGoToMatchHistory
 import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
 
 const val RANKING_ACTIVITY_TAG = "RANKING_ACTIVITY_TAG"
@@ -53,12 +52,14 @@ class RankingActivity : ComponentActivity() {
 
         setContent {
             val currentState = vm.state.collectAsState(initial = Idle).value
-            val players =
-                if (currentState is FetchedRankingInfo) currentState.rankingInfo.rankingTable
-                else emptyList()
+            val players = when (currentState) {
+                is FetchedRankingInfo -> currentState.rankingInfo.rankingTable
+                is FetchedPlayersBySearch -> currentState.players.rankingTable
+                else -> emptyList()
+            }
             RankingScreen(
                 vmState = currentState,
-                isRequestInProgress = currentState is FetchingRankingInfo || currentState is Idle,
+                isRequestInProgress = currentState is FetchingRankingInfo || currentState is Idle || currentState is FetchingPlayersBySearch,
                 onBackRequested = { finish() },
                 players = players,
                 onPagedRequested = { page -> vm.getPlayers(page) },
@@ -82,8 +83,6 @@ class RankingActivity : ComponentActivity() {
                 }
             }
         }
-
-
     }
 
     private fun RankingScreenState.getErrorMessage(): String {
