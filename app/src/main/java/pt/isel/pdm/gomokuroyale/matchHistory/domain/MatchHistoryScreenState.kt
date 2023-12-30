@@ -16,7 +16,6 @@ import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 sealed interface MatchHistoryScreenState
 
 data object Idle : MatchHistoryScreenState
-
 data object FetchingPlayerInfo : MatchHistoryScreenState
 data class FetchedPlayerInfo(val userInfo: UserInfo?) : MatchHistoryScreenState
 data class FailedToFetch(val error: Throwable) : MatchHistoryScreenState

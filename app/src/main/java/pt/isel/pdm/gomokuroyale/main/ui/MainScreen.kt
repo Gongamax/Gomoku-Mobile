@@ -38,6 +38,11 @@ import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
 const val MainScreenTestTag = "MainScreenTestTag"
+const val PlayButtonTestTag = "PlayButtonTestTag"
+const val RankingButtonTestTag = "RankingButtonTestTag"
+const val RegisterButtonTestTag = "RegisterButtonTestTag"
+const val LoginButtonTestTag = "LoginButtonTestTag"
+const val LogoutButtonTestTag = "LogoutButtonTestTag"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,24 +94,25 @@ fun MainScreen(
                         style = MaterialTheme.typography.titleLarge,
                     )
                     Spacer(modifier = Modifier.size(30.dp))
-                    ButtonMenu(icon = Icons.Default.PlayArrow, stringId = R.string.play_title) {
+                    ButtonMenu(icon = Icons.Default.PlayArrow, stringId = R.string.play_title, testTag = PlayButtonTestTag) {
                         onCreateGameRequested()
                     }
-                    ButtonMenu(icon = Icons.Default.List, stringId = R.string.ranking_menu_title) {
+                    ButtonMenu(icon = Icons.Default.List, stringId = R.string.ranking_menu_title, testTag = RankingButtonTestTag) {
                         onRankingRequested()
                     }
                     if (!isLoggedIn) {
                         ButtonMenu(
                             icon = Icons.Default.AccountBox,
-                            stringId = R.string.register_title
+                            stringId = R.string.register_title,
+                            testTag = RegisterButtonTestTag
                         ) {
                             onRegisterRequested()
                         }
-                        ButtonMenu(icon = Icons.Default.Person, stringId = R.string.login_title) {
+                        ButtonMenu(icon = Icons.Default.Person, stringId = R.string.login_title, testTag = LoginButtonTestTag) {
                             onLoginRequested()
                         }
                     } else
-                        ButtonMenu(icon = Icons.Default.ExitToApp, stringId = R.string.logout) {
+                        ButtonMenu(icon = Icons.Default.ExitToApp, stringId = R.string.logout, testTag = LogoutButtonTestTag) {
                             onLogoutRequested()
                         }
                 }
@@ -116,9 +122,9 @@ fun MainScreen(
 }
 
 @Composable
-private fun ButtonMenu(icon: ImageVector, stringId: Int, onClick: () -> Unit) {
+private fun ButtonMenu(icon: ImageVector, stringId: Int, testTag: String = "",onClick: () -> Unit) {
     Button(
-        modifier = Modifier.fillMaxWidth(0.8f),
+        modifier = Modifier.fillMaxWidth(0.8f).testTag(testTag),
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(DarkViolet)
     ) {

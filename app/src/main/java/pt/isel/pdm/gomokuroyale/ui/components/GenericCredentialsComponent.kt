@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -49,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.isel.pdm.gomokuroyale.R
 
+const val ButtonTestTag = "ButtonTestTag"
+const val VerificationTestTag = "VerificationTestTag"
 const val BUTTON_COLOR = 0xFF7E91DB
 const val TEXT_BOX = 0xFFBDBDBD
 
@@ -206,7 +209,7 @@ fun TextComponent1(
 @Composable
 fun VerificationComponent(text: String? = null, textUnderline: String, onClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().testTag(VerificationTestTag),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -219,7 +222,6 @@ fun VerificationComponent(text: String? = null, textUnderline: String, onClick: 
                 enableClick = true,
                 onClick = onClick
             )
-
         } else {
             TextComponent1(
                 text = textUnderline,
@@ -237,7 +239,7 @@ fun VerificationComponent(text: String? = null, textUnderline: String, onClick: 
 fun ButtonComponent(iconResourceId: Int, text: String, onClick: () -> Unit, enabled: Boolean = true) {
     Button(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(1f),
+        modifier = Modifier.fillMaxWidth(1f).testTag(ButtonTestTag),
         enabled = enabled,
         colors = ButtonDefaults.buttonColors(Color(BUTTON_COLOR))
     ) {

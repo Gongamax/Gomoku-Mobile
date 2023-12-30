@@ -15,8 +15,8 @@ import pt.isel.pdm.gomokuroyale.game.lobby.storage.VariantDataStore
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Board
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
-import pt.isel.pdm.gomokuroyale.util.BoardDeserializer
 import pt.isel.pdm.gomokuroyale.http.storage.UriDataStore
+import pt.isel.pdm.gomokuroyale.util.BoardDeserializer
 import java.util.concurrent.TimeUnit
 
 /**
@@ -55,7 +55,7 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
 
     companion object {
         private const val API_ENDPOINT =
-            "https://edae-2001-8a0-f978-ae00-e4c6-5379-5805-b9d0.ngrok-free.app" // API NGROK URL
+            " https://fe91-95-94-202-249.ngrok-free.app" // API NGROK URL
         private const val GOMOKU_DATA_STORE = "gomoku_data_store"
     }
 }

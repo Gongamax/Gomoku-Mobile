@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import pt.isel.pdm.gomokuroyale.R
@@ -18,6 +19,9 @@ import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import pt.isel.pdm.gomokuroyale.http.domain.MatchmakingStatus
 import pt.isel.pdm.gomokuroyale.ui.TipInfoBox
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
+
+const val MatchMakingScreenTestTag = "MatchMakingScreenTestTag"
+const val MatchMakingCancelButtonTestTag = "MatchMakingCancelButtonTestTag"
 
 @Composable
 fun MatchmakerScreen(
@@ -28,7 +32,7 @@ fun MatchmakerScreen(
 ) {
     GomokuRoyaleTheme {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag(MatchMakingScreenTestTag),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -54,7 +58,7 @@ fun MatchmakerScreen(
                 }
             }
             if (status == MatchmakingStatus.PENDING)
-                Button(onClick = onCancelingMatchmaking, enabled = onCancelingEnabled) {
+                Button(modifier = Modifier.testTag(MatchMakingCancelButtonTestTag), onClick = onCancelingMatchmaking, enabled = onCancelingEnabled) {
                     Text(text = "Cancel")
                 }
             Row(

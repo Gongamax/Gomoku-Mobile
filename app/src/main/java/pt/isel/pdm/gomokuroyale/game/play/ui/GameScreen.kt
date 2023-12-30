@@ -44,6 +44,8 @@ import pt.isel.pdm.gomokuroyale.ui.theme.Violet
 
 
 const val GameScreenTestTag = "GameScreenTestTag"
+const val GameExitButtonTestTag = "GameExitButtonTestTag"
+const val GameHelpButtonTestTag = "GameHelpButtonTestTag"
 
 @Composable
 fun GameScreen(
@@ -80,11 +82,13 @@ fun GameScreen(
                     iconResourceId = R.drawable.ic_exit,
                     text = "Exit",
                     onSelectEnabled = state is GameScreenState.MyTurn,
+                    testTag = GameExitButtonTestTag,
                     onClick = onForfeitRequested
                 )
                 ButtonComponent(
                     iconResourceId = R.drawable.ic_robot,
                     text = "Help",
+                    testTag = GameHelpButtonTestTag,
                     onClick = onHelpRequested
                 )
             }
@@ -114,9 +118,11 @@ fun ButtonComponent(
     iconResourceId: Int,
     onSelectEnabled: Boolean = true,
     text: String,
+    testTag:String = "",
     onClick: () -> Unit
 ) {
     Button(
+        modifier= Modifier.testTag(testTag),
         onClick = onClick,
         enabled = onSelectEnabled,
         colors = ButtonDefaults.buttonColors(DarkViolet)

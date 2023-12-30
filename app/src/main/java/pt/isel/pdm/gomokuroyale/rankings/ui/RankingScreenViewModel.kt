@@ -1,6 +1,5 @@
 package pt.isel.pdm.gomokuroyale.rankings.ui
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
@@ -36,7 +35,6 @@ class RankingScreenViewModel(
         check(_state.value is Idle || _state.value is FetchedRankingInfo) {
             "Cannot fetch players while loading, is on state ${_state.value}"
         }
-        Log.v("RANKING_ACTIVITY_TAG", "page: $page")
         _state.value = FetchingRankingInfo
         viewModelScope.launch {
             service.getRankingInfo(page).onSuccessResult { rankingList ->

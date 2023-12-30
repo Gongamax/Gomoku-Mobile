@@ -7,7 +7,6 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
 import pt.isel.pdm.gomokuroyale.http.domain.users.RankingEntry
-import pt.isel.pdm.gomokuroyale.util.UserStatsDeserializer
 import java.lang.reflect.Type
 
 // region Input Models
@@ -48,6 +47,33 @@ data class UserStatsOutputModel(
     val points: Int
 ) {
 
+    private class UserStatsDeserializer : JsonDeserializer<UserStatsOutputModel> {
+        override fun deserialize(
+            json: JsonElement?,
+            typeOfT: Type?,
+            context: JsonDeserializationContext?
+        ): UserStatsOutputModel {
+            val jsonObject = json?.asJsonObject ?: throw JsonParseException("Invalid JSON")
+            val uid = jsonObject["uid"].asInt
+            val username = jsonObject["username"].asString
+            val gamesPlayed = jsonObject["gamesPlayed"].asInt
+            val wins = jsonObject["wins"].asInt
+            val losses = jsonObject["losses"].asInt
+            val draws = gamesPlayed - wins - losses
+            val rank = jsonObject["rank"].asInt
+            val points = jsonObject["points"].asInt
+            return UserStatsOutputModel(
+                uid,
+                username,
+                gamesPlayed,
+                wins,
+                losses,
+                draws,
+                rank,
+                points
+            )
+        }
+    }
 
     companion object {
         fun getCustomGson(): Gson {

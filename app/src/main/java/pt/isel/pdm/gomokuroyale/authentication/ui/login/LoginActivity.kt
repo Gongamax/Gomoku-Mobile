@@ -3,22 +3,16 @@ package pt.isel.pdm.gomokuroyale.authentication.ui.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
-import pt.isel.pdm.gomokuroyale.authentication.domain.validateUsername
 import pt.isel.pdm.gomokuroyale.authentication.ui.register.RegisterActivity
 import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
-//import pt.isel.pdm.gomokuroyale.authentication.ui.register.RegisterActivity
 import pt.isel.pdm.gomokuroyale.util.Idle
-import pt.isel.pdm.gomokuroyale.util.Loaded
-import pt.isel.pdm.gomokuroyale.util.Loading
 import pt.isel.pdm.gomokuroyale.util.Saved
 import pt.isel.pdm.gomokuroyale.util.idle
 

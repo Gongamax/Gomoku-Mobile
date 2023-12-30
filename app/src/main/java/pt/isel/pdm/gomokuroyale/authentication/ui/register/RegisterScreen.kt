@@ -33,7 +33,6 @@ import pt.isel.pdm.gomokuroyale.ui.TopBar
 import pt.isel.pdm.gomokuroyale.ui.components.ButtonComponent
 import pt.isel.pdm.gomokuroyale.ui.components.DivideComponent
 import pt.isel.pdm.gomokuroyale.ui.components.FieldType
-import pt.isel.pdm.gomokuroyale.ui.components.IconButtonWithBorder
 import pt.isel.pdm.gomokuroyale.ui.components.InformationBox
 import pt.isel.pdm.gomokuroyale.ui.components.TextComponent
 import pt.isel.pdm.gomokuroyale.ui.components.VerificationComponent
@@ -41,6 +40,7 @@ import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
 
 const val RegisterScreenTestTag = "RegisterScreenTestTag"
+const val RegisterCheckBoxTestTag = "RegisterButtonTestTag"
 private val paddingHead = 30.dp
 private val errorAcceptTermsSize = 12.sp
 
@@ -82,8 +82,7 @@ fun RegisterScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
-                        .testTag(RegisterScreenTestTag),
+                        .padding(innerPadding),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
 
@@ -156,7 +155,7 @@ fun RegisterScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start
                     ) {
-                        Checkbox(checked = acceptTerms, onCheckedChange =
+                        Checkbox(modifier = Modifier.testTag(RegisterCheckBoxTestTag), checked = acceptTerms, onCheckedChange =
                         {
                             acceptTerms = it
                         })
@@ -196,9 +195,8 @@ fun RegisterScreen(
 
                     VerificationComponent(
                         text = HAVE_ACCOUNT,
-                        textUnderline = "Login in",
-                        onClick = { onLoginActivity() })
-
+                        textUnderline = "Login in"
+                    ) { onLoginActivity() }
                 }
 
             }

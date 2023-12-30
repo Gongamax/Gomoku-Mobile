@@ -1,6 +1,5 @@
 package pt.isel.pdm.gomokuroyale.game.matchmake.ui
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
@@ -14,10 +13,10 @@ import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Error
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Idle
+import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.LeftQueue
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.LookingForMatch
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Matched
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Queueing
-import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.LeftQueue
 import pt.isel.pdm.gomokuroyale.http.domain.MatchmakingStatus
 import pt.isel.pdm.gomokuroyale.http.services.games.GameService
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingInputModel
@@ -39,9 +38,6 @@ class MatchmakerViewModel(
     fun findGame() {
         check(_screenStateFlow.value is Idle)
         { "Cannot find a game while in state ${_screenStateFlow.value}" }
-
-        Log.v(MATCHMAKER_ACTIVITY_TAG, "Finding a game.")
-        Log.v(MATCHMAKER_ACTIVITY_TAG, "Match info: $matchInfo")
 
         viewModelScope.launch {
             _screenStateFlow.value = Queueing

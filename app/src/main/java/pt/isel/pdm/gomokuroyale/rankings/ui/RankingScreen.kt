@@ -36,12 +36,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.valentinilk.shimmer.shimmer
 import pt.isel.pdm.gomokuroyale.R
-import pt.isel.pdm.gomokuroyale.about.ui.AboutScreenTestTag
-import pt.isel.pdm.gomokuroyale.http.domain.users.unitsConverter
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
+import pt.isel.pdm.gomokuroyale.http.domain.users.unitsConverter
+import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchedPlayerInfo
 import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchingRankingInfo
-import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
 import pt.isel.pdm.gomokuroyale.ui.components.LoadingView
@@ -53,14 +52,16 @@ import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 import pt.isel.pdm.gomokuroyale.util.Term
 import pt.isel.pdm.gomokuroyale.util.toTermOrNull
 
+const val RankingScreenTestTag = "RankingScreenTestTag"
 const val SearchBarTestTag = "SEARCH_BAR_TEST_TAG"
+const val RankingListTestTag = "RANKING_LIST_TEST_TAG"
 const val FirstPage = 1
 const val MAX_USERNAME_LENGTH = 10
 const val MAX_USERNAME_LENGTH_SPACER = 13
 
 @Composable
 fun RankingScreen(
-    vmState: RankingScreenState,
+    vmState: RankingScreenState = FetchingRankingInfo,
     isRequestInProgress: Boolean = false,
     onBackRequested: () -> Unit = { },
     players: List<UserRanking> = listOf(),
@@ -80,7 +81,7 @@ fun RankingScreen(
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
-                .testTag(AboutScreenTestTag),
+                .testTag(RankingScreenTestTag),
             topBar = {
                 TopBar(
                     title = {
@@ -144,7 +145,7 @@ fun RankingLazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().testTag(RankingListTestTag),
     ) {
         val mod = if (isRequestInProgress) Modifier.shimmer() else Modifier
         stickyHeader {

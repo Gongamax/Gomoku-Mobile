@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
-import pt.isel.pdm.gomokuroyale.matchHistory.model.InfoParam
+import pt.isel.pdm.gomokuroyale.matchHistory.domain.InfoParam
 
 @Composable
 fun UserInfoPopUp(
