@@ -35,6 +35,7 @@ class GameScreenViewModel(
             "Cannot start a match when the screen state is playing"
         }
         viewModelScope.launch {
+
             gameService.getGame(startGameInfo.gameId, startGameInfo.localPlayer.accessToken)
                 .onSuccessResult { game ->
                     if (game.isOver) {

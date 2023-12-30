@@ -71,7 +71,7 @@ dependencies {
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.11.0"))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.google.code.gson:gson:2.10.1")
-
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
     implementation("com.valentinilk.shimmer:compose-shimmer:1.2.0")
 
     testImplementation("junit:junit:4.13.2")

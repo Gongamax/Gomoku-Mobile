@@ -28,11 +28,13 @@ const val PLAYER_INFO_EXTRA = "PLAYER_INFO_EXTRA"
 class MatchmakerActivity : ComponentActivity() {
 
     private val dependencies by lazy { application as DependenciesContainer }
+    private val repo by lazy { dependencies.userInfoRepository }
 
     private val viewModel by viewModels<MatchmakerViewModel> {
         MatchmakerViewModel.factory(
             dependencies.gomokuService.gameService,
-            matchInfo
+            matchInfo,
+            repo
         )
     }
 

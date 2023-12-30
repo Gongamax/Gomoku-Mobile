@@ -7,4 +7,6 @@ interface UserInfoRepository {
 
     suspend fun logout(): Unit
     suspend fun getUserInfo(): UserInfo?
+
+
 }

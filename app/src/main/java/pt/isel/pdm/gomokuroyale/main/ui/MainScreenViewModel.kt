@@ -86,6 +86,11 @@ class MainScreenViewModel(
             throw IllegalStateException("The view model cant fetch player info on ${_state.value} state.")
         _state.value = FetchingPlayerInfo
         viewModelScope.launch {
+//            val isLogged = kotlin.runCatching { repository.isLoggedIn() }
+//            if (isLogged.getOrNull() == false) {
+//                _state.value = MainScreenState.FailedToToken(Exception("Failure of the token, time overrun"))
+//                return@launch
+//            }
             val result = runCatching { repository.getUserInfo() }
             _state.value = FetchedPlayerInfo(result)
         }

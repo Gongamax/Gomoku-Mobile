@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Error
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState.Idle
@@ -26,7 +27,8 @@ import pt.isel.pdm.gomokuroyale.util.onSuccessResult
 //TODO: MOVE POLLING TO SERVICE
 class MatchmakerViewModel(
     private val service: GameService,
-    private val matchInfo: MatchInfo
+    private val matchInfo: MatchInfo,
+    private val repository: UserInfoRepository
 ) : ViewModel() {
 
     private val _screenStateFlow: MutableStateFlow<MatchmakingScreenState> =
@@ -43,6 +45,11 @@ class MatchmakerViewModel(
 
         viewModelScope.launch {
             _screenStateFlow.value = Queueing
+             val isLogged = kotlin.runCatching { repository.isLoggedIn() }
+            if(isLogged.getOrNull() == false) {
+                _screenStateFlow.value = Error(Exception("Failure of the token, time overrun"))
+                return@launch
+            }
             service.matchmaking(
                 matchInfo.userInfo.accessToken,
                 GameMatchmakingInputModel(matchInfo.variant.name)
@@ -95,9 +102,9 @@ class MatchmakerViewModel(
         private const val GAME_TYPE_ID = "gid"
         private const val MATCH_TYPE_ID = "mid"
 
-        fun factory(service: GameService, matchInfo: MatchInfo) =
+        fun factory(service: GameService, matchInfo: MatchInfo,userInfoRepository: UserInfoRepository) =
             viewModelFactory {
-                initializer { MatchmakerViewModel(service, matchInfo) }
+                initializer { MatchmakerViewModel(service, matchInfo,userInfoRepository) }
             }
     }
 }

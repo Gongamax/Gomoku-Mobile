@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MyIcon(resultId: Int, size: Dp = 50.dp, padding: Dp = 10.dp){
+fun MyIcon(resultId: Int, size: Dp = 40.dp, padding: Dp = 5.dp){
     Image(
         painter = painterResource(id = resultId),
         contentDescription = null,

@@ -1,6 +1,7 @@
 package pt.isel.pdm.gomokuroyale
 
 import com.google.gson.Gson
+import kotlinx.datetime.Clock
 import okhttp3.OkHttpClient
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.VariantRepository
@@ -40,4 +41,9 @@ interface DependenciesContainer {
      * The repository used to access the game variants
      */
     val variantRepository: VariantRepository
+
+    /**
+     * The clock used to access the current time
+     */
+    val clock: Clock
 }

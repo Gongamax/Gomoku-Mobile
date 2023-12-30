@@ -5,10 +5,16 @@
       <entry key="GameActivity">
         <State />
       </entry>
+      <entry key="LeaderboardPreview">
+        <State />
+      </entry>
       <entry key="MainActivity">
         <State />
       </entry>
       <entry key="MainActivity (1)">
+        <State />
+      </entry>
+      <entry key="UserInfoPopUpPreview">
         <State />
       </entry>
       <entry key="app">

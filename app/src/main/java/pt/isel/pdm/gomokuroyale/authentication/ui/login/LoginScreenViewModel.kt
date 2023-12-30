@@ -40,6 +40,7 @@ class LoginScreenViewModel(
     fun login(username: String, password: String) {
         if (_state.value !is Idle)
             throw IllegalStateException("Cannot login while loading")
+
         _state.value = loading()
         viewModelScope.launch {
             val response = userService.login(username, password)
@@ -47,12 +48,15 @@ class LoginScreenViewModel(
                 _state.value = saving()
                 val userInfo = UserInfo(it.token, username)
                 val result = kotlin.runCatching { userInfoRepository.login(userInfo); userInfo }
+
                 _state.value = saved(result)
             }.onFailureResult {
                 _state.value = saveFailure(it)
             }
         }
     }
+
+
 
     fun resetToIdle() {
         if (_state.value !is Saved)

@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import kotlinx.datetime.Clock
 import okhttp3.OkHttpClient
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 import pt.isel.pdm.gomokuroyale.authentication.storage.UserInfoDataStore
@@ -35,13 +36,16 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
             .callTimeout(10, TimeUnit.SECONDS)
             .build()
 
+    override val clock: Clock = Clock.System
+
     private val dataStore: DataStore<Preferences> by preferencesDataStore(name = GOMOKU_DATA_STORE)
 
     override val userInfoRepository: UserInfoRepository
-        get() = UserInfoDataStore(dataStore)
+        get() = UserInfoDataStore(dataStore,clock)
 
     override val uriRepository: UriRepository
         get() = UriDataStore(dataStore)
+
 
     override val gomokuService: GomokuService
         get() = lazy { GomokuService(client, gson, API_ENDPOINT, uriRepository) }.value

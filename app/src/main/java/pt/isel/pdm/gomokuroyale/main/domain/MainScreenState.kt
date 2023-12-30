@@ -16,4 +16,6 @@ sealed interface MainScreenState {
     data object LoggingOut : MainScreenState
     data class LoggedOut(val result: Result<Unit>) : MainScreenState
     data class FailedToLogout(val error: Throwable) : MainScreenState
+
+    //data class FailedToToken(val error: Throwable) : MainScreenState
 }

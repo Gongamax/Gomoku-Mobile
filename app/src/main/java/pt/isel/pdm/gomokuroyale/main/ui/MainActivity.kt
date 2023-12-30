@@ -67,12 +67,20 @@ class MainActivity : ComponentActivity() {
             )
 
             currentState.let {
-                if (it is MainScreenState.FailedToFetch || it is MainScreenState.FailedToLogout) {
+                if (it is MainScreenState.FailedToFetch || it is MainScreenState.FailedToLogout){ //|| it is MainScreenState.FailedToToken) {
+                   // val state = it is MainScreenState.FailedToToken
                     ErrorAlert(
                         title = "Main Screen Error",
                         message = getErrorMessage(it),
                         buttonText = "Ok",
-                        onDismiss = { viewModel.resetToIdle() }
+                        onDismiss = {
+//                            if (state) {
+//                                viewModel.resetToIdle()
+//                                LoginActivity.navigateTo(this)
+//                            } else {
+                                viewModel.resetToIdle()
+                           // }
+                        }
                     )
                 }
             }
@@ -99,10 +107,12 @@ class MainActivity : ComponentActivity() {
             when (state) {
                 is MainScreenState.FailedToFetch -> state.error.message ?: UNKNOWN_ERROR
                 is MainScreenState.FailedToLogout -> state.error.message ?: UNKNOWN_ERROR
+               // is MainScreenState.FailedToToken -> state.error.message ?: TOKEN_ERROR
                 else -> UNKNOWN_ERROR
             }
 
         private const val UNKNOWN_ERROR = "Unknown error"
+        //private const val TOKEN_ERROR = "Failure of the token, time overrun"
     }
 }
 

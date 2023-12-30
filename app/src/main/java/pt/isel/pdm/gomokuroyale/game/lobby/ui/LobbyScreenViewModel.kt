@@ -36,12 +36,17 @@ class LobbyScreenViewModel(
 
         _state.value = FetchingPlayerInfo
         viewModelScope.launch {
-            val result = kotlin.runCatching { repository.getUserInfo() }
-            val res = result.getOrNull()
-            if (res == null)
-                _state.value = FailedToFetch(Exception("Failed to fetch user info"))
-            else
-                _state.value = FetchedPlayerInfo(res)
+            val isLogged = kotlin.runCatching { repository.isLoggedIn() }
+            if (isLogged.getOrNull() == true) {
+                val result = kotlin.runCatching { repository.getUserInfo() }
+                val res = result.getOrNull()
+                if (res == null)
+                    _state.value = FailedToFetch(Exception("Failed to fetch user info"))
+                else
+                    _state.value = FetchedPlayerInfo(res)
+            } else
+                _state.value = FailedToFetch(Exception("Failure of the token, time overrun"))
+
         }
     }
 
