@@ -1,1 +1,6 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/REvBSC4c)
+Número de Alunos:
+49419 DANIEL CARVALHO
+49462 FRANCISCO SARAIVA
+49495 GONÇALO FRUTUOSO
+
+Link do vídeo: https://youtu.be/9N6yJklnH9A
