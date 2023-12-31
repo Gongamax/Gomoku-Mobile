@@ -37,6 +37,8 @@ class MainActivity : ComponentActivity() {
         Log.v(TAG, "onCreate() called")
         lifecycleScope.launch {
             viewModel.state.collect {
+                Log.v("MAINACTIVITY", "state: $it")
+
                 if (it is MainScreenState.Idle) {
                     viewModel.updateRecipes()
                 }
@@ -46,6 +48,9 @@ class MainActivity : ComponentActivity() {
                 if (it is MainScreenState.FetchedVariants) {
                     viewModel.fetchPlayerInfo()
                 }
+
+
+
             }
         }
 
@@ -58,7 +63,7 @@ class MainActivity : ComponentActivity() {
                     null
             MainScreen(
                 isLoggedIn = token != null,
-                onLoginRequested = { LoginActivity.navigateTo(this) },
+                onLoginRequested = { LoginActivity.navigateTo(this)  },
                 onRegisterRequested = { RegisterActivity.navigateTo(this) },
                 onCreateGameRequested = { LobbyActivity.navigateTo(this) },
                 onInfoRequested = { AboutActivity.navigateTo(this) },

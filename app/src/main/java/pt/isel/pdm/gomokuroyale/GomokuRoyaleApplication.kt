@@ -56,7 +56,7 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
 
     companion object {
         private const val API_ENDPOINT =
-            "https://2e75-94-132-54-53.ngrok-free.app" // API NGROK URL
+            "https://f1a0-94-132-54-53.ngrok-free.app" // API NGROK URL
         private const val GOMOKU_DATA_STORE = "gomoku_data_store"
     }
 }

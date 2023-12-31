@@ -12,7 +12,29 @@
         <State />
       </entry>
       <entry key="MainActivity (1)">
-        <State />
+        <State>
+          <multipleDevicesSelectedInDropDown value="true" />
+          <targetsSelectedWithDialog>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\Francisco Saraiva\.android\avd\Pixel_4a_Edited_prooo_API_34_2.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\Francisco Saraiva\.android\avd\Pixel_4a_Edited_prooo_API_34.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetsSelectedWithDialog>
+        </State>
       </entry>
       <entry key="UserInfoPopUpPreview">
         <State />
