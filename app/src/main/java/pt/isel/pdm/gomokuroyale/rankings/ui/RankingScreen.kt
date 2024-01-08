@@ -4,7 +4,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -38,19 +37,14 @@ import com.valentinilk.shimmer.shimmer
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
 import pt.isel.pdm.gomokuroyale.http.domain.users.unitsConverter
-import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState
-import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchedPlayerInfo
-import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState.FetchingRankingInfo
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
-import pt.isel.pdm.gomokuroyale.ui.components.LoadingView
 import pt.isel.pdm.gomokuroyale.ui.components.MyIcon
 import pt.isel.pdm.gomokuroyale.ui.components.MySearchBar
 import pt.isel.pdm.gomokuroyale.ui.components.UserInfoPopUp
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 import pt.isel.pdm.gomokuroyale.util.Term
-import pt.isel.pdm.gomokuroyale.util.toTermOrNull
 
 const val RankingScreenTestTag = "RankingScreenTestTag"
 const val SearchBarTestTag = "SEARCH_BAR_TEST_TAG"
@@ -61,7 +55,8 @@ const val MAX_USERNAME_LENGTH_SPACER = 13
 
 @Composable
 fun RankingScreen(
-    vmState: RankingScreenState = FetchingRankingInfo,
+    isPlayerFetched: Boolean = false,
+    playerInfo: UserRanking? = null,
     isRequestInProgress: Boolean = false,
     onBackRequested: () -> Unit = { },
     players: List<UserRanking> = listOf(),
@@ -85,7 +80,6 @@ fun RankingScreen(
             topBar = {
                 TopBar(
                     title = {
-                        Spacer(modifier = Modifier.padding(5.dp))
                         Text(
                             text = stringResource(id = R.string.ranking_title),
                             textAlign = TextAlign.Center
@@ -100,17 +94,8 @@ fun RankingScreen(
                 isRequestInProgress = isRequestInProgress,
                 listState = listState,
                 rank = currPlayers,
-                state = vmState,
                 modifier = Modifier.padding(innerPadding),
-                onMatchHistoryRequested = onMatchHistoryRequested,
-                onSearchRequested = {
-                    query.toTermOrNull()?.let {
-                        if (!isRequestInProgress){
-                            onSearchRequested(it)
-                            currPlayers =players
-                        }
-                    }
-                },
+                onSearchRequested = { onSearchRequested(it); currPlayers = emptyList() },
                 onQueryChanged = { query = it },
                 onClearSearch = { query = "" },
                 onPlayerSelected = { playerId -> onPlayerSelected(playerId) },
@@ -119,25 +104,31 @@ fun RankingScreen(
                     if (nextPage == currPage) return@RankingLazyColumn
                     onPagedRequested(nextPage)
                     currPage = nextPage
-                    currPlayers = currPlayers + players
+                    currPlayers += players
                 },
                 currentPage = currPage,
                 isLastPage = isLastPage
             )
+
+            if (playerInfo != null && isPlayerFetched) {
+                UserInfoPopUp(
+                    onDismissRequest = onPlayerDismissed,
+                    onMatchHistoryRequested = onMatchHistoryRequested,
+                    playerInfo = playerInfo,
+                )
+            }
         }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun RankingLazyColumn(
+private fun RankingLazyColumn(
     modifier: Modifier = Modifier,
     query: String,
     isRequestInProgress: Boolean = false,
     listState: LazyListState,
-    state: RankingScreenState,
     rank: List<UserRanking>,
-    onMatchHistoryRequested: (Int, String) -> Unit = { _, _ -> },
     onSearchRequested: (Term) -> Unit = { },
     onQueryChanged: (String) -> Unit = { },
     onClearSearch: () -> Unit = { },
@@ -165,32 +156,14 @@ fun RankingLazyColumn(
                 onQueryChanged,
                 onClearSearch
             )
-            Spacer(modifier = Modifier.padding(5.dp))
         }
         rank.forEach { player ->
             item {
                 PlayerView(mod, player, onPlayerSelected)
-                // Spacer(modifier = Modifier.padding(1.dp))
-            }
-        }
-        if (state is FetchingRankingInfo) {
-
-            item {
-                LoadingView()   //onLoadingView
-            }
-        }
-        if (state is FetchedPlayerInfo) {
-            item {
-                UserInfoPopUp(
-                    onDismissRequest = { },
-                    onMatchHistoryRequested = onMatchHistoryRequested,
-                    playerInfo = state.playerInfo,
-                )
             }
         }
         val lastIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
         if (lastIndex != null && lastIndex >= rank.size && !isRequestInProgress && !isLastPage) {
-
             onPagedRequested(currentPage + 1)
         }
     }
@@ -260,38 +233,59 @@ private val String.accommodateUsername: String
 @Composable
 private fun LeaderboardPreview() {
     RankingScreen(
-        vmState = FetchingRankingInfo,
         onBackRequested = {},
         onMatchHistoryRequested = { _, _ -> },
     )
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//private fun LeaderboardPreviewWithPlayers() {
-//    RankingScreen(
-//        vmState = null,
-//        onBackRequested = {},
-//        players = players,
-//        onMatchHistoryRequested = { _, _ -> },
-//    )
-//}
-//
-//private val players = buildList<UserRanking> {
-//    repeat(30) {
-//        add(
-//            UserRanking(
-//                id = it,
-//                username = "Player $it",
-//                gamesPlayed = it * 7,
-//                wins = it * 5,
-//                losses = it * 2,
-//                points = it * 10,
-//                rank = it
-//            )
-//        )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+private fun LeaderboardPreviewWithPlayers() {
+    RankingScreen(
+        onBackRequested = {},
+        players = players,
+        onMatchHistoryRequested = { _, _ -> },
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UserInfoPopUpPreview() {
+    val mockPlayerInfo = UserRanking(
+        id = 1,
+        username = "Test User",
+        gamesPlayed = 10,
+        wins = 5,
+        losses = 5,
+        draws = 0,
+        points = 100,
+        rank = 1
+    )
+
+    UserInfoPopUp(
+        onDismissRequest = { },
+        onMatchHistoryRequested = { _, _ -> },
+        playerInfo = mockPlayerInfo
+    )
+}
+
+private val players = buildList<UserRanking> {
+    repeat(30) {
+        val it = it + 1
+        add(
+            UserRanking(
+                id = it,
+                username = "Player $it",
+                gamesPlayed = it * 7,
+                wins = it * 5,
+                losses = it * 2,
+                draws = 0,
+                points = it * 10,
+                rank = it
+            )
+        )
+    }
+}
 
 private val top3 = mapOf<Int, @Composable () -> Unit>(
     1 to { MyIcon(resultId = R.drawable.first_place) },

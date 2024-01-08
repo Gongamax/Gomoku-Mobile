@@ -102,7 +102,7 @@ class UserService(
                 )
             )
         }.onFailure {
-            val message = it.message ?: "Unknown error"
+            val message = it.message.errorMessage
             HttpResult.Failure(ApiError(message))
         }
     }
@@ -156,7 +156,6 @@ class UserService(
     }
 
     suspend fun getRankingInfo(page: Int): HttpResult<RankingList> {
-        val gson = UserStatsOutputModel.getCustomGson()
         val path = uriRepository.getRecipeLink(Rels.RANKING_INFO) ?: return HttpResult.Failure(
             ApiError("Ranking link not found")
         )
@@ -193,7 +192,6 @@ class UserService(
     }
 
     suspend fun getRankingInfoByUsername(username: String, page: Int): HttpResult<RankingList> {
-        val gson = UserStatsOutputModel.getCustomGson()
         val path = uriRepository.getRecipeLink(Rels.GET_STATS_BY_USERNAME_FOR_RANKING)
             ?: return HttpResult.Failure(
                 ApiError("Ranking link not found")

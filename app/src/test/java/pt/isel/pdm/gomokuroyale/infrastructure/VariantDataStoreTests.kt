@@ -4,7 +4,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import com.google.android.material.color.utilities.Variant
 import com.google.gson.Gson
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -15,6 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import pt.isel.pdm.gomokuroyale.game.lobby.storage.VariantDataStore
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class VariantDataStoreTests {
@@ -44,21 +44,21 @@ class VariantDataStoreTests {
         // Arrange
         val sut = VariantDataStore(testDataStore, gson)
         val expected = listOf(
-            pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant(
+            Variant(
                 "STANDARD",
                 15,
                 "Standard",
                 "Standard",
                 5
             ),
-            pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant(
+            Variant(
                 "Pente",
                 15,
                 "Standard",
                 "Standard",
                 5
             ),
-            pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant(
+            Variant(
                 "RENJU",
                 15,
                 "Standard",

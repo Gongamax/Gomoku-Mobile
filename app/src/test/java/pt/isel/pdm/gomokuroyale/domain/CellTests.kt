@@ -11,7 +11,7 @@ class CellTests {
     @Test
     fun testCell() {
         val cell = Cell(0, 0)
-        Assert.assertEquals(Row(1), cell.row)
+        Assert.assertEquals(Row(0), cell.row)
         Assert.assertEquals(Column('A'), cell.col)
     }
 

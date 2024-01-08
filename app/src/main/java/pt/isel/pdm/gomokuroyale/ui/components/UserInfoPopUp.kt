@@ -29,101 +29,104 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserRanking
-import pt.isel.pdm.gomokuroyale.matchHistory.domain.InfoParam
+import pt.isel.pdm.gomokuroyale.matchHistory.ui.InfoParam
 
 @Composable
 fun UserInfoPopUp(
     onDismissRequest: () -> Unit,
-    onMatchHistoryRequested: (Int, String)-> Unit,
+    onMatchHistoryRequested: (Int, String) -> Unit,
     playerInfo: UserRanking
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
-        Card (
+        Card(
             modifier = Modifier
                 .padding(10.dp)
                 .fillMaxHeight(0.7f)
                 .clip(RoundedCornerShape(15.dp)),
-        shape = RectangleShape,
-        ){
-
-        Spacer(modifier = Modifier.padding(10.dp))
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            shape = RectangleShape,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+
+            Spacer(modifier = Modifier.padding(10.dp))
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Image(modifier = Modifier
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .size(100.dp),
-                        painter = painterResource(id = R.drawable.chapeleiro_louco), contentDescription = "pfp")
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(Color.White)
+                                .size(100.dp),
+                            painter = painterResource(id = R.drawable.chapeleiro_louco),
+                            contentDescription = "pfp"
+                        )
+                    }
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = playerInfo.username,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
                 }
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Spacer(modifier = Modifier.padding(15.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = playerInfo.username,
-                        style = MaterialTheme.typography.titleLarge
+                    DrawCircle(
+                        dim = 60f,
+                        color = Color.Black,
+                        infoParam = InfoParam("Games", " ${playerInfo.gamesPlayed}")
+                    )
+                    DrawCircle(
+                        dim = 60f,
+                        color = Color.White,
+                        infoParam = InfoParam("Losses", " ${playerInfo.losses}")
+                    )
+                    DrawCircle(
+                        dim = 60f,
+                        color = Color.Black,
+                        infoParam = InfoParam("Wins", " ${playerInfo.wins}")
+                    )
+                    DrawCircle(
+                        dim = 60f,
+                        color = Color.White,
+                        infoParam = InfoParam("Draws", " ${playerInfo.draws}")
                     )
                 }
-            }
-            Spacer(modifier = Modifier.padding(15.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                DrawCircle(
-                    dim = 60f,
-                    color = Color.Black,
-                    infoParam = InfoParam("Games"," ${playerInfo.gamesPlayed}")
-                )
-                DrawCircle(
-                    dim = 60f,
-                    color = Color.White,
-                    infoParam = InfoParam("Losses"," ${playerInfo.losses}")
-                )
-                DrawCircle(
-                    dim = 60f,
-                    color = Color.Black,
-                    infoParam = InfoParam("Wins"," ${playerInfo.wins}")
-                )
-                DrawCircle(
-                    dim = 60f,
-                    color = Color.White,
-                    infoParam = InfoParam("Draws"," ${playerInfo.draws}")
-                )
-            }
-            Spacer(modifier = Modifier.padding(10.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Button(
-                    onClick = { onMatchHistoryRequested(playerInfo.id, playerInfo.username) },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp)),
-                    shape = RectangleShape,
+                Spacer(modifier = Modifier.padding(10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "Match History")
+                    Button(
+                        onClick = { onMatchHistoryRequested(playerInfo.id, playerInfo.username) },
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp)),
+                        shape = RectangleShape,
+                    ) {
+                        Text(text = "Match History")
+                    }
                 }
             }
         }
     }
-    }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun UserInfoPopUpPreview() {
     UserInfoPopUp(

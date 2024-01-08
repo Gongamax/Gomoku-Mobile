@@ -13,11 +13,17 @@ import pt.isel.pdm.gomokuroyale.authentication.storage.UserInfoDataStore
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.VariantRepository
 import pt.isel.pdm.gomokuroyale.game.lobby.storage.VariantDataStore
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Board
+import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
-import pt.isel.pdm.gomokuroyale.http.services.users.dto.UserStatsOutputModel
-import pt.isel.pdm.gomokuroyale.util.BoardDeserializer
+import pt.isel.pdm.gomokuroyale.http.domain.users.UserModel
+import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameOutputModel
 import pt.isel.pdm.gomokuroyale.http.storage.UriDataStore
+import pt.isel.pdm.gomokuroyale.util.BoardDeserializer
+import pt.isel.pdm.gomokuroyale.util.GameOutputModelDeserializer
+import pt.isel.pdm.gomokuroyale.util.UserDeserializer
+import pt.isel.pdm.gomokuroyale.util.UserStatsDeserializer
+import pt.isel.pdm.gomokuroyale.util.VariantDeserializer
 import java.util.concurrent.TimeUnit
 
 /**
@@ -30,6 +36,10 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
 
     override val gson: Gson = GsonBuilder()
         .registerTypeAdapter(Board::class.java, BoardDeserializer())
+        .registerTypeAdapter(UserModel::class.java, UserDeserializer())
+        .registerTypeAdapter(Variant::class.java, VariantDeserializer())
+        .registerTypeAdapter(GameOutputModel::class.java, GameOutputModelDeserializer())
+        .registerTypeAdapter(UserStatsDeserializer::class.java, UserStatsDeserializer())
         .create()
 
     override val client =
@@ -42,11 +52,10 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
     private val dataStore: DataStore<Preferences> by preferencesDataStore(name = GOMOKU_DATA_STORE)
 
     override val userInfoRepository: UserInfoRepository
-        get() = UserInfoDataStore(dataStore,clock)
+        get() = UserInfoDataStore(dataStore, clock)
 
     override val uriRepository: UriRepository
         get() = UriDataStore(dataStore)
-
 
     override val gomokuService: GomokuService
         get() = lazy { GomokuService(client, gson, API_ENDPOINT, uriRepository) }.value
@@ -56,7 +65,7 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
 
     companion object {
         private const val API_ENDPOINT =
-            "https://f1a0-94-132-54-53.ngrok-free.app" // API NGROK URL
+            "https://e97f-2001-8a0-f947-5e00-2cd7-3e4c-7616-c0fe.ngrok-free.app" // API NGROK URL
         private const val GOMOKU_DATA_STORE = "gomoku_data_store"
     }
 }

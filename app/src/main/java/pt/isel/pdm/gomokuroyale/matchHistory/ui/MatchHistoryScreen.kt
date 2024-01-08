@@ -39,10 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Piece
-import pt.isel.pdm.gomokuroyale.matchHistory.domain.MatchInfo
-import pt.isel.pdm.gomokuroyale.matchHistory.domain.Result
-import pt.isel.pdm.gomokuroyale.matchHistory.domain.toColor
-import pt.isel.pdm.gomokuroyale.matchHistory.domain.toOther
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
 import pt.isel.pdm.gomokuroyale.ui.components.MyIcon

@@ -45,7 +45,6 @@ class MatchmakerActivity : ComponentActivity() {
             ctx.startActivity(createIntent(ctx, info))
         }
 
-        //TODO: REVIEW THIS, CHECK NULL SAFETY
         private fun createIntent(ctx: Context, matchInfo: MatchInfo): Intent {
             val intent = Intent(ctx, MatchmakerActivity::class.java)
             matchInfo.let { intent.putExtra(PLAYER_INFO_EXTRA, PlayerInfoExtra(it)) }

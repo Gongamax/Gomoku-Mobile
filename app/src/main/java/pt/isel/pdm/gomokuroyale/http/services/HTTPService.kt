@@ -29,6 +29,8 @@ abstract class HTTPService(
             HttpResult.Failure(ApiError(e.message ?: "Unknown error"))
         }
 
+    protected val gson = jsonEncoder
+
     protected suspend inline fun <reified T> get(path: String): HttpResult<SirenModel<T>> =
         Request.Builder()
             .url("$apiEndpoint$path")

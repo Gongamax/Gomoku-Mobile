@@ -18,6 +18,7 @@ import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState
 import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FailedToFetch
 import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FailedToLogout
 import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedPlayerInfo
+import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedVariants
 import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedRecipes
 import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchingPlayerInfo
 import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchingRecipes
@@ -73,7 +74,7 @@ class MainScreenViewModel(
                 }
                 val result =
                     kotlin.runCatching { variantRepository.storeVariants(variants); variants }
-                _state.value = MainScreenState.FetchedVariants(result)
+                _state.value = FetchedVariants(result)
             }.onFailureResult {
                 _state.value = FailedToFetch(it)
             }
@@ -82,17 +83,15 @@ class MainScreenViewModel(
 
 
     fun fetchPlayerInfo() {
-        if (_state.value !is MainScreenState.FetchedVariants && _state.value !is FetchedPlayerInfo)
-            throw IllegalStateException("The view model cant fetch player info on ${_state.value} state.")
+        if (_state.value !is FetchedVariants && _state.value !is FetchedPlayerInfo)
+            throw IllegalStateException("The view model cant be on fetched state.")
+
         _state.value = FetchingPlayerInfo
         viewModelScope.launch {
-//            val isLogged = kotlin.runCatching { repository.isLoggedIn() }
-//            if (isLogged.getOrNull() == false) {
-//                _state.value = MainScreenState.FailedToToken(Exception("Failure of the token, time overrun"))
-//                return@launch
-//            }
-            val result = runCatching { repository.getUserInfo() }
-            _state.value = FetchedPlayerInfo(result)
+            kotlin.runCatching { repository.isLoggedIn() }.getOrNull()?.let { isLoggedIn ->
+                val result = runCatching { repository.getUserInfo() }
+                _state.value = FetchedPlayerInfo(result, isLoggedIn)
+            }
         }
     }
 
@@ -114,7 +113,7 @@ class MainScreenViewModel(
     }
 
     fun resetToIdle() {
-        if (_state.value !is FailedToFetch && _state.value !is FailedToLogout)
+        if (_state.value !is FailedToFetch && _state.value !is FailedToLogout && _state.value !is FetchedPlayerInfo)
             throw IllegalStateException("The view model is not in fetched state.")
         _state.value = Idle
     }

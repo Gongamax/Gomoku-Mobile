@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.matchHistory.domain
+package pt.isel.pdm.gomokuroyale.matchHistory.ui
 
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 

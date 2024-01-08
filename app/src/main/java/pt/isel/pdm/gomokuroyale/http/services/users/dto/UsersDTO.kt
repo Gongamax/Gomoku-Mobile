@@ -47,41 +47,41 @@ data class UserStatsOutputModel(
     val points: Int
 ) {
 
-    private class UserStatsDeserializer : JsonDeserializer<UserStatsOutputModel> {
-        override fun deserialize(
-            json: JsonElement?,
-            typeOfT: Type?,
-            context: JsonDeserializationContext?
-        ): UserStatsOutputModel {
-            val jsonObject = json?.asJsonObject ?: throw JsonParseException("Invalid JSON")
-            val uid = jsonObject["uid"].asInt
-            val username = jsonObject["username"].asString
-            val gamesPlayed = jsonObject["gamesPlayed"].asInt
-            val wins = jsonObject["wins"].asInt
-            val losses = jsonObject["losses"].asInt
-            val draws = gamesPlayed - wins - losses
-            val rank = jsonObject["rank"].asInt
-            val points = jsonObject["points"].asInt
-            return UserStatsOutputModel(
-                uid,
-                username,
-                gamesPlayed,
-                wins,
-                losses,
-                draws,
-                rank,
-                points
-            )
-        }
-    }
-
-    companion object {
-        fun getCustomGson(): Gson {
-            return GsonBuilder()
-                .registerTypeAdapter(UserStatsOutputModel::class.java, UserStatsDeserializer())
-                .create()
-        }
-    }
+//    private class UserStatsDeserializer : JsonDeserializer<UserStatsOutputModel> {
+//        override fun deserialize(
+//            json: JsonElement?,
+//            typeOfT: Type?,
+//            context: JsonDeserializationContext?
+//        ): UserStatsOutputModel {
+//            val jsonObject = json?.asJsonObject ?: throw JsonParseException("Invalid JSON")
+//            val uid = jsonObject["uid"].asInt
+//            val username = jsonObject["username"].asString
+//            val gamesPlayed = jsonObject["gamesPlayed"].asInt
+//            val wins = jsonObject["wins"].asInt
+//            val losses = jsonObject["losses"].asInt
+//            val draws = gamesPlayed - wins - losses
+//            val rank = jsonObject["rank"].asInt
+//            val points = jsonObject["points"].asInt
+//            return UserStatsOutputModel(
+//                uid,
+//                username,
+//                gamesPlayed,
+//                wins,
+//                losses,
+//                draws,
+//                rank,
+//                points
+//            )
+//        }
+//    }
+//
+//    companion object {
+//        fun getCustomGson(): Gson {
+//            return GsonBuilder()
+//                .registerTypeAdapter(UserStatsOutputModel::class.java, UserStatsDeserializer())
+//                .create()
+//        }
+//    }
 }
 
 data class UserHomeOutputModel(

@@ -1,8 +1,9 @@
-package pt.isel.pdm.gomokuroyale.matchHistory.domain
+package pt.isel.pdm.gomokuroyale.matchHistory.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,32 +17,30 @@ import pt.isel.pdm.gomokuroyale.util.onSuccessResult
 
 class MatchHistoryViewModel(
     private val repository: UserInfoRepository,
-    private val service: GameService): ViewModel() {
+    private val service: GameService
+) : ViewModel() {
 
-    companion object {
-        fun factory(repository: UserInfoRepository, service: GameService) = viewModelFactory {
-            MatchHistoryViewModel(repository, service)
-        }
-    }
-
-    private val _state = MutableStateFlow<MatchHistoryScreenState>(Idle)
+    private val _state: MutableStateFlow<MatchHistoryScreenState> = MutableStateFlow(Idle)
     val state: Flow<MatchHistoryScreenState> get() = _state.asStateFlow()
 
-    fun fetchMatchHistory(id: Int) {
+    fun fetchMatchHistory(id: Int, page : Int = 1) {
         check(_state.value is FetchedPlayerInfo) { "Cannot fetch match history while loading" }
         val userInfo = checkNotNull((_state.value as FetchedPlayerInfo).userInfo)
         _state.value = FetchingMatchHistory
         viewModelScope.launch {
-            val result = kotlin.runCatching { service.getUserGames(userInfo.accessToken, id) }
-            val res = result.getOrNull()
-            if (res == null)
+            val result =
+                kotlin.runCatching { service.getUserGames(userInfo.accessToken, id, page) }.getOrNull()
+            if (result == null)
                 _state.value = FailedToFetch(Exception("Failed to fetch match history"))
-            else{
-                res.onSuccessResult { matchesList ->
+            else {
+                result.onSuccessResult { matchesList ->
                     val matchInfoList = matchesList.map { match ->
-                        val gameResult = if (match.winner?.id?.value == id) Result.Win else Result.Loss
-                        val opponent = if (match.userWhite.id.value == id) match.userBlack else match.userWhite
-                        val myPiece = if (match.userWhite.id.value == id) Piece.WHITE else Piece.BLACK
+                        val gameResult =
+                            if (match.winner?.id?.value == id) Result.Win else Result.Loss
+                        val opponent =
+                            if (match.userWhite.id.value == id) match.userBlack else match.userWhite
+                        val myPiece =
+                            if (match.userWhite.id.value == id) Piece.WHITE else Piece.BLACK
                         MatchInfo(gameResult, match.variant.name, opponent.username, myPiece)
                     }
                     _state.value = FetchedMatchHistory(matchInfoList)
@@ -71,9 +70,14 @@ class MatchHistoryViewModel(
         }
     }
 
+    companion object {
+        fun factory(repository: UserInfoRepository, service: GameService) = viewModelFactory {
+            initializer { MatchHistoryViewModel(repository, service) }
+        }
+    }
 }
 
-data class InfoParam (val name : String, val value : String)
+data class InfoParam(val name: String, val value: String)
 
 data class MatchInfo(
     val result: Result,
@@ -87,6 +91,6 @@ enum class Result {
     Loss,
 }
 
-fun Piece.toColor() = if(this == Piece.BLACK) Color.Black else Color.White
+fun Piece.toColor() = if (this == Piece.BLACK) Color.Black else Color.White
 
-fun Color.toOther()= if(this == Color.Black) Color.White else Color.Black
+fun Color.toOther() = if (this == Color.Black) Color.White else Color.Black

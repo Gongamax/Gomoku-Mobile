@@ -5,8 +5,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import org.junit.Rule
 import org.junit.Test
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Piece
-import pt.isel.pdm.gomokuroyale.matchHistory.domain.MatchInfo
-import pt.isel.pdm.gomokuroyale.matchHistory.domain.Result
+import pt.isel.pdm.gomokuroyale.matchHistory.ui.MatchInfo
+import pt.isel.pdm.gomokuroyale.matchHistory.ui.Result
 import pt.isel.pdm.gomokuroyale.matchHistory.ui.MatchHistoryListTestTag
 import pt.isel.pdm.gomokuroyale.matchHistory.ui.MatchHistoryScreen
 import pt.isel.pdm.gomokuroyale.matchHistory.ui.MatchHistoryScreenTestTag

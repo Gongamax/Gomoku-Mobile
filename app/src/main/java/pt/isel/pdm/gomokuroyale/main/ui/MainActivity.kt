@@ -16,6 +16,12 @@ import pt.isel.pdm.gomokuroyale.GomokuRoyaleApplication
 import pt.isel.pdm.gomokuroyale.TAG
 import pt.isel.pdm.gomokuroyale.game.lobby.ui.LobbyActivity
 import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState
+import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FailedToLogout
+import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FailedToFetch
+import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.Idle
+import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedVariants
+import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedRecipes
+import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedPlayerInfo
 import pt.isel.pdm.gomokuroyale.rankings.ui.RankingActivity
 import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
 
@@ -37,57 +43,38 @@ class MainActivity : ComponentActivity() {
         Log.v(TAG, "onCreate() called")
         lifecycleScope.launch {
             viewModel.state.collect {
-                Log.v("MAINACTIVITY", "state: $it")
-
-                if (it is MainScreenState.Idle) {
+                if (it is Idle) {
                     viewModel.updateRecipes()
                 }
-                if (it is MainScreenState.FetchedRecipes) {
+                if (it is FetchedRecipes) {
                     viewModel.updateVariants()
                 }
-                if (it is MainScreenState.FetchedVariants) {
+                if (it is FetchedVariants) {
                     viewModel.fetchPlayerInfo()
                 }
-
-
-
             }
         }
 
         setContent {
-            val currentState = viewModel.state.collectAsState(initial = MainScreenState.Idle).value
-            val token =
-                if (currentState is MainScreenState.FetchedPlayerInfo)
-                    currentState.userInfo.getOrNull()?.accessToken
-                else
-                    null
+            val currentState = viewModel.state.collectAsState(initial = Idle).value
+            val (token, isLoggedIn) = getTokenAndLoginStatus(currentState)
             MainScreen(
-                isLoggedIn = token != null,
-                onLoginRequested = { LoginActivity.navigateTo(this)  },
+                isLoggedIn = isLoggedIn,
+                onLoginRequested = { LoginActivity.navigateTo(this) },
                 onRegisterRequested = { RegisterActivity.navigateTo(this) },
                 onCreateGameRequested = { LobbyActivity.navigateTo(this) },
                 onInfoRequested = { AboutActivity.navigateTo(this) },
                 onRankingRequested = { RankingActivity.navigateTo(this) },
                 onLogoutRequested = { viewModel.logout(token) },
             )
-
             currentState.let {
-                if (it is MainScreenState.FailedToFetch || it is MainScreenState.FailedToLogout){ //|| it is MainScreenState.FailedToToken) {
-                   // val state = it is MainScreenState.FailedToToken
+                if (it is FailedToFetch || it is FailedToLogout)
                     ErrorAlert(
                         title = "Main Screen Error",
                         message = getErrorMessage(it),
                         buttonText = "Ok",
-                        onDismiss = {
-//                            if (state) {
-//                                viewModel.resetToIdle()
-//                                LoginActivity.navigateTo(this)
-//                            } else {
-                                viewModel.resetToIdle()
-                           // }
-                        }
+                        onDismiss = viewModel::resetToIdle
                     )
-                }
             }
         }
     }
@@ -108,16 +95,24 @@ class MainActivity : ComponentActivity() {
     }
 
     companion object {
-        private fun getErrorMessage(state: MainScreenState): String =
-            when (state) {
-                is MainScreenState.FailedToFetch -> state.error.message ?: UNKNOWN_ERROR
-                is MainScreenState.FailedToLogout -> state.error.message ?: UNKNOWN_ERROR
-               // is MainScreenState.FailedToToken -> state.error.message ?: TOKEN_ERROR
-                else -> UNKNOWN_ERROR
-            }
+        private fun getErrorMessage(state: MainScreenState): String = when (state) {
+            is FailedToFetch -> state.error.message ?: UNKNOWN_ERROR
+            is FailedToLogout -> state.error.message ?: UNKNOWN_ERROR
+            else -> UNKNOWN_ERROR
+        }
+
+        private fun getTokenAndLoginStatus(state: MainScreenState): Pair<String?, Boolean> =
+            if (state is FetchedPlayerInfo)
+                state.userInfo.getOrNull()?.accessToken to state.isLoggedIn
+            else
+                null to false
 
         private const val UNKNOWN_ERROR = "Unknown error"
-        //private const val TOKEN_ERROR = "Failure of the token, time overrun"
+
+        fun navigateTo(origin: ComponentActivity) {
+            val intent = Intent(origin, MainActivity::class.java)
+            origin.startActivity(intent)
+        }
     }
 }
 

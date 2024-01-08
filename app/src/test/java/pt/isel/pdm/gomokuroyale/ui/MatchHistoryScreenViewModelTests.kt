@@ -15,11 +15,11 @@ import org.junit.Test
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 import pt.isel.pdm.gomokuroyale.http.GomokuService
-import pt.isel.pdm.gomokuroyale.matchHistory.domain.FetchedPlayerInfo
-import pt.isel.pdm.gomokuroyale.matchHistory.domain.FetchingPlayerInfo
-import pt.isel.pdm.gomokuroyale.matchHistory.domain.Idle
-import pt.isel.pdm.gomokuroyale.matchHistory.domain.MatchHistoryScreenState
-import pt.isel.pdm.gomokuroyale.matchHistory.domain.MatchHistoryViewModel
+import pt.isel.pdm.gomokuroyale.matchHistory.ui.FetchedPlayerInfo
+import pt.isel.pdm.gomokuroyale.matchHistory.ui.FetchingPlayerInfo
+import pt.isel.pdm.gomokuroyale.matchHistory.ui.Idle
+import pt.isel.pdm.gomokuroyale.matchHistory.ui.MatchHistoryScreenState
+import pt.isel.pdm.gomokuroyale.matchHistory.ui.MatchHistoryViewModel
 import pt.isel.pdm.gomokuroyale.util.HttpResult
 import pt.isel.pdm.gomokuroyale.utils.MockMainDispatcherRule
 import pt.isel.pdm.gomokuroyale.utils.SuspendingGate
@@ -39,7 +39,8 @@ class MatchHistoryScreenViewModelTests {
         coEvery {
             gameService.getUserGames(
                 token = testUserInfo.accessToken,
-                userId = 1
+                userId = 1,
+                page = 1
             )
         } coAnswers {
             HttpResult.Success(

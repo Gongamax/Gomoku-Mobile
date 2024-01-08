@@ -14,6 +14,7 @@ import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameGetByIdOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingInputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingStatusOutputModel
+import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GamePlayInputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameRoundOutputModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GetVariantsOutputModel
@@ -102,26 +103,30 @@ class GameService(
         }
     }
 
-
-    suspend fun getUserGames(token: String, userId: Int): HttpResult<List<Game>> {
-        val path = uriRepository.getRecipeLink(Rels.GET_ALL_GAMES_BY_USER) ?: return HttpResult.Failure(
-            ApiError("Game link not found")
-        )
+    suspend fun getUserGames(token: String, userId: Int, page: Int): HttpResult<List<Game>> {
+        val path =
+            uriRepository.getRecipeLink(Rels.GET_ALL_GAMES_BY_USER) ?: return HttpResult.Failure(
+                ApiError("Game link not found")
+            )
         val response = get<GameGetAllByUserOutputModel>(
-            path = path.href.replace("{uid}", userId.toString()),
+            path = path.href
+                .replace("1", page.toString())
+                .replace("{uid}", userId.toString()),
             token = token,
         )
         return response.onSuccess {
             HttpResult.Success(
                 it.entities.map { entity ->
-                    val property = entity.properties as GameGetByIdOutputModel
+                    val game = gson.fromJson(
+                        entity.properties.toString(), GameOutputModel::class.java
+                    )
                     Game(
-                        id = property.game.id,
-                        userBlack = property.game.userBlack,
-                        userWhite = property.game.userWhite,
-                        board = property.game.board,
-                        state = property.game.state,
-                        variant = property.game.variant
+                        id = game.id,
+                        userBlack = game.userBlack,
+                        userWhite = game.userWhite,
+                        board = game.board,
+                        state = game.state,
+                        variant = game.variant
                     )
                 }
             )
@@ -131,9 +136,7 @@ class GameService(
         }
     }
 
-
-    suspend fun getVariants() : HttpResult<List<Variant>>{
-
+    suspend fun getVariants(): HttpResult<List<Variant>> {
         val path = uriRepository.getRecipeLink(Rels.GET_ALL_VARIANTS) ?: return HttpResult.Failure(
             ApiError("Variants link not found")
         )
@@ -149,7 +152,6 @@ class GameService(
             HttpResult.Failure(ApiError(message))
         }
     }
-
 
 
     suspend fun matchmaking(
@@ -179,9 +181,10 @@ class GameService(
     }
 
     suspend fun cancelMatchmaking(token: String, id: Int): HttpResult<Unit> {
-        val path = uriRepository.getRecipeLink(Rels.EXIT_MATCHMAKING_QUEUE) ?: return HttpResult.Failure(
-            ApiError("Matchmaking link not found")
-        )
+        val path =
+            uriRepository.getRecipeLink(Rels.EXIT_MATCHMAKING_QUEUE) ?: return HttpResult.Failure(
+                ApiError("Matchmaking link not found")
+            )
         val response = delete<CancelMatchmakingOutputModel>(
             path = path.href.replace("{mid}", id.toString()),
             token = token,

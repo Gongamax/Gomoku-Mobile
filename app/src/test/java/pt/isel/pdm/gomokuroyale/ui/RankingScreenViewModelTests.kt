@@ -17,7 +17,7 @@ import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.PaginationLinks
 import pt.isel.pdm.gomokuroyale.http.domain.users.RankingList
-import pt.isel.pdm.gomokuroyale.rankings.domain.RankingScreenState
+import pt.isel.pdm.gomokuroyale.rankings.ui.RankingScreenState
 import pt.isel.pdm.gomokuroyale.rankings.ui.RankingScreenViewModel
 import pt.isel.pdm.gomokuroyale.util.HttpResult
 import pt.isel.pdm.gomokuroyale.utils.MockMainDispatcherRule

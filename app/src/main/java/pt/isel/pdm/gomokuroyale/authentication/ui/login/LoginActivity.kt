@@ -2,9 +2,7 @@ package pt.isel.pdm.gomokuroyale.authentication.ui.login
 
 import android.app.Activity
 import android.content.Intent
-import android.nfc.Tag
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -13,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
 import pt.isel.pdm.gomokuroyale.authentication.ui.register.RegisterActivity
+import pt.isel.pdm.gomokuroyale.main.ui.MainActivity
 import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
 import pt.isel.pdm.gomokuroyale.util.Idle
 import pt.isel.pdm.gomokuroyale.util.Saved
@@ -41,7 +40,7 @@ class LoginActivity : ComponentActivity() {
         lifecycleScope.launch {
             viewModel.state.collect {
                 if (it is Saved && it.value.isSuccess) {
-                    finish()
+                    MainActivity.navigateTo(this@LoginActivity)
                     viewModel.resetToIdle()
                 }
             }
@@ -67,6 +66,4 @@ class LoginActivity : ComponentActivity() {
             }
         }
     }
-
-
 }

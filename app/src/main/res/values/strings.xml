@@ -84,4 +84,7 @@
     <string name="match_ended_dialog_text_opponent_left">Your opponent has left the match.</string>
     <string name="match_bad_move">Invalid move</string>
 
+    <!-- MatchHistory Strings   -->
+    <string name="match_history_failed_to_load">Failed to load match history</string>
+
 </resources>
