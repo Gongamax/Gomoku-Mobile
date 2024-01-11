@@ -2,7 +2,6 @@ package pt.isel.pdm.gomokuroyale.ui
 
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -18,12 +17,12 @@ import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakerViewModel
 import pt.isel.pdm.gomokuroyale.game.matchmake.ui.MatchmakingScreenState
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import pt.isel.pdm.gomokuroyale.http.GomokuService
-import pt.isel.pdm.gomokuroyale.http.domain.games.MatchmakerStatus
+import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameMatchmakingInputModel
+import pt.isel.pdm.gomokuroyale.util.ApiError
 import pt.isel.pdm.gomokuroyale.util.HttpResult
 import pt.isel.pdm.gomokuroyale.utils.MockMainDispatcherRule
 import pt.isel.pdm.gomokuroyale.utils.SuspendingGate
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class MatchMakeScreenViewModelTests {
 
     @get:Rule
@@ -36,23 +35,13 @@ class MatchMakeScreenViewModelTests {
 
     private val gomokuService = mockk<GomokuService> {
         coEvery {
-            gameService.getMatchmakingStatus(
+            gameService.matchmaking(
                 testUserInfo.accessToken,
-                1
+                GameMatchmakingInputModel("STANDARD")
             )
-        } coAnswers {
-            HttpResult.Success(
-                MatchmakerStatus(
-                    mid = 1,
-                    uid = 1,
-                    gid = null,
-                    variant = "STANDARD",
-                    state = "PENDING",
-                    created = "2021-05-31T15:00:00.000Z",
-                    pollingTimeOut = 3000
-                )
-            )
-        }
+        } returns HttpResult.Failure(
+            ApiError("Matchmaking link not found")
+        )
     }
 
     private val testSut = MatchmakerViewModel(
@@ -86,7 +75,7 @@ class MatchMakeScreenViewModelTests {
     }
 
     @Test
-    fun findGame_emits_to_the_state_flow_the_queuing_state() = runTest {
+    fun findGame_emits_to_the_state_flow_the_error_state() = runTest {
         // Arrange
         val sut = testSut
         // Act
@@ -94,7 +83,7 @@ class MatchMakeScreenViewModelTests {
         var lastCollectedState: MatchmakingScreenState? = null
         val collectJob = launch {
             sut.screenState.collect {
-                if (it is MatchmakingScreenState.Queueing) {
+                if (it is MatchmakingScreenState.Error) {
                     lastCollectedState = it
                     gate.open()
                 }
@@ -109,7 +98,7 @@ class MatchMakeScreenViewModelTests {
         }
 
         // Assert
-        val loading = lastCollectedState as? MatchmakingScreenState.Queueing
+        val loading = lastCollectedState as? MatchmakingScreenState.Error
         Assert.assertNotNull("Expected Loading but got $lastCollectedState instead", loading)
     }
 }
