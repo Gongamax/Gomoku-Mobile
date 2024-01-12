@@ -192,7 +192,7 @@ private fun PlayerLobbyInfo(playerInfo: PlayerInfo?, modifier: Modifier) {
         text = playerInfo?.username ?: "",
         style = MaterialTheme.typography.titleLarge
     )
-    Text(modifier = modifier, text = playerInfo?.points.toString())
+    //Text(modifier = modifier, text = playerInfo?.points.toString())
 }
 
 @Composable

@@ -1,6 +1,5 @@
 package pt.isel.pdm.gomokuroyale.authentication.ui.login
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
@@ -9,24 +8,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import pt.isel.pdm.gomokuroyale.TAG
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 import pt.isel.pdm.gomokuroyale.http.services.users.UserService
 import pt.isel.pdm.gomokuroyale.util.IOState
 import pt.isel.pdm.gomokuroyale.util.Idle
-import pt.isel.pdm.gomokuroyale.util.Loading
 import pt.isel.pdm.gomokuroyale.util.Saved
-import pt.isel.pdm.gomokuroyale.util.Saving
 import pt.isel.pdm.gomokuroyale.util.idle
 import pt.isel.pdm.gomokuroyale.util.loading
 import pt.isel.pdm.gomokuroyale.util.onFailureResult
-import pt.isel.pdm.gomokuroyale.util.onSuccess
 import pt.isel.pdm.gomokuroyale.util.onSuccessResult
 import pt.isel.pdm.gomokuroyale.util.saveFailure
 import pt.isel.pdm.gomokuroyale.util.saved
 import pt.isel.pdm.gomokuroyale.util.saving
-
 
 class LoginScreenViewModel(
     private val userInfoRepository: UserInfoRepository,
@@ -55,8 +49,6 @@ class LoginScreenViewModel(
             }
         }
     }
-
-
 
     fun resetToIdle() {
         if (_state.value !is Saved)

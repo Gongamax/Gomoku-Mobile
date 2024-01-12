@@ -19,11 +19,11 @@ import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
 import pt.isel.pdm.gomokuroyale.http.domain.users.UserModel
 import pt.isel.pdm.gomokuroyale.http.services.games.dto.GameOutputModel
 import pt.isel.pdm.gomokuroyale.http.storage.UriDataStore
-import pt.isel.pdm.gomokuroyale.util.BoardDeserializer
-import pt.isel.pdm.gomokuroyale.util.GameOutputModelDeserializer
-import pt.isel.pdm.gomokuroyale.util.UserDeserializer
-import pt.isel.pdm.gomokuroyale.util.UserStatsDeserializer
-import pt.isel.pdm.gomokuroyale.util.VariantDeserializer
+import pt.isel.pdm.gomokuroyale.util.deserializers.BoardDeserializer
+import pt.isel.pdm.gomokuroyale.util.deserializers.GameOutputModelDeserializer
+import pt.isel.pdm.gomokuroyale.util.deserializers.UserDeserializer
+import pt.isel.pdm.gomokuroyale.util.deserializers.UserStatsDeserializer
+import pt.isel.pdm.gomokuroyale.util.deserializers.VariantDeserializer
 import java.util.concurrent.TimeUnit
 
 /**
@@ -65,7 +65,7 @@ class GomokuRoyaleApplication : Application(), DependenciesContainer {
 
     companion object {
         private const val API_ENDPOINT =
-            "https://e97f-2001-8a0-f947-5e00-2cd7-3e4c-7616-c0fe.ngrok-free.app" // API NGROK URL
+            "https://666c-2001-8a0-f947-5e00-5591-eeb-ff3c-46f9.ngrok-free.app" // API NGROK URL
         private const val GOMOKU_DATA_STORE = "gomoku_data_store"
     }
 }

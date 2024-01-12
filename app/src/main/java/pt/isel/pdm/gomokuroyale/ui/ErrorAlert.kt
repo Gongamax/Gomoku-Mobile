@@ -41,7 +41,7 @@ fun ErrorAlert(
 fun ErrorAlert(
     title: String,
     message: String,
-    buttonText: String,
+    buttonText: String = "OK",
     onDismiss: () -> Unit = { }
 ) {
     ErrorAlertImpl(

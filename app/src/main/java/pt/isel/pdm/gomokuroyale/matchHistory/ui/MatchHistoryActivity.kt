@@ -72,7 +72,6 @@ class MatchHistoryActivity : ComponentActivity() {
                     ErrorAlert(
                         title = stringResource(id = R.string.match_history_failed_to_load),
                         message = it.error.message ?: UNKNOWN_ERROR,
-                        buttonText = "Ok",
                         onDismiss = viewModel::resetToIdle
                     )
             }

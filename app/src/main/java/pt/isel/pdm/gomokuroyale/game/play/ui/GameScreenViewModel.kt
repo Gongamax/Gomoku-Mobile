@@ -30,12 +30,11 @@ class GameScreenViewModel(
 
     val screenStateFlow get() = _screenStateFlow
 
-    fun startMatch() { //TODO: CHANGE THIS NAME
+    fun monitorGame() {
         check(_screenStateFlow.value !is GameScreenState.MyTurn) {
             "Cannot start a match when the screen state is playing"
         }
         viewModelScope.launch {
-
             gameService.getGame(startGameInfo.gameId, startGameInfo.localPlayer.accessToken)
                 .onSuccessResult { game ->
                     if (game.isOver) {
@@ -79,7 +78,6 @@ class GameScreenViewModel(
         }
     }
 
-
     fun makeMove(at: Cell) {
         check(_screenStateFlow.value is GameScreenState.MyTurn) {
             "Cannot make a move when the screen state is not playing"
@@ -103,7 +101,7 @@ class GameScreenViewModel(
                 Log.e(GameScreenViewModelTag, "Error making move: $apiError")
                 _screenStateFlow.value = GameScreenState.BadMove(
                     apiError,
-                    (screenStateFlow.value as GameScreenState.MyTurn).game //TODO: Check this
+                    (screenStateFlow.value as GameScreenState.MyTurn).game
                 )
             }
         }
@@ -117,7 +115,7 @@ class GameScreenViewModel(
         viewModelScope.launch {
             gameService.surrender(startGameInfo.gameId, startGameInfo.localPlayer.accessToken)
                 .onSuccessResult {
-                    val game = (screenStateFlow.value as GameScreenState.MyTurn).game // Safe because of the check above, still TODO: Check this
+                    val game = (screenStateFlow.value as GameScreenState.MyTurn).game
                     _screenStateFlow.value = GameScreenState.GameOver(
                         game,
                         game.variant.points,

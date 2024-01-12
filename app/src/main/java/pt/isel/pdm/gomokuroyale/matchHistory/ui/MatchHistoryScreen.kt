@@ -39,10 +39,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Piece
+import pt.isel.pdm.gomokuroyale.matchHistory.domain.MatchHistoryInfo
+import pt.isel.pdm.gomokuroyale.matchHistory.domain.toColor
+import pt.isel.pdm.gomokuroyale.matchHistory.domain.toOther
 import pt.isel.pdm.gomokuroyale.ui.NavigationHandlers
 import pt.isel.pdm.gomokuroyale.ui.TopBar
 import pt.isel.pdm.gomokuroyale.ui.components.MyIcon
 import pt.isel.pdm.gomokuroyale.ui.theme.DarkViolet
+import pt.isel.pdm.gomokuroyale.matchHistory.domain.Result
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
 const val MatchHistoryScreenTestTag = "MatchHistoryScreen"
@@ -53,12 +57,13 @@ fun MatchHistoryScreen(
     modifier: Modifier = Modifier,
     onBackRequested: () -> Unit = {},
     username: String,
-    matches: List<MatchInfo>
+    matches: List<MatchHistoryInfo>
 ) {
     GomokuRoyaleTheme {
         Scaffold(
             modifier = modifier
-                .fillMaxSize().testTag(MatchHistoryScreenTestTag),
+                .fillMaxSize()
+                .testTag(MatchHistoryScreenTestTag),
             topBar = {
                 TopBar(
                     title = {
@@ -68,7 +73,8 @@ fun MatchHistoryScreen(
                             textAlign = TextAlign.Center
                         )
                     },
-                    navigation = NavigationHandlers(onBackRequested = onBackRequested))
+                    navigation = NavigationHandlers(onBackRequested = onBackRequested)
+                )
             },
         ) { innerPadding ->
             MatchHistoryContent(
@@ -81,26 +87,29 @@ fun MatchHistoryScreen(
 }
 
 @Composable
-private fun MatchHistoryContent(modifier: Modifier, username: String, matches: List<MatchInfo>) {
-    Column (
+private fun MatchHistoryContent(modifier: Modifier, username: String, matches: List<MatchHistoryInfo>) {
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(DarkViolet),
         horizontalAlignment = Alignment.CenterHorizontally
-        ){
+    ) {
         MatchHistoryHeader(username = username)
         MatchHistoryBody(matches)
     }
 }
+
 @Composable
-private fun MatchHistoryBody(matches: List<MatchInfo>) {
+private fun MatchHistoryBody(matches: List<MatchHistoryInfo>) {
     LazyColumn(
         userScrollEnabled = true,
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(vertical = 35.dp).testTag(MatchHistoryListTestTag)
+        modifier = Modifier
+            .padding(vertical = 35.dp)
+            .testTag(MatchHistoryListTestTag)
     ) {
-        items(matches.size){
+        items(matches.size) {
             val color = matches[it].myPiece.toColor()
             Card(
                 shape = RectangleShape,
@@ -121,16 +130,16 @@ private fun MatchHistoryBody(matches: List<MatchInfo>) {
 
 @Composable
 private fun MatchHistoryHeader(username: String) {
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-    ){
+    ) {
         Spacer(modifier = Modifier.padding(15.dp))
-        Row (
+        Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
-        ){
+        ) {
             UsersProfilePic()
             Spacer(modifier = Modifier.padding(35.dp))
             UsersProfileName(username = username)
@@ -147,13 +156,13 @@ private fun MatchHistoryHeader(username: String) {
                         strokeWidth = 5.dp.toPx()
                     )
                 },
-        ){}
+        ) {}
         Spacer(modifier = Modifier.padding(5.dp))
-        Row (
+        Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             Text(text = "Matches", fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
     }
@@ -161,8 +170,8 @@ private fun MatchHistoryHeader(username: String) {
 
 @Composable
 private fun UsersProfilePic() {
-    Column (
-        modifier= Modifier.height(75.dp),
+    Column(
+        modifier = Modifier.height(75.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -175,7 +184,7 @@ private fun UsersProfilePic() {
 
 @Composable
 private fun UsersProfileName(username: String) {
-    Column (
+    Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -194,27 +203,28 @@ private fun UsersProfileName(username: String) {
 }
 
 @Composable
-private fun MatchView(match: MatchInfo) {
+private fun MatchView(match: MatchHistoryInfo) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
-    ){
-        when(match.result){
+    ) {
+        when (match.result) {
             Result.Win -> {
-                if(match.myPiece == Piece.BLACK) Match(resultId = R.drawable.ic_win_white, match)
+                if (match.myPiece == Piece.BLACK) Match(resultId = R.drawable.ic_win_white, match)
                 else Match(resultId = R.drawable.ic_win_black, match)
             }
+
             else -> {
-                    if(match.myPiece == Piece.WHITE) Match(resultId = R.drawable.ic_loss_black, match)
-                    else Match(resultId = R.drawable.ic_loss_white, match)
-                }
+                if (match.myPiece == Piece.WHITE) Match(resultId = R.drawable.ic_loss_black, match)
+                else Match(resultId = R.drawable.ic_loss_white, match)
             }
         }
     }
+}
 
 @Composable
-private fun Match(resultId: Int, match: MatchInfo){
+private fun Match(resultId: Int, match: MatchHistoryInfo) {
     MyIcon(resultId = resultId)
     Text(
         text = "${match.variant} | You vs ${match.opponent}",
@@ -223,6 +233,7 @@ private fun Match(resultId: Int, match: MatchInfo){
         maxLines = 1,
     )
 }
+
 @Preview
 @Composable
 fun MatchesPreview() {
@@ -235,16 +246,16 @@ fun MatchesPreview() {
 
 val matchesList = buildList {
     repeat(15) {
-        if(it%2 == 0)
+        if (it % 2 == 0)
             if (it == 4)
-                add(MatchInfo(Result.Win, "STANDARD", "Opponent", Piece.WHITE))
+                add(MatchHistoryInfo(Result.Win, "STANDARD", "Opponent", Piece.WHITE))
             else
-                add(MatchInfo(Result.Win, "STANDARD", "Opponent", Piece.BLACK))
+                add(MatchHistoryInfo(Result.Win, "STANDARD", "Opponent", Piece.BLACK))
         else {
             if (it == 1)
-                add(MatchInfo(Result.Loss, "STANDARD", "Opponent", Piece.BLACK))
+                add(MatchHistoryInfo(Result.Loss, "STANDARD", "Opponent", Piece.BLACK))
             else
-                add(MatchInfo(Result.Loss, "STANDARD", "Opponent", Piece.WHITE))
+                add(MatchHistoryInfo(Result.Loss, "STANDARD", "Opponent", Piece.WHITE))
         }
 
     }
@@ -253,5 +264,5 @@ val matchesList = buildList {
 @Preview
 @Composable
 fun MatchPreview() {
-    MatchView(MatchInfo(Result.Win, "STANDARD", "Opponent", Piece.BLACK))
+    MatchView(MatchHistoryInfo(Result.Win, "STANDARD", "Opponent", Piece.BLACK))
 }

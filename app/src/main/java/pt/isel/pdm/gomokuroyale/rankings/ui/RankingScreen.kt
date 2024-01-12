@@ -49,7 +49,7 @@ import pt.isel.pdm.gomokuroyale.util.Term
 const val RankingScreenTestTag = "RankingScreenTestTag"
 const val SearchBarTestTag = "SEARCH_BAR_TEST_TAG"
 const val RankingListTestTag = "RANKING_LIST_TEST_TAG"
-const val FirstPage = 1
+const val FIRST_PAGE = 1
 const val MAX_USERNAME_LENGTH = 10
 const val MAX_USERNAME_LENGTH_SPACER = 13
 
@@ -63,9 +63,10 @@ fun RankingScreen(
     onPagedRequested: (Int) -> Unit = { },
     onMatchHistoryRequested: (Int, String) -> Unit = { _, _ -> },
     onSearchRequested: (Term) -> Unit = { },
+    onLocalPlayerSearch: () -> Unit = { },
     onPlayerSelected: (Int) -> Unit = { },
     onPlayerDismissed: () -> Unit = { },
-    initialPage: Int = FirstPage,
+    initialPage: Int = FIRST_PAGE,
     isLastPage: Boolean = false
 ) {
     GomokuRoyaleTheme {
@@ -95,11 +96,21 @@ fun RankingScreen(
                 listState = listState,
                 rank = currPlayers,
                 modifier = Modifier.padding(innerPadding),
-                onSearchRequested = { onSearchRequested(it); currPlayers = emptyList() },
+                onSearchRequested = {
+                    if (!isRequestInProgress) {
+                        onSearchRequested(it)
+                        currPlayers = emptyList()
+                    }
+                },
+                onLocalPlayerSearch = {
+                    if (!isRequestInProgress) {
+                        onLocalPlayerSearch()
+                        currPlayers = emptyList()
+                    }
+                },
                 onQueryChanged = { query = it },
                 onClearSearch = { query = "" },
-                onPlayerSelected = { playerId -> onPlayerSelected(playerId) },
-                onPlayerDismissed = onPlayerDismissed,
+                onPlayerSelected = onPlayerSelected,
                 onPagedRequested = { nextPage ->
                     if (nextPage == currPage) return@RankingLazyColumn
                     onPagedRequested(nextPage)
@@ -107,7 +118,8 @@ fun RankingScreen(
                     currPlayers += players
                 },
                 currentPage = currPage,
-                isLastPage = isLastPage
+                isLastPage = isLastPage,
+                isPlayerFetched = isPlayerFetched,
             )
 
             if (playerInfo != null && isPlayerFetched) {
@@ -130,13 +142,14 @@ private fun RankingLazyColumn(
     listState: LazyListState,
     rank: List<UserRanking>,
     onSearchRequested: (Term) -> Unit = { },
+    onLocalPlayerSearch: () -> Unit = { },
     onQueryChanged: (String) -> Unit = { },
     onClearSearch: () -> Unit = { },
     onPlayerSelected: (Int) -> Unit = { },
-    onPlayerDismissed: () -> Unit = { },
     onPagedRequested: (Int) -> Unit = { },
     currentPage: Int = 1,
-    isLastPage: Boolean = false
+    isLastPage: Boolean = false,
+    isPlayerFetched: Boolean = false,
 ) {
     LazyColumn(
         userScrollEnabled = true,
@@ -154,7 +167,8 @@ private fun RankingLazyColumn(
                 isRequestInProgress,
                 onSearchRequested,
                 onQueryChanged,
-                onClearSearch
+                onClearSearch,
+                onLocalPlayerSearch
             )
         }
         rank.forEach { player ->
@@ -163,7 +177,7 @@ private fun RankingLazyColumn(
             }
         }
         val lastIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-        if (lastIndex != null && lastIndex >= rank.size && !isRequestInProgress && !isLastPage) {
+        if (lastIndex != null && lastIndex >= rank.size && !isRequestInProgress && !isLastPage && !isPlayerFetched) {
             onPagedRequested(currentPage + 1)
         }
     }
@@ -219,7 +233,6 @@ fun PlayerView(
     }
 }
 
-
 private val String.isLimitUsername: Boolean
     get() = this.length >= MAX_USERNAME_LENGTH
 
@@ -269,7 +282,7 @@ fun UserInfoPopUpPreview() {
     )
 }
 
-private val players = buildList<UserRanking> {
+private val players = buildList {
     repeat(30) {
         val it = it + 1
         add(

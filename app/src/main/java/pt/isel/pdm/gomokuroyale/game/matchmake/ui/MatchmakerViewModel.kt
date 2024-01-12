@@ -41,8 +41,8 @@ class MatchmakerViewModel(
 
         viewModelScope.launch {
             _screenStateFlow.value = Queueing
-             val isLogged = kotlin.runCatching { repository.isLoggedIn() }
-            if(isLogged.getOrNull() == false) {
+            val isLogged = kotlin.runCatching { repository.isLoggedIn() }
+            if (isLogged.getOrNull() == false) {
                 _screenStateFlow.value = Error(Exception("Failure of the token, time overrun"))
                 return@launch
             }
@@ -50,27 +50,31 @@ class MatchmakerViewModel(
                 matchInfo.userInfo.accessToken,
                 GameMatchmakingInputModel(matchInfo.variant.name)
             ).onSuccessResult { queueEntry ->
-                if (queueEntry.idType == GAME_TYPE_ID) {
-                    _screenStateFlow.value = Matched(queueEntry.id)
-                } else {
-                    _screenStateFlow.value = LookingForMatch(queueEntry.id)
-                    while (true) {
-                        val status = service.getMatchmakingStatus(
-                            matchInfo.userInfo.accessToken,
-                            queueEntry.id
-                        )
-                        status.onSuccessResult { matchStatus ->
-                            if (matchStatus.state == MatchmakingStatus.MATCHED.toString()) {
-                                _screenStateFlow.value =
-                                    Matched(matchStatus.gid!!) // Safe double bang, because we know it is matched
+                when (queueEntry.idType) {
+                    GAME_TYPE_ID -> _screenStateFlow.value = Matched(queueEntry.id)
+
+                    MATCH_TYPE_ID -> {
+                        _screenStateFlow.value = LookingForMatch(queueEntry.id)
+                        while (true) {
+                            val status = service.getMatchmakingStatus(
+                                matchInfo.userInfo.accessToken,
+                                queueEntry.id
+                            )
+                            status.onSuccessResult { matchStatus ->
+                                if (matchStatus.state == MatchmakingStatus.MATCHED.toString()) {
+                                    _screenStateFlow.value =
+                                        Matched(matchStatus.gid!!) // Safe double bang, because we know it is matched
+                                    return@launch
+                                }
+                            }.onFailureResult { error ->
+                                _screenStateFlow.value = Error(error)
                                 return@launch
                             }
-                        }.onFailureResult { error ->
-                            _screenStateFlow.value = Error(error)
-                            return@launch
+                            delay(POOLING_DELAY)
                         }
-                        delay(POOLING_DELAY)
                     }
+
+                    else -> _screenStateFlow.value = Error(Exception("Invalid id type"))
                 }
             }.onFailureResult {
                 _screenStateFlow.value = Error(it)
@@ -98,9 +102,13 @@ class MatchmakerViewModel(
         private const val GAME_TYPE_ID = "gid"
         private const val MATCH_TYPE_ID = "mid"
 
-        fun factory(service: GameService, matchInfo: MatchInfo,userInfoRepository: UserInfoRepository) =
+        fun factory(
+            service: GameService,
+            matchInfo: MatchInfo,
+            userInfoRepository: UserInfoRepository
+        ) =
             viewModelFactory {
-                initializer { MatchmakerViewModel(service, matchInfo,userInfoRepository) }
+                initializer { MatchmakerViewModel(service, matchInfo, userInfoRepository) }
             }
     }
 }

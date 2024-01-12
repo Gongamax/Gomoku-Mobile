@@ -4,22 +4,24 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
+import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.domain.MatchInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.ui.LobbyActivity
 import pt.isel.pdm.gomokuroyale.game.matchmake.domain.StartGameInfo
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import pt.isel.pdm.gomokuroyale.game.play.ui.GameActivity
-import pt.isel.pdm.gomokuroyale.http.domain.MatchmakingStatus
+import pt.isel.pdm.gomokuroyale.http.domain.MatchmakingStatus.MATCHED
+import pt.isel.pdm.gomokuroyale.http.domain.MatchmakingStatus.PENDING
 import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
 
 const val MATCHMAKER_ACTIVITY_TAG = "MATCHMAKER_ACTIVITY_TAG"
@@ -28,20 +30,17 @@ const val PLAYER_INFO_EXTRA = "PLAYER_INFO_EXTRA"
 class MatchmakerActivity : ComponentActivity() {
 
     private val dependencies by lazy { application as DependenciesContainer }
-    private val repo by lazy { dependencies.userInfoRepository }
 
     private val viewModel by viewModels<MatchmakerViewModel> {
         MatchmakerViewModel.factory(
             dependencies.gomokuService.gameService,
             matchInfo,
-            repo
+            dependencies.userInfoRepository
         )
     }
 
     companion object {
         fun navigateTo(ctx: Context, info: MatchInfo) {
-            Log.v(MATCHMAKER_ACTIVITY_TAG, "Navigating to matchmaker activity.")
-            Log.v(MATCHMAKER_ACTIVITY_TAG, "Match info: $info")
             ctx.startActivity(createIntent(ctx, info))
         }
 
@@ -74,26 +73,17 @@ class MatchmakerActivity : ComponentActivity() {
 
         setContent {
             val currentState = viewModel.screenState.collectAsState().value
-            val status = if (currentState is MatchmakingScreenState.Matched)
-                MatchmakingStatus.MATCHED
-            else
-                MatchmakingStatus.PENDING
-
             MatchmakerScreen(
-                status = status,
+                status = currentState.status,
                 onCancelingMatchmaking = viewModel::leaveQueue,
-                onCancelingEnabled =
-                        currentState !is MatchmakingScreenState.Matched &&
-                        currentState !is MatchmakingScreenState.Queueing,
+                onCancelingEnabled = currentState.isCancelable,
                 variant = matchInfo.variant
             )
-
             currentState.let {
                 if (it is MatchmakingScreenState.Error) {
                     ErrorAlert(
-                        title = "Error",
+                        title = stringResource(id = R.string.matchmaking_error),
                         message = it.error.message ?: "Unknown error",
-                        buttonText = "Ok",
                         onDismiss = { LobbyActivity.navigateTo(this) }
                     )
                 }
@@ -101,6 +91,11 @@ class MatchmakerActivity : ComponentActivity() {
         }
     }
 
+    private val MatchmakingScreenState.status
+        get() = if (this is MatchmakingScreenState.Matched) MATCHED else PENDING
+
+    private val MatchmakingScreenState.isCancelable
+        get() = this !is MatchmakingScreenState.Matched && this !is MatchmakingScreenState.Queueing
 
     private val matchInfo: MatchInfo by lazy {
         checkNotNull(getPlayerInfoExtra()) { "The match info must be provided." }.toMatchInfo()

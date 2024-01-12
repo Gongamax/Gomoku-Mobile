@@ -27,21 +27,17 @@ sealed interface RankingScreenState {
 
     data object Idle : RankingScreenState
     data object FetchingRankingInfo : RankingScreenState
-    data class FetchedRankingInfo(val rankingInfo: RankingList, val page : Int) : RankingScreenState
+    data class FetchedRankingInfo(val rankingInfo: RankingList, val page: Int) : RankingScreenState
     data object FetchingPlayerInfo : RankingScreenState
-    data class FetchedPlayerInfo(val playerInfo: UserRanking, val page: Int) : RankingScreenState
-    data object FetchingPlayersBySearch : RankingScreenState
-    data class FetchedPlayersBySearch(val players: RankingList, val page : Int) : RankingScreenState
-    data class FailedToFetch(val error: Throwable) : RankingScreenState
-    data class WantsToGoToMatchHistory(val id: Int, val username: String, val page : Int) :
-        RankingScreenState
-}
+    data class FetchedPlayerInfo(
+        val playerInfo: UserRanking,
+        val rankingInfo: RankingList,
+        val page: Int
+    ) : RankingScreenState
 
-fun Int.unitsConverter(): String {
-    val points = this
-    return when {
-        points < 1000 -> points.toString()
-        points < 1000000 -> String.format("%.1fK", points / 1000)
-        else -> String.format("%.1fM", points / 1000000)
-    }
+    data object FetchingPlayersBySearch : RankingScreenState
+    data class FetchedPlayersBySearch(val players: RankingList, val page: Int) : RankingScreenState
+    data class FailedToFetch(val error: Throwable) : RankingScreenState
+    data class WantsToGoToMatchHistory(val id: Int, val username: String, val page: Int) :
+        RankingScreenState
 }

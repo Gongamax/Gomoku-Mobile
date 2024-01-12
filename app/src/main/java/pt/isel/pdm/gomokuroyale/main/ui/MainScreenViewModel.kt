@@ -14,17 +14,16 @@ import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.Recipe
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FailedToFetch
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FailedToLogout
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedPlayerInfo
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedVariants
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedRecipes
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchingPlayerInfo
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchingRecipes
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.Idle
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.LoggedOut
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.LoggingOut
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.FailedToFetch
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.FailedToLogout
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.FetchedPlayerInfo
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.FetchedVariants
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.FetchedRecipes
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.FetchingPlayerInfo
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.FetchingRecipes
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.Idle
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.LoggedOut
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.LoggingOut
 import pt.isel.pdm.gomokuroyale.util.onFailureResult
 import pt.isel.pdm.gomokuroyale.util.onSuccessResult
 

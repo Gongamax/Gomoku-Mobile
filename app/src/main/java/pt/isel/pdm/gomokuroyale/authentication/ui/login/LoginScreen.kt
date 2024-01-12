@@ -14,6 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pt.isel.pdm.gomokuroyale.R
@@ -29,23 +30,12 @@ import pt.isel.pdm.gomokuroyale.ui.components.TextComponent
 import pt.isel.pdm.gomokuroyale.ui.components.VerificationComponent
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
-
-//TODO: CHANGE ALL HARDCODED STRINGS AND COLORS TO CONSTANTS AND VALUES
-
 const val LoginScreenTestTag = "LoginScreenTestTag"
-
 private val paddingHead = 30.dp
-const val INVALID_USERNAME = "Invalid username. Must be between 5 and 20 characters"
-const val INVALID_PASSWORD = "Password must be at least 8 characters and include at least one letter and one number"
-const val LOGIN = "Login"
-const val FORGOT_PASSWORD = "Forgot Password?"
-const val NO_HAVE_ACCOUNT = "Don't have an account yet?"
-const val HELP_USERNAME ="Between 5 and 20 characters"
-const val HELP_PASSWORD = "At least 8 characters and include at least one letter and one number"
 
 @Composable
 fun LoginScreen(
-    isLoginButtonEnabled : Boolean = true,
+    isLoginButtonEnabled: Boolean = true,
     onBackRequested: () -> Unit = { },
     onRegisterRequested: () -> Unit = { },
     onLoginRequested: (username: String, password: String) -> Unit
@@ -84,7 +74,8 @@ fun LoginScreen(
                         fieldType = FieldType.EMAIL_OR_USER,
                         validateField = validateUsername(username),
                         isError = !isUsernameValid,
-                        supportText = if (!isUsernameValid) INVALID_USERNAME else HELP_USERNAME
+                        supportText = if (!isUsernameValid) stringResource(id = R.string.login_invalid_username)
+                        else stringResource(id = R.string.login_help_username)
                     )
                     InformationBox(
                         label = "Password",
@@ -96,11 +87,12 @@ fun LoginScreen(
                         fieldType = FieldType.PASSWORD,
                         validateField = validatePassword(password),
                         isError = !isPasswordValid,
-                        supportText = if (!isPasswordValid) INVALID_PASSWORD else HELP_PASSWORD
+                        supportText = if (!isPasswordValid)  stringResource(id = R.string.login_invalid_password)
+                        else stringResource(id = R.string.login_help_password)
                     )
                     ButtonComponent(
                         iconResourceId = R.drawable.ic_enter,
-                        text = LOGIN,
+                        text = stringResource(id = R.string.login_title),
                         enabled = isLoginButtonEnabled,
                         onClick = {
                             isUsernameValid = validateUsername(username)
@@ -113,7 +105,7 @@ fun LoginScreen(
                     DivideComponent()
 
                     VerificationComponent(
-                        text = NO_HAVE_ACCOUNT,
+                        text = stringResource(id = R.string.login_no_account),
                         textUnderline = "Sign Up",
                         onClick = { onRegisterRequested() }
                     )

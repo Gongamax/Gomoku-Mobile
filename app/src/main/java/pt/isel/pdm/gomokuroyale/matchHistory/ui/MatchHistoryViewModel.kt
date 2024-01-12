@@ -1,6 +1,5 @@
 package pt.isel.pdm.gomokuroyale.matchHistory.ui
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
@@ -12,8 +11,10 @@ import kotlinx.coroutines.launch
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfoRepository
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Piece
 import pt.isel.pdm.gomokuroyale.http.services.games.GameService
+import pt.isel.pdm.gomokuroyale.matchHistory.domain.MatchHistoryInfo
 import pt.isel.pdm.gomokuroyale.util.onFailureResult
 import pt.isel.pdm.gomokuroyale.util.onSuccessResult
+import pt.isel.pdm.gomokuroyale.matchHistory.domain.Result
 
 class MatchHistoryViewModel(
     private val repository: UserInfoRepository,
@@ -41,7 +42,7 @@ class MatchHistoryViewModel(
                             if (match.userWhite.id.value == id) match.userBlack else match.userWhite
                         val myPiece =
                             if (match.userWhite.id.value == id) Piece.WHITE else Piece.BLACK
-                        MatchInfo(gameResult, match.variant.name, opponent.username, myPiece)
+                        MatchHistoryInfo(gameResult, match.variant.name, opponent.username, myPiece)
                     }
                     _state.value = FetchedMatchHistory(matchInfoList)
                 }.onFailureResult {
@@ -76,21 +77,3 @@ class MatchHistoryViewModel(
         }
     }
 }
-
-data class InfoParam(val name: String, val value: String)
-
-data class MatchInfo(
-    val result: Result,
-    val variant: String,
-    val opponent: String,
-    val myPiece: Piece
-)
-
-enum class Result {
-    Win,
-    Loss,
-}
-
-fun Piece.toColor() = if (this == Piece.BLACK) Color.Black else Color.White
-
-fun Color.toOther() = if (this == Color.Black) Color.White else Color.Black

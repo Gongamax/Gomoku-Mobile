@@ -155,6 +155,33 @@ class UserService(
         }
     }
 
+    suspend fun getStatsByUsername(username: String, token: String): HttpResult<UserRanking> {
+        val path = uriRepository.getRecipeLink(Rels.USER_STATS_BY_USERNAME) ?: return HttpResult.Failure(
+            ApiError("User stats link not found")
+        )
+        val response = get<UserStatsOutputModel>(
+            path = path.href.replace("{name}", username),
+            token = token
+        )
+        return response.onSuccess {
+            HttpResult.Success(
+                UserRanking(
+                    id = it.properties.uid,
+                    username = it.properties.username,
+                    gamesPlayed = it.properties.gamesPlayed,
+                    wins = it.properties.wins,
+                    losses = it.properties.losses,
+                    draws = it.properties.draws,
+                    rank = it.properties.rank,
+                    points = it.properties.points
+                )
+            )
+        }.onFailure {
+            val message = it.message.errorMessage
+            HttpResult.Failure(ApiError(message))
+        }
+    }
+
     suspend fun getRankingInfo(page: Int): HttpResult<RankingList> {
         val path = uriRepository.getRecipeLink(Rels.RANKING_INFO) ?: return HttpResult.Failure(
             ApiError("Ranking link not found")

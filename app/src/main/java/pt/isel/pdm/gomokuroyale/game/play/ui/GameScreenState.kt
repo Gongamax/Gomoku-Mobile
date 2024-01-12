@@ -2,6 +2,7 @@ package pt.isel.pdm.gomokuroyale.game.play.ui
 
 import pt.isel.pdm.gomokuroyale.authentication.domain.User
 import pt.isel.pdm.gomokuroyale.game.play.domain.Game
+import pt.isel.pdm.gomokuroyale.game.play.domain.GameState
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Board
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
 
@@ -71,6 +72,9 @@ sealed interface GameScreenState {
         else -> Board.EMPTY
     }
 
+    /**
+     * Gets the game variant. If the game is not ongoing, returns a standard variant.
+     */
     fun getGameVariant(): Variant = when (this) {
         is MyTurn -> game.variant
         is WaitingForOpponent -> game.variant
@@ -82,5 +86,25 @@ sealed interface GameScreenState {
             "STANDARD",
             15,
         )
+    }
+
+    /**
+     * Gets the usernames of the players. If the game is not ongoing, returns "Black" and "White".
+     */
+    data class Usernames(val black: String, val white: String)
+    fun getPlayersUsernames(): Usernames = when (this) {
+        is MyTurn -> Usernames(game.userBlack.username, game.userWhite.username)
+        is WaitingForOpponent -> Usernames(game.userBlack.username, game.userWhite.username)
+        is GameOver -> Usernames(game.userBlack.username, game.userWhite.username)
+        else -> Usernames("Black", "White")
+    }
+
+    /**
+     * Checks if it's player black's turn.
+     */
+    fun isBlackTurn(): Boolean = when (this) {
+        is MyTurn -> game.state == GameState.NEXT_PLAYER_WHITE.name
+        is WaitingForOpponent -> game.state == GameState.NEXT_PLAYER_WHITE.name
+        else -> false
     }
 }

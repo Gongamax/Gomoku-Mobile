@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import pt.isel.pdm.gomokuroyale.matchHistory.ui.InfoParam
+import pt.isel.pdm.gomokuroyale.matchHistory.domain.InfoParam
 
 
 @Composable

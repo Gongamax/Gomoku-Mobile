@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,28 +38,11 @@ import pt.isel.pdm.gomokuroyale.ui.components.TextComponent
 import pt.isel.pdm.gomokuroyale.ui.components.VerificationComponent
 import pt.isel.pdm.gomokuroyale.ui.theme.GomokuRoyaleTheme
 
-
 const val RegisterScreenTestTag = "RegisterScreenTestTag"
 const val RegisterCheckBoxTestTag = "RegisterButtonTestTag"
 private val paddingHead = 30.dp
 private val errorAcceptTermsSize = 12.sp
 
-const val INVALID_USERNAME = "Invalid username. Must be between 5 and 20 characters"
-const val INVALID_PASSWORD =
-    "Password must be at least 8 characters and include at least one letter and one number"
-const val REGISTER = "Register"
-const val HAVE_ACCOUNT = "Already have an account?"
-const val INVALID_EMAIL = "Email is not valid. Must have @ and .letter at least"
-const val INVALID_CONFIRMATION_PASSWORD = "Password is not valid or not equal to password"
-const val INVALID_TERMS = "You must accept the terms"
-const val NO_HAVE_ACCOUNT = "Don't have an account yet?"
-const val HELP_USERNAME = "Between 5 and 20 characters"
-const val HELP_PASSWORD = "At least 8 characters and include at least one letter and one number"
-const val HELP_CONFIRMATION_PASSWORD = "Password must be equal to password"
-const val HELP_EMAIL = "Email must @ and .letter at least"
-
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     onBackRequested: () -> Unit = { },
@@ -85,7 +68,6 @@ fun RegisterScreen(
                         .padding(innerPadding),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-
                     var username by rememberSaveable { mutableStateOf("") }
                     var email by rememberSaveable { mutableStateOf("") }
                     var password by rememberSaveable { mutableStateOf("") }
@@ -96,12 +78,11 @@ fun RegisterScreen(
                     var isPasswordValid by rememberSaveable { mutableStateOf(false) }
                     var isPasswordConfirmationValid by rememberSaveable { mutableStateOf(false) }
                     var isTermsValid by rememberSaveable { mutableStateOf(false) }
-
                     var isButtonClicked by rememberSaveable { mutableStateOf(false) }
 
                     TextComponent(R.string.register_title)
                     InformationBox(
-                        label = "Username", value = username,
+                        label = stringResource(id = R.string.register_username), value = username,
                         onValueChange = {
                             username = it
                         },
@@ -109,10 +90,13 @@ fun RegisterScreen(
                         fieldType = FieldType.EMAIL_OR_USER,
                         validateField = validateUsername(username),
                         isError = !isUsernameValid && isButtonClicked,
-                        supportText = if (!isUsernameValid && isButtonClicked) INVALID_USERNAME else HELP_USERNAME
+                        supportText =
+                        if (!isUsernameValid && isButtonClicked)
+                            stringResource(id = R.string.register_invalid_username)
+                        else stringResource(R.string.register_help_username)
                     )
                     InformationBox(
-                        label = "Email", value = email,
+                        label = stringResource(id = R.string.register_email), value = email,
                         onValueChange = {
                             email = it
                         },
@@ -120,10 +104,12 @@ fun RegisterScreen(
                         fieldType = FieldType.EMAIL_OR_USER,
                         validateField = validateEmail(email),
                         isError = !isEmailValid && isButtonClicked,
-                        supportText = if (!isEmailValid && isButtonClicked) INVALID_EMAIL else HELP_EMAIL
+                        supportText = if (!isEmailValid && isButtonClicked)
+                            stringResource(id = R.string.register_invalid_email)
+                        else stringResource(R.string.register_help_email)
                     )
                     InformationBox(
-                        label = "Password",
+                        label = stringResource(id = R.string.register_password),
                         value = password,
                         onValueChange = {
                             password = it
@@ -132,10 +118,12 @@ fun RegisterScreen(
                         fieldType = FieldType.PASSWORD,
                         validateField = validatePassword(password),
                         isError = !isPasswordValid && isButtonClicked,
-                        supportText = if (!isPasswordValid && isButtonClicked) pt.isel.pdm.gomokuroyale.authentication.ui.login.INVALID_PASSWORD else pt.isel.pdm.gomokuroyale.authentication.ui.login.HELP_PASSWORD
+                        supportText = if (!isPasswordValid && isButtonClicked)
+                            stringResource(id = R.string.register_invalid_password)
+                        else stringResource(R.string.register_help_password)
                     )
                     InformationBox(
-                        label = "Confirm Password",
+                        label = stringResource(id = R.string.register_confirm_password),
                         value = passwordConfirmation,
                         onValueChange = {
                             passwordConfirmation = it
@@ -147,7 +135,9 @@ fun RegisterScreen(
                             passwordConfirmation
                         ),
                         isError = !isPasswordConfirmationValid && isButtonClicked,
-                        supportText = if (!isPasswordConfirmationValid && isButtonClicked) INVALID_CONFIRMATION_PASSWORD else HELP_CONFIRMATION_PASSWORD
+                        supportText = if (!isPasswordConfirmationValid && isButtonClicked)
+                            stringResource(id = R.string.register_invalid_password)
+                        else stringResource(R.string.register_help_password)
                     )
 
                     Row(
@@ -155,16 +145,18 @@ fun RegisterScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start
                     ) {
-                        Checkbox(modifier = Modifier.testTag(RegisterCheckBoxTestTag), checked = acceptTerms, onCheckedChange =
-                        {
-                            acceptTerms = it
-                        })
+                        Checkbox(modifier = Modifier.testTag(RegisterCheckBoxTestTag),
+                            checked = acceptTerms,
+                            onCheckedChange =
+                            {
+                                acceptTerms = it
+                            })
 
                         Text(text = "Accept Terms ")
 
                         if (!acceptTerms && isButtonClicked) {
                             Text(
-                                text = INVALID_TERMS,
+                                text = stringResource(id = R.string.register_invalid_terms),
                                 fontSize = errorAcceptTermsSize,
                                 color = MaterialTheme.colorScheme.error
                             )
@@ -173,7 +165,7 @@ fun RegisterScreen(
 
                     ButtonComponent(
                         iconResourceId = R.drawable.ic_enter,
-                        text = REGISTER,
+                        text = stringResource(id = R.string.register_title),
                         onClick = {
                             isButtonClicked = true
                             isUsernameValid = validateUsername(username)
@@ -188,14 +180,10 @@ fun RegisterScreen(
                             if (isUsernameValid && isEmailValid && isPasswordValid && isPasswordConfirmationValid && isTermsValid)
                                 onRegisterRequested(username, email, password)
                         })
-
-
                     DivideComponent()
-
-
                     VerificationComponent(
-                        text = HAVE_ACCOUNT,
-                        textUnderline = "Login in"
+                        text = stringResource(id = R.string.register_already_registered),
+                        textUnderline = stringResource(id = R.string.register_login_question),
                     ) { onLoginActivity() }
                 }
 

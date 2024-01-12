@@ -46,7 +46,6 @@ class LobbyScreenViewModel(
                     _state.value = FetchedPlayerInfo(res)
             } else
                 _state.value = FailedToFetch(Exception("Failure of the token, time overrun"))
-
         }
     }
 

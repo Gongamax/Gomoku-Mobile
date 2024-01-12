@@ -21,7 +21,7 @@ import pt.isel.pdm.gomokuroyale.http.GomokuService
 import pt.isel.pdm.gomokuroyale.http.domain.Recipe
 import pt.isel.pdm.gomokuroyale.http.domain.UriRepository
 import pt.isel.pdm.gomokuroyale.http.media.siren.LinkModel
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState
 import pt.isel.pdm.gomokuroyale.main.ui.MainScreenViewModel
 import pt.isel.pdm.gomokuroyale.util.HttpResult
 import pt.isel.pdm.gomokuroyale.utils.MockMainDispatcherRule

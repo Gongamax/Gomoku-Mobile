@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.util
+package pt.isel.pdm.gomokuroyale.util.deserializers
 
 import com.google.gson.*
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.*

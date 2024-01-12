@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.isel.pdm.gomokuroyale.R
-import pt.isel.pdm.gomokuroyale.authentication.domain.User
 import pt.isel.pdm.gomokuroyale.game.play.domain.GameState
 
 const val GameOverDialogButtonTag = "GameOverDialogButtonTag"
@@ -26,15 +25,15 @@ const val GameOverDialogTag = "GameOverDialogTag"
 
 @Composable
 fun GameOverDialog(
-    isWin : Boolean,
-    points : Int,
+    isWin: Boolean,
+    points: Int,
     result: GameState,
     onDismissRequested: () -> Unit = { }
 ) {
-    val dialogTextId = when {
-        result == GameState.DRAW -> R.string.match_ended_dialog_text_tied_match
-        isWin -> R.string.match_ended_dialog_text_local_won
-        else -> R.string.match_ended_dialog_text_opponent_won
+    val dialogText = when {
+        result == GameState.DRAW -> stringResource(id = R.string.match_ended_dialog_text_tied_match)
+        isWin -> stringResource(id = R.string.match_ended_dialog_text_local_won, points)
+        else -> stringResource(id = R.string.match_ended_dialog_text_opponent_won, points)
     }
 
     AlertDialog(
@@ -58,8 +57,23 @@ fun GameOverDialog(
                 }
             }
         },
-        title = { Text(stringResource(id = R.string.match_ended_dialog_title), textAlign = TextAlign.Center) },
-        text = { Text(stringResource(id = dialogTextId)) },
+        title = {
+            Text(
+                stringResource(id = R.string.match_ended_dialog_title),
+                textAlign = TextAlign.Center
+            )
+        },
+        text = { Text(dialogText) },
         modifier = Modifier.testTag(GameOverDialogTag)
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GameOverDialogPreview() {
+    GameOverDialog(
+        isWin = false,
+        points = 10,
+        result = GameState.PLAYER_BLACK_WON
     )
 }

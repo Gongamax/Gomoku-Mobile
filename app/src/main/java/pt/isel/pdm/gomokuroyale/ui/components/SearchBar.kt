@@ -31,16 +31,18 @@ import pt.isel.pdm.gomokuroyale.util.toTermOrNull
 @Composable
 fun MySearchBar(
     query: String,
-    isLoading : Boolean = false,
+    isLoading: Boolean = false,
     onSearchRequested: (Term) -> Unit = { },
     onQueryChanged: (String) -> Unit = { },
     onClearSearch: () -> Unit = { },
-){
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .background(Color.White),
+    onLocalPlayerSearch: () -> Unit = { },
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally,
-    ){
+    ) {
         SearchBar(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
@@ -59,7 +61,8 @@ fun MySearchBar(
             leadingIcon = {
                 Image(
                     painterResource(id = R.drawable.search),
-                    contentDescription = null
+                    contentDescription = null,
+                    modifier = Modifier.clickable { if (!isLoading) onLocalPlayerSearch() }
                 )
             },
             enabled = !isLoading,
@@ -81,7 +84,7 @@ fun MySearchBar(
 
 @Preview
 @Composable
-fun SearchBarPreview(){
+fun SearchBarPreview() {
     MySearchBar(
         query = "",
         onSearchRequested = { },

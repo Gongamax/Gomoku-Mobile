@@ -15,13 +15,12 @@ import pt.isel.pdm.gomokuroyale.authentication.ui.register.RegisterActivity
 import pt.isel.pdm.gomokuroyale.GomokuRoyaleApplication
 import pt.isel.pdm.gomokuroyale.TAG
 import pt.isel.pdm.gomokuroyale.game.lobby.ui.LobbyActivity
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FailedToLogout
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FailedToFetch
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.Idle
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedVariants
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedRecipes
-import pt.isel.pdm.gomokuroyale.main.domain.MainScreenState.FetchedPlayerInfo
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.FailedToLogout
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.FailedToFetch
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.Idle
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.FetchedVariants
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.FetchedRecipes
+import pt.isel.pdm.gomokuroyale.main.ui.MainScreenState.FetchedPlayerInfo
 import pt.isel.pdm.gomokuroyale.rankings.ui.RankingActivity
 import pt.isel.pdm.gomokuroyale.ui.ErrorAlert
 

@@ -27,7 +27,6 @@ class LoginActivity : ComponentActivity() {
             dependencies.gomokuService.userService
         )
     }
-
     companion object {
         fun navigateTo(origin: Activity) {
             val intent = Intent(origin, LoginActivity::class.java)
@@ -60,7 +59,6 @@ class LoginActivity : ComponentActivity() {
                     ErrorAlert(
                         title = "Login failed",
                         message = it.value.exceptionOrNull()?.message ?: "Unknown error",
-                        buttonText = "Ok",
                         onDismiss = { viewModel.resetToIdle() }
                     )
             }

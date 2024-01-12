@@ -1,8 +1,6 @@
 package pt.isel.pdm.gomokuroyale.game.play.ui
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
@@ -18,11 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,14 +25,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import pt.isel.pdm.gomokuroyale.R
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Board
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.BoardDim
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.BoardRun
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Cell
 import pt.isel.pdm.gomokuroyale.game.play.domain.board.Piece
-import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variants
 import pt.isel.pdm.gomokuroyale.ui.theme.AlabasterWhite
 import pt.isel.pdm.gomokuroyale.ui.theme.Brown
 
@@ -131,23 +122,10 @@ fun CellView(
         }
     else
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
-//            var fill by remember(player) { mutableStateOf(0.1f) }
             val image = when (player) {
                 Piece.WHITE -> R.drawable.checkers_white
                 Piece.BLACK -> R.drawable.checkers_black
             }
-//            Image(
-//                painter = painterResource(image),
-//                modifier = Modifier.fillMaxSize(fill),
-//                contentDescription = "piece"
-//            )
-//            LaunchedEffect(player) {
-//                while (fill < 1f) {
-//                    delay(50)
-//                    fill *= 2
-//                }
-//                fill = 1f
-//            }
             AnimatedVisibility(
                 visible = true,
                 enter = scaleIn(initialScale = 0.1f) + expandVertically(expandFrom = Alignment.CenterVertically),

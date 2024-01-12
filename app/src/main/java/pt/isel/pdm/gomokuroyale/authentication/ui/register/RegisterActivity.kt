@@ -33,7 +33,6 @@ class RegisterActivity : ComponentActivity() {
             origin.startActivity(intent)
         }
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {

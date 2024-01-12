@@ -1,5 +1,10 @@
 package pt.isel.pdm.gomokuroyale.game.play.ui
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,11 +21,14 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -63,11 +71,12 @@ fun GameScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
+            val (black, white) = state.getPlayersUsernames()
             IconComposable(
                 iconResourceId = R.drawable.gomokulog,
                 height = 50.dp,
             )
-            RectangleComponent()
+            RectangleComponent(black, white, state.isBlackTurn())
             BoardView(
                 board = state.getGameBoard(),
                 boardDim = state.getGameVariant().boardDim,
@@ -80,14 +89,14 @@ fun GameScreen(
             ) {
                 ButtonComponent(
                     iconResourceId = R.drawable.ic_exit,
-                    text = "Exit",
+                    text = stringResource(id = R.string.match_exit),
                     onSelectEnabled = state is GameScreenState.MyTurn,
                     testTag = GameExitButtonTestTag,
                     onClick = onForfeitRequested
                 )
                 ButtonComponent(
                     iconResourceId = R.drawable.ic_robot,
-                    text = "Help",
+                    text = stringResource(id = R.string.match_help),
                     testTag = GameHelpButtonTestTag,
                     onClick = onHelpRequested
                 )
@@ -101,14 +110,16 @@ fun IconComposable(
     iconResourceId: Int,
     color: Color = Color.Unspecified,
     height: Dp,
-    padding: Dp = 0.dp
+    padding: Dp = 0.dp,
+    rotation: Float = 0f
 ) {
     Icon(
         painter = painterResource(id = iconResourceId),
         contentDescription = "",
         modifier = Modifier
             .height(height)
-            .padding(padding),
+            .padding(padding)
+            .rotate(rotation),
         tint = color
     )
 }
@@ -141,9 +152,19 @@ fun ButtonComponent(
     }
 }
 
-
 @Composable
-fun RectangleComponent() {
+fun RectangleComponent(
+    black: String,
+    white: String,
+    isBlackTurn: Boolean = true
+) {
+    val rotation by animateFloatAsState(
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ), label = ""
+    )
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -160,21 +181,21 @@ fun RectangleComponent() {
             IconComposable(
                 iconResourceId = R.drawable.icon_player1_m,
                 height = 70.dp,
-                padding = 4.dp
+                padding = 4.dp,
+                rotation = if (isBlackTurn) rotation else 0f
             )
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
             Column(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text("Player White", fontSize = 16.sp, color = Color.White)
+                Text(white, fontSize = 16.sp, color = Color.White)
                 IconComposable(
                     iconResourceId = R.drawable.checkers_white,
                     height = 30.dp,
-                    padding = 2.dp
+                    padding = 2.dp,
                 )
             }
-
         }
         Row(
             modifier = Modifier
@@ -187,7 +208,7 @@ fun RectangleComponent() {
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text("Player Black", fontSize = 16.sp, color = Color.Black)
+                Text(black, fontSize = 16.sp, color = Color.Black)
                 IconComposable(
                     iconResourceId = R.drawable.checkers_black,
                     height = 30.dp,
@@ -198,9 +219,9 @@ fun RectangleComponent() {
             IconComposable(
                 iconResourceId = R.drawable.icon_player2_f,
                 height = 70.dp,
-                padding = 4.dp
+                padding = 4.dp,
+                rotation = if (!isBlackTurn) rotation else 0f
             )
-
         }
     }
 }
@@ -253,13 +274,13 @@ private fun GamePlayScreenMyTurnPreview() {
 
 val mockUser1 = User(
     id = Id(1),
-    username = "user1",
+    username = "Ackermann",
     email = Email("mock1@example.com"),
 )
 
 val mockUser2 = User(
     id = Id(2),
-    username = "user2",
+    username = "BakerBoy",
     email = Email("mock2@example.com"),
 )
 

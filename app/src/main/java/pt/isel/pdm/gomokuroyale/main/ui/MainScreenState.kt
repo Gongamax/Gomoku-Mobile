@@ -1,4 +1,4 @@
-package pt.isel.pdm.gomokuroyale.main.domain
+package pt.isel.pdm.gomokuroyale.main.ui
 
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 import pt.isel.pdm.gomokuroyale.game.play.domain.variants.Variant
@@ -9,7 +9,8 @@ sealed interface MainScreenState {
     data object FetchingRecipes : MainScreenState
     data class FetchedRecipes(val recipes: Result<List<Recipe>>) : MainScreenState
     data object FetchingPlayerInfo : MainScreenState
-    data class FetchedPlayerInfo(val userInfo: Result<UserInfo?>, val isLoggedIn : Boolean) : MainScreenState
+    data class FetchedPlayerInfo(val userInfo: Result<UserInfo?>, val isLoggedIn : Boolean) :
+        MainScreenState
     data object FetchingVariants : MainScreenState
     data class FetchedVariants(val variants: Result<List<Variant>>?) : MainScreenState
     data class  FailedToFetch(val error: Throwable) : MainScreenState

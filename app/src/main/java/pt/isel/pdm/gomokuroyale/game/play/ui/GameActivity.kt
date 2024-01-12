@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
@@ -16,7 +15,6 @@ import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import pt.isel.pdm.gomokuroyale.DependenciesContainer
 import pt.isel.pdm.gomokuroyale.R
-import pt.isel.pdm.gomokuroyale.TAG
 import pt.isel.pdm.gomokuroyale.authentication.domain.UserInfo
 import pt.isel.pdm.gomokuroyale.game.lobby.ui.LobbyActivity
 import pt.isel.pdm.gomokuroyale.game.matchmake.domain.StartGameInfo
@@ -67,33 +65,29 @@ class GameActivity : ComponentActivity() {
                 if (it !is GameScreenState.MyTurn && it !is GameScreenState.GameOver
                     && it !is GameScreenState.Error
                 ) {
-                    viewModel.startMatch()
+                    viewModel.monitorGame()
                 }
             }
         }
         setContent {
             val currentState = viewModel.screenStateFlow.collectAsState().value
-            Log.v(TAG, "currentState: $currentState")
             GameScreen(
                 currentState,
-                onPlayRequested = { at -> viewModel.makeMove(at) },
-                onForfeitRequested = { viewModel.forfeit() },
+                onPlayRequested = viewModel::makeMove,
+                onForfeitRequested = viewModel::forfeit,
                 onHelpRequested = {}
             )
-
             currentState.let { state ->
                 if (state is GameScreenState.BadMove)
                     ErrorAlert(
                         title = stringResource(id = R.string.match_bad_move),
                         message = state.error.message ?: "Unknown error",
-                        buttonText = "Ok",
                         onDismiss = { viewModel.keepOnPlaying() }
                     )
                 if (state is GameScreenState.Error)
                     ErrorAlert(
                         title = "Error",
                         message = state.error.message ?: "Unknown error",
-                        buttonText = "Ok",
                         onDismiss = { viewModel.resetToLoading() }
                     )
                 if (state is GameScreenState.GameOver)
